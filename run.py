@@ -2,7 +2,7 @@ from sanic import Sanic
 from sanic.response import text
 from mcweb.mc.communication import ServerCommunication
 
-app = Sanic("TestServer")
+app = Sanic("MCWeb-Server")
 server = ServerCommunication("java -Xmx2G -jar server.jar --nogui", "./tests/run")
 
 
