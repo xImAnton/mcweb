@@ -14,7 +14,6 @@ class Communicator(threading.Thread):
                 sys.stdout.write(stdline.decode())
 
     def send_cmd(self, cmd):
-        # self.process.stdin.write(cmd.encode("utf-8"))
         self.process.stdin.write(cmd.encode("utf-8"))
         self.process.wait(timeout=2)
 
