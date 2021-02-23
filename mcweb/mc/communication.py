@@ -8,7 +8,6 @@ class ServerCommunication(threading.Thread):
     """
     def __init__(self, command, cwd=".", on_output=lambda line: print(line), on_close=lambda: print("server communication ended")):
         """
-
         :param command: the command to start the server with
         :param cwd: the working directory for the server
         :param on_output: called with the line as only argument on server console output
