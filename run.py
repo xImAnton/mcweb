@@ -8,8 +8,10 @@ server = ServerCommunication("java -Xmx2G -jar server.jar --nogui", "./tests/run
 
 @app.route("/command/<cmd>")
 async def process_command(req, cmd):
-    server.write_stdin(cmd)
-    return text("executed command")
+    if server.running:
+        server.write_stdin(cmd)
+        return text("executed command")
+    return text("server not running", status=405)
 
 
 if __name__ == "__main__":
