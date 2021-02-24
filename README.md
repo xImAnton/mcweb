@@ -7,6 +7,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 ## Todo
 
 * encapsulate mc server code to server.py
+* special endpoint for each server with id in path (eg. /server/1/console)
 * design webinterface
 * transmit json objects and not plain text with ws
 * server.properties api
