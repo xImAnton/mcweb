@@ -3,6 +3,7 @@ from mcweb.mc.communication import ServerCommunication
 from .views.remoteconsole import rconsole
 import asyncio
 from websockets.exceptions import ConnectionClosedOK
+import socket
 
 
 class SanicServer:
@@ -35,6 +36,7 @@ class SanicServer:
                 self.app.ws_connections.remove(ws)
 
     def server_close(self):
+        print("server stopped")
         asyncio.run(self.broadcast_console("--- SERVER STOPPED ---\n"))
 
     def register_routes(self):
@@ -45,4 +47,4 @@ class SanicServer:
         await self.start_server()
 
     def start(self):
-        self.app.run(host="127.0.0.1", port=1337)
+        self.app.run(host=socket.gethostname(), port=1337)
