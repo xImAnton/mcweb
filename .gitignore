@@ -2,6 +2,7 @@
 tests/run
 # Ignore own config with credentials
 config.json
+models.json
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,python

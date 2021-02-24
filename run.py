@@ -1,6 +1,8 @@
-from mcweb.sanicserver import SanicServer
+from mcweb.sanicserver import MCWeb
+from mcweb.config import Config
 
 
 if __name__ == "__main__":
-    app = SanicServer()
+    Config.load()
+    app = MCWeb()
     app.start()

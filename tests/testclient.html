@@ -9,13 +9,18 @@
     <textarea id="console-out" style="white-space: pre-line; height: 300px; width: 50%; display: block;" readonly></textarea>
     <input type="text" placeholder="> " id="command-input"><button onclick="sendCommand();">Send</button>
     <script>
+        const host = "localhost:1337";
         function processMessage(msg) {
-            let e = document.getElementById("console-out");
-            e.value += msg.data;
-            e.scrollTop = e.scrollHeight;
+            let msgJson = JSON.parse(msg.data);
+            if (msgJson["packetType"] === "ServerConsoleMessagePacket") {
+                let e = document.getElementById("console-out");
+                e.value += msgJson.data.message;
+                e.scrollTop = e.scrollHeight;
+            }
+            console.log(msgJson);
         }
 
-        var socket = new WebSocket("ws://" + window.location.host + "/console/socket");
+        var socket = new WebSocket("ws://" + host + "/server/1/console");
         socket.onmessage = processMessage;
 
         function sendCommand() {
@@ -23,7 +28,7 @@
             let msg = i.value;
             i.value = "";
             document.getElementById("console-out").value += "> " + msg + "\n";
-            socket.send(msg);
+            fetch("http://" + host + "/server/1/command", {method: "POST", headers: {'Content-Type': 'application/json'}, body: '{"command": "stop"}', mode: 'no-cors'}).then((s) => console.log(s));
         }
 
         document.getElementById('command-input').addEventListener("keyup", function(e) {

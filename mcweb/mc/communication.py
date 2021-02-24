@@ -28,7 +28,6 @@ class ServerCommunication():
         self.running = True
         t = threading.Thread(target=self.run)
         t.start()
-        print("server started")
 
     def run(self) -> None:
         """

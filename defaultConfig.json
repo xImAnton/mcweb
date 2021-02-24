@@ -1,8 +1,4 @@
 {
-  "hint": "rename to 'config.json'",
-  "mysqlIp": "localhost",
-  "mysqlPort": "3306",
-  "mysqlUser": "root",
-  "mysqlPass": "",
-  "debugMode": true
+  "dbPath": "./database.db",
+  "resetDB": false
 }
