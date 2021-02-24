@@ -6,11 +6,13 @@
 </head>
 <body>
     <h1>Console:</h1>
-    <div id="console-out" style="white-space: pre-line"></div>
+    <textarea id="console-out" style="white-space: pre-line; height: 300px; width: 50%; display: block;" readonly></textarea>
     <input type="text" placeholder="> " id="command-input"><button onclick="sendCommand();">Send</button>
     <script>
         function processMessage(msg) {
-            document.getElementById("console-out").innerText += msg.data;
+            let e = document.getElementById("console-out");
+            e.value += msg.data;
+            e.scrollTop = e.scrollHeight;
         }
 
         var socket = new WebSocket("ws://" + window.location.host + "/console/socket");
@@ -20,9 +22,15 @@
             let i = document.getElementById('command-input');
             let msg = i.value;
             i.value = "";
-            document.getElementById("console-out").innerText += "> " + msg + "\n";
+            document.getElementById("console-out").value += "> " + msg + "\n";
             socket.send(msg);
         }
+
+        document.getElementById('command-input').addEventListener("keyup", function(e) {
+            if (e.key === "Enter") {
+                sendCommand();
+            }
+        });
     </script>
 </body>
 </html>
