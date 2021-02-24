@@ -2,7 +2,7 @@ import subprocess
 import threading
 
 
-class ServerCommunication(threading.Thread):
+class ServerCommunication():
     """
     A class for abstracting away sending commands to and receiving output from the server
     """
@@ -13,7 +13,6 @@ class ServerCommunication(threading.Thread):
         :param on_output: called with the line as only argument on server console output
         :param on_close: called when the server closed
         """
-        super().__init__(daemon=True)
         self.command = command
         self.cwd = cwd
         self.process = None
@@ -27,7 +26,8 @@ class ServerCommunication(threading.Thread):
         """
         self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, cwd=self.cwd)
         self.running = True
-        self.start()
+        t = threading.Thread(target=self.run)
+        t.start()
         print("server started")
 
     def run(self) -> None:

@@ -13,14 +13,14 @@
             document.getElementById("console-out").innerText += msg.data;
         }
 
-        var socket = new WebSocket("ws://localhost:1337/console");
+        var socket = new WebSocket("ws://localhost:1337/console/socket");
         socket.onmessage = processMessage;
 
         function sendCommand() {
             let i = document.getElementById('command-input');
             let msg = i.value;
             i.value = "";
-            document.getElementById("console-out").innerText += msg + "\n";
+            document.getElementById("console-out").innerText += "> " + msg + "\n";
             socket.send(msg);
         }
     </script>

@@ -11,7 +11,8 @@ class SanicServer:
         self.set_configs()
         self.register_routes()
         self.app.ws_connections = []
-        self.app.server = ServerCommunication("java -Xmx2G -jar server.jar --nogui", "./tests/run", on_output=self.on_console_out)
+        self.app.server = ServerCommunication("java -Xmx2G -jar server.jar --nogui", "./tests/run", on_output=self.on_console_out, on_close=self.server_close)
+        self.app.start_server = self.start_server
 
     def set_configs(self):
         pass
@@ -19,10 +20,12 @@ class SanicServer:
         # self.app.config.update(dict(MYSQL=dict(host="", port=3306, user="", password="", db="minecraft")))
 
     def on_console_out(self, msg):
-        #self.app.add_task(self.broadcast_console(msg))
         asyncio.run(self.broadcast_console(msg))
-        # self.app.loop.call_soon_threadsafe(self.broadcast_console(msg))
-        # asyncio.run_coroutine_threadsafe(self.broadcast_console(msg), loop=self.app.loop)
+
+    async def start_server(self):
+        if not self.app.server.running:
+            await self.broadcast_console("--- SERVER START ---\n")
+            self.app.server.begin()
 
     async def broadcast_console(self, msg):
         for ws in self.app.ws_connections:
@@ -31,12 +34,15 @@ class SanicServer:
             except ConnectionClosedOK:
                 self.app.ws_connections.remove(ws)
 
+    def server_close(self):
+        asyncio.run(self.broadcast_console("--- SERVER STOPPED ---\n"))
+
     def register_routes(self):
         self.app.blueprint(rconsole)
         self.app.register_listener(self.post_server_start, "after_server_start")
 
     async def post_server_start(self, app, loop):
-        self.app.server.begin()
+        await self.start_server()
 
     def start(self):
         self.app.run(host="127.0.0.1", port=1337)
