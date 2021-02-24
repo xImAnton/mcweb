@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Remote Console Test Client</title>
+</head>
+<body>
+    <h1>Console:</h1>
+    <div id="console-out" style="white-space: pre-line"></div>
+    <input type="text" placeholder="> " id="command-input"><button onclick="sendCommand();">Send</button>
+    <script>
+        function processMessage(msg) {
+            document.getElementById("console-out").innerText += msg.data;
+        }
+
+        var socket = new WebSocket("ws://localhost:1337/console");
+        socket.onmessage = processMessage;
+
+        function sendCommand() {
+            let i = document.getElementById('command-input');
+            let msg = i.value;
+            i.value = "";
+            document.getElementById("console-out").innerText += msg + "\n";
+            socket.send(msg);
+        }
+    </script>
+</body>
+</html>

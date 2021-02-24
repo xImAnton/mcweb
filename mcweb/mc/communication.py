@@ -28,6 +28,7 @@ class ServerCommunication(threading.Thread):
         self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, cwd=self.cwd)
         self.running = True
         self.start()
+        print("server started")
 
     def run(self) -> None:
         """

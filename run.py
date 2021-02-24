@@ -1,19 +1,6 @@
-from sanic import Sanic
-from sanic.response import text
-from mcweb.mc.communication import ServerCommunication
-
-app = Sanic("MCWeb-Server")
-server = ServerCommunication("java -Xmx2G -jar server.jar --nogui", "./tests/run")
-
-
-@app.route("/command/<cmd>")
-async def process_command(req, cmd):
-    if server.running:
-        server.write_stdin(cmd)
-        return text("executed command")
-    return text("server not running", status=405)
+from mcweb.sanicserver import SanicServer
 
 
 if __name__ == "__main__":
-    server.begin()
-    app.run(host="127.0.0.1", port=1337)
+    app = SanicServer()
+    app.start()

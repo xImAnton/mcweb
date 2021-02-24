@@ -1,5 +1,7 @@
 # Ignore run directory
 tests/run
+# Ignore own config with credentials
+config.json
 
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,python
