@@ -1,6 +1,6 @@
 from sanic.blueprints import Blueprint
 from websockets.exceptions import ConnectionClosed
-from .deco import server_endpoint, requires_server_online, json_res, requires_post_params
+from .deco import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login
 from json import dumps as json_dumps
 
 
@@ -8,13 +8,14 @@ server_blueprint = Blueprint("server", url_prefix="server")
 
 
 @server_blueprint.route("/<i>")
+@requires_login()
 @server_endpoint()
 async def get_server(req, i):
-    print(req.ctx.user)
     return json_res(req.ctx.server.json())
 
 
 @server_blueprint.route("/")
+@requires_login()
 async def get_all_servers(req):
     l = []
     for server in req.app.server_manager.servers:
@@ -23,6 +24,7 @@ async def get_all_servers(req):
 
 
 @server_blueprint.route("/<i>/start")
+@requires_login()
 @server_endpoint()
 @requires_server_online(False)
 async def start_server(req, i):
@@ -31,6 +33,7 @@ async def start_server(req, i):
 
 
 @server_blueprint.websocket("/<i>/console")
+@requires_login()
 @server_endpoint()
 async def console_websocket(req, ws, i):
     await req.ctx.server.connections.connected(ws)
@@ -53,6 +56,7 @@ async def console_websocket(req, ws, i):
 
 
 @server_blueprint.route("/<i>/command", methods=frozenset({"POST"}))
+@requires_login()
 @server_endpoint()
 @requires_server_online()
 @requires_post_params("command")
@@ -62,6 +66,7 @@ async def execute_console_command(req, i):
 
 
 @server_blueprint.route("/<i>/stop")
+@requires_login()
 @server_endpoint()
 @requires_server_online()
 async def stop_server(req, i):

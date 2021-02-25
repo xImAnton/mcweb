@@ -6,7 +6,7 @@ class ServerManager:
         self.servers = []
 
     async def init(self):
-        servers = await self.mc.db_connection.fetch_all("SELECT * FROM servers")
+        servers = await self.mc.db_connection.fetch_all("SELECT * FROM servers;")
         for server in servers:
             self.servers.append(MinecraftServer(self.mc, server))
 

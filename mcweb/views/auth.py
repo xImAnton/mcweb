@@ -1,5 +1,5 @@
 from sanic.blueprints import Blueprint
-from .deco import json_res, requires_post_params
+from .deco import json_res, requires_post_params, requires_login
 from ..login import User
 from datetime import datetime
 
@@ -19,4 +19,10 @@ async def login_post(req):
             resp.cookies["MCWeb-Session"] = sess_id
             resp.cookies["MCWeb-Session"]["expires"] = datetime.fromtimestamp(expires)
             return resp
-    return json_res({"error": "Wrong Credentials", "status": 423, "description": "either username or password are wrong"}, status=401)
+    return json_res({"error": "Wrong Credentials", "status": 401, "description": "either username or password are wrong"}, status=401)
+
+
+@account_blueprint.get("/logout")
+@requires_login()
+async def logout(req):
+    await req.ctx.user.logout()

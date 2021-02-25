@@ -1,6 +1,6 @@
 from functools import wraps
 from sanic.response import json
-from json import dumps as json_dumps
+from json import dumps as json_dumps, loads as json_loads
 
 
 def json_res(*args, **kwargs):
@@ -49,6 +49,34 @@ def requires_post_params(*json_keys):
             for prop in json_keys:
                 if prop not in req.json.keys():
                     return json_res({"error": "KeyError", "status": 400, "description": "you need to specify " + prop}, status=404)
+            response = await f(req, *args, **kwargs)
+            return response
+        return decorated_function
+    return decorator
+
+
+def requires_login():
+    def decorator(f):
+        @wraps(f)
+        async def decorated_function(req, *args, **kwargs):
+            if not req.ctx.user:
+                return json_res({"error": "Not Logged In", "status": 401, "description": "please login using POST to /account/login"},
+                                status=401)
+            response = await f(req, *args, **kwargs)
+            return response
+        return decorated_function
+    return decorator
+
+
+def requires_permission(*perms):
+    def decorator(f):
+        @wraps(f)
+        async def decorated_function(req, *args, **kwargs):
+            user_perms = json_loads(req.ctx.user.perms)
+            for perm in perms:
+                if perm not in user_perms:
+                    return json_res({"error": "No Permission", "status": 403, "description": "you don't have the permission to access this endpoint"},
+                                status=403)
             response = await f(req, *args, **kwargs)
             return response
         return decorated_function

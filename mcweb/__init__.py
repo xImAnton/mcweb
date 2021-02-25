@@ -1,0 +1,1 @@
+from .sanicserver import MCWeb

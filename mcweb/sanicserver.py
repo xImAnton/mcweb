@@ -4,7 +4,8 @@ from .config import Config
 from .mc.servermanager import ServerManager
 from .views.server import server_blueprint
 from .views.auth import account_blueprint
-from .login import User
+from .login import User, Session
+import time
 
 
 class MCWeb(Sanic):
@@ -26,8 +27,13 @@ class MCWeb(Sanic):
     async def set_session_middleware(self, req):
         sid = req.cookies.get("MCWeb-Session")
         if sid:
-            user = User(self.db_connection)
-            req.ctx.user = await user.fetch_by_sid(sid)
+            session = Session(self.db_connection)
+            await session.fetch_by_sid(sid)
+            if session.expiration > time.time():
+                user = User(self.db_connection)
+                req.ctx.user = await user.fetch_by_sid(sid)
+            else:
+                await session.delete()
         else:
             req.ctx.user = None
 

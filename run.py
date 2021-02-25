@@ -1,4 +1,4 @@
-from mcweb.sanicserver import MCWeb
+from mcweb import MCWeb
 from mcweb.config import Config
 
 
