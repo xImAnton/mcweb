@@ -18,7 +18,7 @@ class DatabaseConnector(Database):
 
     async def update(self, table, condition, values):
         kvalues = []
-        for kv in values.items():
-            kvalues.append(" = ".join(kv))
+        for k, v in values.items():
+            kvalues.append(" = ".join((k, str(v))))
         set_string = ", ".join(kvalues)
         await self.execute(f"UPDATE {table} SET {set_string} WHERE {condition};")

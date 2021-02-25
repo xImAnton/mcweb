@@ -1,6 +1,8 @@
 from ..mc.communication import ServerCommunication
 from ..io.wsmanager import WebsocketConnectionManager
 from json import dumps as json_dumps
+import asyncio
+import re
 
 
 class MinecraftServer:
@@ -23,25 +25,33 @@ class MinecraftServer:
         self.jar = record[4]
         self.status = record[5]
 
+    async def set_online_status(self, status):
+        await self.mc.db_connection.update("servers", "id = " + str(self.id), {"online_status": status})
+        await self.connections.broadcast(json_dumps({"packetType": "StateChangePacket", "update": {"server": {"onlineStatus": status}}}))
+
     @property
     def running(self):
         return self.communication.running
 
     async def start(self):
-        # update online status
+        await self.set_online_status(1)
         self.communication.begin()
 
     async def stop(self, force=False):
         if not force:
             await self.send_command("stop")
         else:
+            await self.set_online_status(3)
             self.communication.process.kill()
 
     def on_stop(self):
-        # update online status
-        pass
+        asyncio.run(self.set_online_status(0))
 
     def on_output(self, line):
+        timings_reset = re.compile(r"^\[[0-9]*:[0-9]*:[0-9]* .*\]: Timings Reset$")
+        if timings_reset.search(line):
+            print("online")
+            asyncio.run_coroutine_threadsafe(self.set_online_status(2), self.mc.loop)
         self.connections.broadcast_sync(json_dumps({
             "packetType": "ServerConsoleMessagePacket",
             "data": {
@@ -51,6 +61,8 @@ class MinecraftServer:
         }))
 
     async def send_command(self, cmd):
+        if cmd.startswith("stop"):
+            await self.set_online_status(3)
         self.communication.write_stdin(cmd)
 
     def json(self):

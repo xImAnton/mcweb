@@ -1,4 +1,5 @@
 {
   "dbPath": "./database.db",
-  "resetDB": false
+  "resetDB": false,
+  "sessionExpiration": 7200
 }

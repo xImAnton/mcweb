@@ -5,7 +5,8 @@ class Config:
 
     ATTR_KEYS = {
         "DB_PATH": ("dbPath", "data.db"),
-        "RESET_DB": ("resetDB", False)
+        "RESET_DB": ("resetDB", False),
+        "SESSION_EXPIRATION": ("sessionExpiration", 7200)
     }
 
     DB_PATH = "data.db"
