@@ -33,9 +33,17 @@ async def start_server(req, i):
 
 
 @server_blueprint.websocket("/<i>/console")
-@requires_login()
 @server_endpoint()
 async def console_websocket(req, ws, i):
+    if not req.ctx.user:
+        await ws.send(json_dumps({
+            "packetType": "ConsoleInfoPacket",
+            "data": {
+                "message": "please login using POST to /account/login before using this"
+            }
+        }))
+        await ws.close()
+        return
     await req.ctx.server.connections.connected(ws)
     await ws.send(json_dumps({
             "packetType": "ConsoleConnectedPacket",

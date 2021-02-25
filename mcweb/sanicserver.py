@@ -32,10 +32,14 @@ class MCWeb(Sanic):
             if session.expiration > time.time():
                 user = User(self.db_connection)
                 req.ctx.user = await user.fetch_by_sid(sid)
+                req.ctx.session = session
             else:
                 await session.delete()
+                req.ctx.user = None
+                req.ctx.session = None
         else:
             req.ctx.user = None
+            req.ctx.session = None
 
     def start(self):
         self.run(host="localhost", port=1337)
