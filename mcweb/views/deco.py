@@ -55,12 +55,16 @@ def requires_post_params(*json_keys):
     return decorator
 
 
-def requires_login():
+def requires_login(logged_in=True):
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
-            if not req.ctx.user:
+            if logged_in and not req.ctx.user:
                 return json_res({"error": "Not Logged In", "status": 401, "description": "please login using POST to /account/login"},
+                                status=401)
+            if not logged_in and req.ctx.user:
+                return json_res({"error": "Logged In", "status": 401,
+                                 "description": "you need to be logged out to use this"},
                                 status=401)
             response = await f(req, *args, **kwargs)
             return response

@@ -35,8 +35,6 @@ class User:
             return None
 
     async def check_password(self, pw):
-        print(hashlib.sha256(pw.encode()).hexdigest())
-        print(self.password)
         return hashlib.sha256(pw.encode()).hexdigest() == self.password
 
     async def login(self):
@@ -77,4 +75,4 @@ class Session:
         return await self.db.fetch_one(f"SELECT * FROM users WHERE id={self.user_id};")
 
     async def delete(self):
-        await self.db.fetch_one(f"DELETE FROM session WHERE id={self.id};")
+        await self.db.execute(f"DELETE FROM sessions WHERE id=\"{self.sid}\";")

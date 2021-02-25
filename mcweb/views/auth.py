@@ -8,6 +8,7 @@ account_blueprint = Blueprint("account", url_prefix="account")
 
 
 @account_blueprint.post("/login")
+@requires_login(False)
 @requires_post_params("username", "password")
 async def login_post(req):
     user = User(req.app.db_connection)
@@ -26,3 +27,4 @@ async def login_post(req):
 @requires_login()
 async def logout(req):
     await req.ctx.user.logout()
+    return json_res({"success": "logged out successfully", "data": {}})

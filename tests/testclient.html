@@ -28,7 +28,7 @@
             let msg = i.value;
             i.value = "";
             document.getElementById("console-out").value += "> " + msg + "\n";
-            fetch("http://" + host + "/server/1/command", {method: "POST", headers: {'Content-Type': 'application/json'}, body: '{"command": "stop"}', mode: 'no-cors'}).then((s) => console.log(s));
+            fetch("http://" + host + "/server/1/command", {method: "POST", headers: {'Content-Type': 'application/json'}, body: '{"command": "' + msg + '"}', mode: 'no-cors'}).then((s) => console.log(s));
         }
 
         document.getElementById('command-input').addEventListener("keyup", function(e) {

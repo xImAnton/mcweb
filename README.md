@@ -6,11 +6,13 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 ## Todo
 
+* restart endpoint
 * design webinterface
 * server.properties api
 * api to create servers
 * backups
 * world management
+* dynamic server management
 * implement curseforge api for modpack downloading
 * (spigotmc + dev.bukkit for plugin installation)
 * (bungeecord/ waterfall mode)

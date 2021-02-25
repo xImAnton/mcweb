@@ -20,6 +20,7 @@ class MCWeb(Sanic):
         self.blueprint(account_blueprint)
         self.register_listener(self.after_server_start, "after_server_start")
         self.register_middleware(self.set_session_middleware, "request")
+        self.static("", "./tests/testclient.html")
 
     async def after_server_start(self, app, loop):
         await self.server_manager.init()
