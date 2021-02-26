@@ -1,13 +1,24 @@
 from functools import wraps
-from sanic.response import json
+from sanic.response import json, redirect
 from json import dumps as json_dumps, loads as json_loads
 
 
 def json_res(*args, **kwargs):
+    """
+    straight wrapper for sanic.response.json
+    adds indent to the output json
+    :return: the created sanic.response.HTTPResponse
+    """
     return json(*args, dumps=lambda s: json_dumps(s, indent=2), **kwargs)
 
 
 def server_endpoint():
+    """
+    marks an api endpoint as a server endpoint
+    needs <i> parameter in path
+    fetches the server for the id and saves it to request.ctx.server for access in the endpoint
+    raises json error when server couldn't be found
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
@@ -30,6 +41,11 @@ def server_endpoint():
 
 
 def requires_server_online(online=True):
+    """
+    decorator for a @server_endpoint()
+    raises json error when the server from the @server_endpoint() hasn't the running state that is specified
+    :param online: whether the server has to be online or offline for the request to pass to the handler
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
@@ -43,6 +59,10 @@ def requires_server_online(online=True):
 
 
 def requires_post_params(*json_keys):
+    """
+    rejects post requests if they have not the specified json keys in it
+    :param json_keys: the json keys that the request has to have for the handler to call
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
@@ -56,12 +76,15 @@ def requires_post_params(*json_keys):
 
 
 def requires_login(logged_in=True):
+    """
+    requires the user to be logged in to access this endpoint
+    :param logged_in: whether the user has to be logged in or has to be not logged in
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
             if logged_in and not req.ctx.user:
-                return json_res({"error": "Not Logged In", "status": 401, "description": "please login using POST to /account/login"},
-                                status=401)
+                return redirect("/account/login")
             if not logged_in and req.ctx.user:
                 return json_res({"error": "Logged In", "status": 401,
                                  "description": "you need to be logged out to use this"},
@@ -73,6 +96,11 @@ def requires_login(logged_in=True):
 
 
 def requires_permission(*perms):
+    """
+    requires a user to have the specified permissions to access this endpoint
+    :param perms: the permissions that the user has to have
+    :return:
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):

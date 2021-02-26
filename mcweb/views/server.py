@@ -11,12 +11,18 @@ server_blueprint = Blueprint("server", url_prefix="server")
 @requires_login()
 @server_endpoint()
 async def get_server(req, i):
+    """
+    endpoint for getting server information for a single server
+    """
     return json_res(req.ctx.server.json())
 
 
 @server_blueprint.route("/")
 @requires_login()
 async def get_all_servers(req):
+    """
+    endpoints for getting a list of all servers
+    """
     l = []
     for server in req.app.server_manager.servers:
         l.append(server.json())
@@ -28,6 +34,9 @@ async def get_all_servers(req):
 @server_endpoint()
 @requires_server_online(False)
 async def start_server(req, i):
+    """
+    endpoints for starting the specified server
+    """
     await req.ctx.server.start()
     return json_res({"success": "server started", "update": {"server": {"online_status": 1}}})
 
@@ -35,6 +44,9 @@ async def start_server(req, i):
 @server_blueprint.websocket("/<i>/console")
 @server_endpoint()
 async def console_websocket(req, ws, i):
+    """
+    websocket endpoints for console output and server state change
+    """
     if not req.ctx.user:
         await ws.send(json_dumps({
             "packetType": "ConsoleInfoPacket",
@@ -69,6 +81,9 @@ async def console_websocket(req, ws, i):
 @requires_server_online()
 @requires_post_params("command")
 async def execute_console_command(req, i):
+    """
+    endpoints for sending console commands to the server
+    """
     await req.ctx.server.send_command(req.json["command"])
     return json_res({"success": "command sent", "update": {}})
 
@@ -78,8 +93,24 @@ async def execute_console_command(req, i):
 @server_endpoint()
 @requires_server_online()
 async def stop_server(req, i):
+    """
+    endpoint for stopping the specified server
+    """
     force = False
     if "force" in req.args.keys():
         force = bool(req.args["force"])
     await req.ctx.server.stop(force)
     return json_res({"success": "server stopped", "update": {"server": {"online_status": 3}}})
+
+@server_blueprint.route("<i>/restart")
+@requires_login()
+@server_endpoint()
+@requires_server_online()
+async def restart(req, i):
+    """
+    endpoints for restarting the specified server
+    """
+    await req.ctx.server.stop()
+    while req.ctx.server.running:
+        pass
+    await req.ctx.server.start()

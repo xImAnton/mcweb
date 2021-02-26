@@ -2,6 +2,9 @@ import json
 
 
 class Config:
+    """
+    static class for managing configurations
+    """
 
     ATTR_KEYS = {
         "DB_PATH": ("dbPath", "data.db"),
@@ -13,7 +16,10 @@ class Config:
     RESET_DB = False
 
     @staticmethod
-    def load():
+    def load() -> None:
+        """
+        loads the config file and stores it's values as class attributes
+        """
         with open("config.json") as f:
             data = json.loads(f.read())
 

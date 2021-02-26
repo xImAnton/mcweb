@@ -20,7 +20,7 @@ class ServerCommunication():
         self.on_close = on_close
         self.running = False
 
-    def begin(self):
+    def begin(self) -> None:
         """
         starts the server
         """
@@ -41,7 +41,7 @@ class ServerCommunication():
         self.running = False
         self.on_close()
 
-    def write_stdin(self, cmd):
+    def write_stdin(self, cmd) -> None:
         """
         writes a command to server stdin and flushes it
         :param cmd: the command to send

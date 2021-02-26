@@ -11,6 +11,9 @@ account_blueprint = Blueprint("account", url_prefix="account")
 @requires_login(False)
 @requires_post_params("username", "password")
 async def login_post(req):
+    """
+    post endpoint for logging in a user
+    """
     user = User(req.app.db_connection)
     user = await user.fetch_by_name(req.json["username"])
     if user:
@@ -23,8 +26,22 @@ async def login_post(req):
     return json_res({"error": "Wrong Credentials", "status": 401, "description": "either username or password are wrong"}, status=401)
 
 
+@account_blueprint.get("/login")
+async def login_get(req):
+    """
+    endpoint to redirect on wrong login
+    """
+    if not req.ctx.session:
+        return json_res({"error": "Not Logged In", "status": 401, "description": "please login using POST to /account/login"}, status=401)
+    else:
+        return json_res({"info": "you are logged in", "status": 200})
+
+
 @account_blueprint.get("/logout")
 @requires_login()
 async def logout(req):
-    await req.ctx.user.logout()
+    """
+    get endpoint for logging out a user
+    """
+    await req.ctx.session.logout()
     return json_res({"success": "logged out successfully", "data": {}})
