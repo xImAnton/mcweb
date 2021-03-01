@@ -1,4 +1,4 @@
-# MCWeb - a minecraft web interface
+# MCWeb - a minecraft server web interface
 
 MCWeb is a web-remote minecraft server wrapper for controlling your minecraft server  
 
@@ -8,6 +8,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 * restart endpoint
 * design webinterface
+* write react frontend
 * server.properties api
 * api to create servers
 * backups
