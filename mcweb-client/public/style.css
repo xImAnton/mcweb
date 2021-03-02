@@ -1,0 +1,231 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    transition: background-color 500ms;
+    --side-width: 256px;
+}
+
+#app.darkmode {
+    --main-bg-color: #0d1625;
+    --sec-bg-color: #4e5358;
+    --bg: #1b2330;
+    --font: white;
+}
+
+#app.brightmode {
+    --main-bg-color: #378af0;
+    --sec-bg-color: #9da7b3;
+    --bg: white;
+    --font: black;
+}
+
+#app {
+    position: relative;
+}
+
+#header {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+    background-color: var(--main-bg-color);
+    transition: background-color 500ms;
+    padding: 8px 16px;
+    color: white;
+    font-size: 30px;
+    height: 36px;
+}
+
+.textblock-centered {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+#sidebar-wrapper {
+    width: var(--side-width);
+    display: block;
+    background-color: var(--sec-bg-color);
+    transition: background-color 500ms;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    top: 52px;
+}
+
+#sidebar-content {
+    height: 100%;
+}
+
+#header-wrapper {
+    width: 100%;
+}
+
+.text-right {
+    float: right;
+}
+
+#image-heading {
+    height: 36px;
+    width: auto;
+}
+
+#content-wrapper {
+    position: fixed;
+    left: var(--side-width);
+    /*margin-top: 52px;*/
+    right: 0;
+    color: var(--font);
+    background-color: var(--bg);
+    bottom: 50px;
+    top: 52px;
+    overflow-y: scroll
+}
+
+#page-content {
+    padding: 12px 16px;
+    left: 0;
+    right: 0;
+    background-color: var(--bg);
+}
+
+#footer-wrapper {
+    color: white;
+    position: fixed;
+    background-color: var(--main-bg-color);
+    height: 50px;
+    bottom: 0;
+    width: 100%;
+    transition: background-color 500ms;
+}
+
+#footer {
+    padding: 10px;
+}
+
+#server-information {
+    background-color: var(--main-bg-color);
+    color: white;
+    display: block;
+    padding: 16px;
+    white-space: pre-line;
+    transition: background-color 500ms;
+}
+
+.copy-field {
+    display: inline-block;
+    background-color: #2a2f3b;
+    padding: 4px;
+    border-radius: 5px;
+    font-family: 'Inconsolata', monospace;
+}
+
+.copy-field button {
+    background-color: #171a1f;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid black;
+    outline: none;
+    transition: background-color 50ms;
+}
+
+.copy-field button:hover {
+    transform: translate(0, 1px);
+}
+
+.copy-field button:active {
+    background-color: #252931;
+}
+
+#page-headline {
+    margin-top: 0;
+}
+
+#online-status {
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: 15px;
+    padding: 1px 4px;
+}
+
+#online-status.online {background-color: #16ab25;}#online-status.online::before {content: "Online";}#online-status.starting {background-color: #dec223;}#online-status.starting::before {content: "Starting";}#online-status.stopping {background-color: #de9323;}#online-status.stopping::before {content: "Stopping"}#online-status.offline {background-color: #de2323;}#online-status.offline::before {content: "Offline";}
+
+/* ------------------------------------------- */
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 22px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+    float: left;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(18px);
+    -ms-transform: translateX(18px);
+    transform: translateX(18px);
+}
+
+/* ------------------------------------------- */
+
+#navbar-options {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#navbar-options li {
+    display: block;
+    padding: 12px 16px;
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+#navbar-options li:hover {
+    background-color: var(--main-bg-color);;
+}
