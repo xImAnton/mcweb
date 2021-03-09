@@ -6,6 +6,9 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 ## Todo
 
+* fix issue with wrong online status on first page reload
+* add global ws broadcast for e.g. server creation
+* work on server state changes
 * restart endpoint
 * design webinterface
 * write react frontend
