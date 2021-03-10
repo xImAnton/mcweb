@@ -45,7 +45,7 @@ class ServerManager:
         versions = await self.versions.get_json(True)
         if server not in versions.keys():
             return json_res({"error": "Invalid Server", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
-        if version not in versions[server].keys():
+        if isinstance(versions[server], list) or version not in versions[server].keys():
             return json_res({"error": "Invalid Version", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
 
         # Check ram

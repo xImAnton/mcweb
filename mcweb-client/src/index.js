@@ -46,7 +46,6 @@ class App extends React.Component {
 
     onSocketPacket(data) {
         data = JSON.parse(data.data);
-        console.log(data);
         if (data.packetType === "StateChangePacket") {
             this.setState({servers: this.state.servers.map(x => {
                 if (x.id === this.state.serverId) {
@@ -78,7 +77,6 @@ class App extends React.Component {
         this.setState({consoleLines: []});
         this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + this.state.serverId + "/console?ticket=" + ticket);
         this.serverSocket.onmessage = (e) => this.onSocketPacket(e);
-        console.log(this.serverSocket);
     }
 
     changeServer(id) {
@@ -104,7 +102,7 @@ class App extends React.Component {
         if (this.serverSocket !== null) {
             this.serverSocket.close();
         }
-        logoutUser().then(res => console.log("logged out"));
+        logoutUser();
         sessionStorage.removeItem("MCWeb_Session");
         this.forceUpdate();
     }

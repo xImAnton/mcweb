@@ -96,13 +96,13 @@ class CreateServerView extends React.Component {
 
     render() {
         let servers = Object.keys(this.state.versions).map(v => {
-            return <option value={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>
+            return <option value={v} key={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>
         });
         
         let versions;
         if (this.state.currentVersion) {
             versions = this.state.versions[this.state.currentServer].map(v => {
-                return <option value={v}>{v}</option>
+                return <option value={v} key={v}>{v}</option>
             });
         } else {
             versions = [];
