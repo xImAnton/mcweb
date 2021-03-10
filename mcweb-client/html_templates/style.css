@@ -70,9 +70,12 @@ body.brightmode {
 #content-wrapper {
     position: absolute;
     left: var(--side-width);
-    margin-top: 52px;
     right: 0;
     color: var(--font);
+}
+
+#content-wrapper.full {
+    left: 0;
 }
 
 #page-content {
@@ -242,4 +245,8 @@ input:checked + .slider:before {
 
 .console-line:hover {
     background-color: #1c1f25;
+}
+
+#btn-add-server {
+    font-weight: 900;
 }

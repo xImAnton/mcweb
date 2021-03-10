@@ -1,5 +1,16 @@
 import React from "react";
-import NavbarEntry from "./navbarentry"
+import { useHistory } from "react-router-dom";
+
+
+function NavbarEntry(props) {
+    const history = useHistory();
+
+    function handleClick() {
+        history.push("/" + props.href);
+    }
+
+    return (<li onClick={handleClick} key={props.index}>{props.name}</li>);
+}
 
 
 class Navbar extends React.Component {

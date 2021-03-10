@@ -129,9 +129,10 @@ async def restart(req, i):
 @requires_login()
 @requires_post_params("name")
 async def create(req, server, version):
-    ram = 2 if "ram" not in req.json.keys() else req.json.keys()["ram"]
+    ram = 2 if "ram" not in req.json.keys() else req.json["ram"]
     name = req.json["name"]
     return await req.app.server_manager.create_server(name, server, version, ram)
+
 
 @server_blueprint.get("/versions")
 @requires_login()

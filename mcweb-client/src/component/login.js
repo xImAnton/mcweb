@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import { login } from "../services";
 
 
 class LoginView extends React.Component {
@@ -34,7 +34,7 @@ class LoginView extends React.Component {
             this.setState({ alert: "Please enter your credentials!", alertColor: "yellow"})
             return
         }
-        axios.post("http://localhost:3000/account/login/", JSON.stringify({username: this.state.username, password: this.state.password })).then(res => {
+        login(this.state.username, this.state.password).then(res => {
             this.props.setSessionId(res.data.data.sessionId);
         }).catch(e => this.setState({ alert: "Please check your username and password!", alertColor: "red"}));
     }

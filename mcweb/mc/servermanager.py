@@ -48,6 +48,10 @@ class ServerManager:
         if version not in versions[server].keys():
             return json_res({"error": "Invalid Version", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
 
+        # Check ram
+        if ram > Config.MAX_RAM:
+            return json_res({"error": "Too Much RAM", "description": "maximal ram is " + str(Config.MAX_RAM), "status": 400, "maxRam": Config.MAX_RAM}, status=400)
+
         # check if server with name is existing
         if not await self.is_name_available(name):
             return json_res({"error": "Duplicate Name", "description": "the server name you specified is already existing", "status": 400}, status=400)

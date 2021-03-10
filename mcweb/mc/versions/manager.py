@@ -9,4 +9,4 @@ class VersionManager:
         await self.paper_provider.reload()
 
     async def get_json(self, links=False):
-        return {"paper": self.paper_provider.versions if links else self.paper_provider.versions.keys()}
+        return {"paper": self.paper_provider.versions if links else list(self.paper_provider.versions.keys()), "forge": [1, 2, 3, 4]}

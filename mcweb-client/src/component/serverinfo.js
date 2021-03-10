@@ -1,7 +1,18 @@
 import React from "react";
-import axios from "axios";
 import CopyField from "./copyfield";
+import { startServer, stopServer } from "../services";
+import { useHistory } from "react-router-dom";
 
+
+function AddServerButton(props) {
+    const history = useHistory();
+
+    function clicked(e) {
+        history.push("/createserver");
+    }
+
+    return <button id="btn-add-server" onClick={clicked}>+</button>
+}
 
 class ServerInfo extends React.Component {
 
@@ -22,17 +33,9 @@ class ServerInfo extends React.Component {
         const currentServer = this.getCurrentServer();
         if (currentServer.onlineStatus === 0) {
             this.props.setConsoleLines([]);
-            axios.get("http://localhost:3000/server/" + this.props.serverId + "/start", {
-                headers: {
-                    "Authorization": "Token " + this.props.sessionId()
-                }
-            });
+            startServer(this.props.serverId);
         } else if (currentServer.onlineStatus === 1 | currentServer.onlineStatus === 2) {
-            axios.get("http://localhost:3000/server/" + this.props.serverId + "/stop", {
-                headers: {
-                    "Authorization": "Token " + this.props.sessionId()
-                }
-            });
+            stopServer(this.props.serverId);
         }
     }
 
@@ -74,6 +77,7 @@ class ServerInfo extends React.Component {
                     <CopyField text={ip} />
                     Status: <div id="online-status" className={serverStatus}></div>
                     <button id="control-server" onClick={() => this.toggleCurrentServer()} disabled={!buttonEnabled} >{buttonText}</button>
+                    <AddServerButton />
                 </div>;
     }
 }

@@ -20,7 +20,7 @@ class MinecraftServer:
         self.run_dir = record[3]
         self.jar = record[4]
         self.status = record[5]
-        self.communication = ServerCommunication(f"java -Xmx{self.ram}G -jar {self.jar} --nogui", self.run_dir, on_close=self.on_stop, on_output=self.on_output)
+        self.communication = ServerCommunication(f"java -Xmx{self.ram}G -jar {self.jar}", self.run_dir, on_close=self.on_stop, on_output=self.on_output)
         self.output = []
 
     async def refetch(self) -> None:

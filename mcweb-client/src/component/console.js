@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import axios from "axios";
+import { sendCommand } from "../services"
 
 
 function ConsoleInput(props) {
@@ -7,21 +7,17 @@ function ConsoleInput(props) {
     const [text, setText] = useState("");
     const inputRef = useRef(null);
 
-    async function sendCommand() {
+    async function submitCommand() {
         if (text === "") {
             return
         }
-        axios.post("http://localhost:3000/server/" + props.currentServer + "/command", JSON.stringify({command: text}), {
-            headers: {
-                "Authorization": "Token " + props.getSessionId()
-            }
-        });
+        await sendCommand(props.currentServer, text)
         inputRef.current.value = "";
     }
 
     return <div className="console-line send">
         <input ref={inputRef} type="text" onChange={e => setText(e.target.value)} placeholder="Enter Command" />
-        <button onClick={sendCommand}>Send</button>
+        <button onClick={submitCommand}>Send</button>
     </div>
 }
 

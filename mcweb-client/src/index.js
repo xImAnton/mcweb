@@ -14,7 +14,8 @@ import SettingsView from "./component/settings";
 import WorldsView from "./component/worlds";
 import DSMView from "./component/dsm";
 import UserView from "./component/user";
-import axios from "axios";
+import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser } from "./services";
+import CreateServerView from "./component/createserver";
 
 
 class App extends React.Component {
@@ -75,17 +76,14 @@ class App extends React.Component {
             this.serverSocket.close();
         }
         this.setState({consoleLines: []});
-        this.serverSocket = new WebSocket("ws://localhost:1337/server/" + this.state.serverId + "/console?ticket=" + ticket);
+        this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + this.state.serverId + "/console?ticket=" + ticket);
         this.serverSocket.onmessage = (e) => this.onSocketPacket(e);
+        console.log(this.serverSocket);
     }
 
     changeServer(id) {
         this.setState({serverId: id});
-        axios.get("http://localhost:3000/server/" + id, {
-            headers: {
-                "Authorization": "Token " + this.getSessionId()
-            }
-        }).then(res => {
+        fetchServer(id).then(res => {
             const newservers = [];
             for (let i = 0; i < this.state.servers.length; i++) {
                 if (this.state.servers[i].id !== id) {
@@ -97,22 +95,16 @@ class App extends React.Component {
             this.setState({servers: newservers});
         });
 
-        axios.get("http://localhost:3000/account/ticket/server/console", {
-            headers: {
-                "Authorization": "Token " + this.getSessionId()
-            }
-        }).then(res => {
+        getConsoleTicket().then(res => {
             this.openWs(id, res.data.ticket);
         })
     }
 
     logout() {
-        this.serverSocket.close();
-        axios.get("http://localhost:3000/account/logout", {
-            headers: {
-                "Authorization": "Token " + this.getSessionId()
-            }
-        }).then(res => console.log("logged out"));
+        if (this.serverSocket !== null) {
+            this.serverSocket.close();
+        }
+        logoutUser().then(res => console.log("logged out"));
         sessionStorage.removeItem("MCWeb_Session");
         this.forceUpdate();
     }
@@ -120,19 +112,11 @@ class App extends React.Component {
     refetch() {
         if (this.getSessionId()) {
             // refetch user informations
-            axios.get("http://localhost:3000/account", {
-                headers: {
-                    "Authorization": "Token " + this.getSessionId()
-                }
-            }).then(res => {
+            fetchUser().then(res => {
                 this.setState({username: res.data.username, permissions: res.data.permissions})
             });
             // refetch servers
-            axios.get("http://localhost:3000/server/", {
-                headers: {
-                    "Authorization": "Token " + this.getSessionId()
-                }
-            }).then(res => {
+            fetchAllServers().then(res => {
                 this.setState({servers: res.data});
                 this.changeServer(1);
             })
@@ -157,38 +141,51 @@ class App extends React.Component {
             <BrowserRouter>
                 <div className="content-wrapper">
                     <Header />
-                    <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} serverId={this.state.serverId} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})}/>
-                    <div id="content-wrapper">
                         <Switch>
-                            <Route path="/general">
-                                <GeneralView />
-                            </Route>
-                            <Route path="/player">
-                                <PlayerView />
-                            </Route>
-                            <Route path="/console">
-                                <ConsoleView lines={this.state.consoleLines} currentServer={this.state.serverId} getSessionId={() => this.getSessionId()} />
-                            </Route>
-                            <Route path="/backups">
-                                <BackupsView />
-                            </Route>
-                            <Route path="/settings">
-                                <SettingsView />
-                            </Route>
-                            <Route path="/worlds">
-                                <WorldsView />
-                            </Route>
-                            <Route path="/dsm">
-                                <DSMView />
-                            </Route>
-                            <Route path="/user">
-                                <UserView />
+                            <Route path="/createserver">
+                                <div id="content-wrapper" className="full">
+                                    <CreateServerView addServer={(s) => {
+                                        const servers = this.state.servers.slice();
+                                        servers.push(s);
+                                        this.setState({servers: servers});
+                                    }}/>
+                                </div>
                             </Route>
                             <Route path="/">
-                                <Redirect to="/general" />
+                                <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} serverId={this.state.serverId} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})}/>
+                                <div id="content-wrapper">
+                                    <Switch>
+                                        <Route path="/general">
+                                            <GeneralView />
+                                        </Route>
+                                        <Route path="/player">
+                                            <PlayerView />
+                                        </Route>
+                                        <Route path="/console">
+                                            <ConsoleView lines={this.state.consoleLines} currentServer={this.state.serverId} getSessionId={() => this.getSessionId()} />
+                                        </Route>
+                                        <Route path="/backups">
+                                            <BackupsView />
+                                        </Route>
+                                        <Route path="/settings">
+                                            <SettingsView />
+                                        </Route>
+                                        <Route path="/worlds">
+                                            <WorldsView />
+                                        </Route>
+                                        <Route path="/dsm">
+                                            <DSMView />
+                                        </Route>
+                                        <Route path="/user">
+                                            <UserView />
+                                        </Route>
+                                        <Route path="/">
+                                            <Redirect to="/general" />
+                                        </Route>
+                                    </Switch>
+                                </div>
                             </Route>
                         </Switch>
-                    </div>
                     <Footer toggleDarkMode={() => this.setState({darkmode: !this.state.darkmode})}/>
                 </div>
             </BrowserRouter>
