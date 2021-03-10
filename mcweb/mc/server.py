@@ -21,6 +21,7 @@ class MinecraftServer:
         self.jar = record[4]
         self.status = record[5]
         self.communication = ServerCommunication(f"java -Xmx{self.ram}G -jar {self.jar} --nogui", self.run_dir, on_close=self.on_stop, on_output=self.on_output)
+        self.output = []
 
     async def refetch(self) -> None:
         """
@@ -57,6 +58,7 @@ class MinecraftServer:
         starts the server and updates it status
         check if server is not running before calling
         """
+        self.output = []
         await self.set_online_status(1)
         self.communication.begin()
 
@@ -86,10 +88,10 @@ class MinecraftServer:
         used to check for patterns and broadcasting to the connected websockets
         :param line: the line that is printed
         """
-        timings_reset = re.compile(r"^\[[0-9]*:[0-9]*:[0-9]* .*\]: Timings Reset$")
-        if timings_reset.search(line):
-            print("online")
-            asyncio.run_coroutine_threadsafe(self.set_online_status(2), self.mc.loop)
+        self.output.append(line)
+        timings_reset = re.compile(r"^\[[0-9]+:[0-9]+:[0-9]+ .*\]: Timings Reset$")
+        if timings_reset.match(line.strip()):
+            asyncio.run(self.set_online_status(2))
         self.connections.broadcast_sync(json_dumps({
             "packetType": "ServerConsoleMessagePacket",
             "data": {
@@ -117,4 +119,5 @@ class MinecraftServer:
                 "ram": self.ram,
                 "run_dir": self.run_dir,
                 "jar": self.jar,
-                "onlineStatus": self.status}
+                "onlineStatus": self.status,
+                "ip": self.mc.public_ip}

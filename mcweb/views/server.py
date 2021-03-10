@@ -1,6 +1,6 @@
 from sanic.blueprints import Blueprint
 from websockets.exceptions import ConnectionClosed
-from .deco import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login
+from .deco import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, ws_with_ticket
 from json import dumps as json_dumps
 
 
@@ -42,6 +42,7 @@ async def start_server(req, i):
 
 
 @server_blueprint.websocket("/<i>/console")
+@ws_with_ticket("server/console")
 @server_endpoint()
 async def console_websocket(req, ws, i):
     """
@@ -62,6 +63,13 @@ async def console_websocket(req, ws, i):
             "data": {
             }
         }))
+    await ws.send(json_dumps({
+        "packetType": "BulkConsoleMessagePacket",
+        "data": {
+            "lines": req.ctx.server.output,
+            "reset": True
+        }
+    }))
     try:
         while True:
             await ws.recv()
@@ -102,6 +110,7 @@ async def stop_server(req, i):
     await req.ctx.server.stop(force)
     return json_res({"success": "server stopped", "update": {"server": {"online_status": 3}}})
 
+
 @server_blueprint.route("<i>/restart")
 @requires_login()
 @server_endpoint()
@@ -114,3 +123,17 @@ async def restart(req, i):
     while req.ctx.server.running:
         pass
     await req.ctx.server.start()
+
+
+@server_blueprint.put("/create/<server>/<version>")
+@requires_login()
+@requires_post_params("name")
+async def create(req, server, version):
+    ram = 2 if "ram" not in req.json.keys() else req.json.keys()["ram"]
+    name = req.json["name"]
+    return await req.app.server_manager.create_server(name, server, version, ram)
+
+@server_blueprint.get("/versions")
+@requires_login()
+async def get_all_versions(req):
+    return json_res(await req.app.server_manager.versions.get_json())

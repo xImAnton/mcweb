@@ -2,12 +2,13 @@
 tests/run
 # Ignore own config with credentials
 config.json
-models.json
+model.json
 database.db
 # SSL Stuff
 server.crt
 server.csr
 server.key
+/servers
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,python
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,python

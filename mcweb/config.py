@@ -9,11 +9,16 @@ class Config:
     ATTR_KEYS = {
         "DB_PATH": ("dbPath", "data.db"),
         "RESET_DB": ("resetDB", False),
-        "SESSION_EXPIRATION": ("sessionExpiration", 7200)
+        "SESSION_EXPIRATION": ("sessionExpiration", 7200),
+        "DOWNLOADS": ("downloads", {}),
+        "MAX_RAM": ("maxRam", 2)
     }
 
     DB_PATH = "data.db"
     RESET_DB = False
+    DOWNLOADS = {}
+    SESSION_EXPIRATION = 7200
+    MAX_RAM = 2
 
     @staticmethod
     def load() -> None:

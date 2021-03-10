@@ -1,4 +1,8 @@
 DROP TABLE IF EXISTS servers;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS ws_tickets;
+DROP TABLE IF EXISTS users;
+
 CREATE TABLE servers (
     id             INTEGER  PRIMARY KEY,
     name           TEXT,               -- the server name
@@ -8,7 +12,6 @@ CREATE TABLE servers (
     online_status  INTEGER  DEFAULT 0   -- online status of server: 0 = offline; 1 = starting; 2 = online; 3 = stopping
 );
 
-DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id          INTEGER  PRIMARY KEY,
     name        TEXT     NOT NULL UNIQUE, -- user name
@@ -16,12 +19,18 @@ CREATE TABLE users (
     permissions TEXT                      -- json string
 );
 
-DROP TABLE IF EXISTS sessions;
 CREATE TABLE sessions (
     id         TEXT      PRIMARY KEY UNIQUE, -- session id
 	user_id    INTEGER,
 	expiration INTEGER,                      -- expiration timestamp
-	sesskey    TEXT      UNIQUE,
 
     FOREIGN KEY (user_id) REFERENCES users (id) -- user reference
 );
+
+CREATE TABLE ws_tickets (
+    id        TEXT   PRIMARY KEY UNIQUE,
+    user_id   INTEGER,
+    endpoint  TEXT,
+
+    FOREIGN KEY (user_id) REFERENCES users (id)
+)

@@ -64,10 +64,9 @@ class User:
         :return: Tuple of the new session id, the new session key and session expiration timestamp
         """
         sess_id = secrets.token_urlsafe(32)
-        sess_key = secrets.token_urlsafe(12)
         expires = int(time.time() + Config.SESSION_EXPIRATION)
-        await self.db.execute(f"INSERT INTO sessions VALUES (\"{sess_id}\", {self.id}, {expires}, \"{sess_key}\");")
-        return sess_id, sess_key, expires
+        await self.db.execute(f"INSERT INTO sessions VALUES (\"{sess_id}\", {self.id}, {expires});")
+        return sess_id
 
     async def fetch_by_sid(self, sid) -> Optional[User]:
         """
@@ -79,6 +78,13 @@ class User:
         session = await session.fetch_by_sid(sid)
         return await self.fetch_by_id(session.user_id)
 
+    async def fetch_by_ticket(self, ticket):
+        user_id = await self.db.fetch_one(f"SELECT * FROM ws_tickets WHERE id=\"{ticket}\";")
+        if not user_id:
+            return None
+        user = await self.db.fetch_one(f"SELECT * FROM users WHERE id={user_id[1]};")
+        return user
+
 
 class Session:
     """
@@ -89,7 +95,6 @@ class Session:
         self.sid = ""
         self.user_id = 0
         self.expiration = 0
-        self.sesskey = ""
 
     async def fetch_by_sid(self, sid) -> Optional[Session]:
         """
@@ -102,7 +107,6 @@ class Session:
             self.sid = s[0]
             self.user_id = s[1]
             self.expiration = s[2]
-            self.sesskey = s[3]
             return self
         return None
 

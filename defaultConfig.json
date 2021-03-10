@@ -1,5 +1,14 @@
 {
   "dbPath": "./database.db",
   "resetDB": false,
-  "sessionExpiration": 7200
+  "sessionExpiration": 7200,
+  "downloads": {
+    "paper": {
+      "getVersions": "https://papermc.io/api/v2/projects/paper/",
+      "getBuilds": "https://papermc.io/api/v2/projects/paper/versions/{version}",
+      "getBuildDownload": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}",
+      "downloadBuild": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}/downloads/{download}"
+    }
+  },
+  "maxRam": 6
 }

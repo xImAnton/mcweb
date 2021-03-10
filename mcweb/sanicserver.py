@@ -6,6 +6,9 @@ from .views.server import server_blueprint
 from .views.auth import account_blueprint
 from .login import User, Session
 import time
+from .views.deco import json_res
+import aiohttp
+import os
 
 
 class MCWeb(Sanic):
@@ -17,6 +20,7 @@ class MCWeb(Sanic):
         self.db_connection = DatabaseConnector(Config.DB_PATH)
         self.server_manager = ServerManager(self)
         self.register_routes()
+        self.public_ip = ""
 
     def register_routes(self) -> None:
         """
@@ -33,12 +37,15 @@ class MCWeb(Sanic):
         listener to be called after server start
         """
         await self.server_manager.init()
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.ipify.org/") as resp:
+                self.public_ip = await resp.text()
 
     async def set_session_middleware(self, req) -> None:
         """
         middleware that fetches and sets the session on the request object
         """
-        sid = req.cookies.get("MCWeb-Session")
+        sid = req.token
         if sid:
             session = Session(self.db_connection)
             await session.fetch_by_sid(sid)
@@ -50,6 +57,7 @@ class MCWeb(Sanic):
                 await session.logout()
                 req.ctx.user = None
                 req.ctx.session = None
+                return json_res({"error": "session id not existing", "status": 401}, status=401)
         else:
             req.ctx.user = None
             req.ctx.session = None
@@ -58,4 +66,6 @@ class MCWeb(Sanic):
         """
         starts up sanic
         """
+        if not os.path.isdir(os.path.join(os.getcwd(), "servers")):
+            os.mkdir(os.path.join(os.getcwd(), "servers"))
         self.run(host="localhost", port=1337)

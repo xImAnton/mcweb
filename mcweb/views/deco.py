@@ -1,6 +1,7 @@
 from functools import wraps
 from sanic.response import json, redirect
 from json import dumps as json_dumps, loads as json_loads
+from ..login import Session, User
 
 
 def json_res(*args, **kwargs):
@@ -109,6 +110,30 @@ def requires_permission(*perms):
                 if perm not in user_perms:
                     return json_res({"error": "No Permission", "status": 403, "description": "you don't have the permission to access this endpoint"},
                                 status=403)
+            response = await f(req, *args, **kwargs)
+            return response
+        return decorated_function
+    return decorator
+
+
+def ws_with_ticket(path):
+    def decorator(f):
+        @wraps(f)
+        async def decorated_function(req, *args, **kwargs):
+            if "ticket" not in req.args.keys():
+                print("no ticket")
+                return json_res({"error": "No Ticket Provided", "status": 401, "description": "open a ticket using /account/ticket<endpoint>"}, status=401)
+            t = req.args.get("ticket")
+            user = User(req.app.db_connection)
+            req.ctx.user = await user.fetch_by_ticket(t)
+            if not req.ctx.user:
+                return json_res({"error": "Invalid Ticket", "status": 401,
+                                 "description": "open a ticket using /account/ticket/<endpoint>"}, status=401)
+            e = await req.app.db_connection.fetch_one(f"SELECT * FROM ws_tickets WHERE id=\"{t}\" AND user_id={req.ctx.user.id} AND endpoint=\"{path}\";")
+            if not e:
+                return json_res({"error": "Invalid Ticket", "status": 401,
+                                 "description": "open a ticket using /account/ticket/<endpoint>"}, status=401)
+            await req.app.db_connection.execute(f"DELETE FROM ws_tickets WHERE id=\"{t}\" AND user_id={req.ctx.user.id} AND endpoint=\"{path}\";")
             response = await f(req, *args, **kwargs)
             return response
         return decorated_function
