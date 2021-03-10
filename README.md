@@ -14,6 +14,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 * write react frontend
 * server.properties api
 * api to create servers
+* use regex to validate api input
 * backups
 * world management
 * dynamic server management
