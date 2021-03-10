@@ -10,10 +10,8 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 ## Todo Server
 * add global ws broadcast for e.g. server creation
-* server.properties api
 * use regex to validate api input
 * api for server creation
-* dynamic server management
 
 ## Todo Client
 * implement interface for server creation
@@ -28,3 +26,5 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
   * bungeecord config api
 * online player api to kick/ban/op a player
 * (web ftp in client)
+* dynamic server management
+* server.properties api
