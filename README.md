@@ -5,24 +5,26 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 **Currently in development**, doesn't do much for now
 
 ## Todo
-
 * fix issue with wrong online status on first page reload
-* add global ws broadcast for e.g. server creation
 * work on server state changes
-* restart endpoint
-* design webinterface
-* write react frontend
+
+## Todo Server
+* add global ws broadcast for e.g. server creation
 * server.properties api
-* api to create servers
 * use regex to validate api input
+* api for server creation
+* dynamic server management
+
+## Todo Client
+* implement interface for server creation
+
+## Coming Features
 * backups
 * world management
-* dynamic server management
 * implement curseforge api for modpack downloading
 * (spigotmc + dev.bukkit for plugin installation)
 * (bungeecord/ waterfall mode)
   * send players between servers
   * bungeecord config api
-* cache console output to send on client reload
 * online player api to kick/ban/op a player
-* web ftp in client
+* (web ftp in client)
