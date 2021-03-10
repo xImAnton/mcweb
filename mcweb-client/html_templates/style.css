@@ -3,13 +3,14 @@ body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     transition: background-color 500ms;
+    --side-width: 256px;
 }
 
 body.darkmode {
-    --font: white;
-    --bg: #1b2330;
     --main-bg-color: #0d1625;
     --sec-bg-color: #4e5358;
+    --bg: #1b2330;
+    --font: white;
 }
 
 body.brightmode {
@@ -39,7 +40,7 @@ body.brightmode {
 }
 
 #sidebar-wrapper {
-    width: 320px;
+    width: var(--side-width);
     display: block;
     background-color: var(--sec-bg-color);
     transition: background-color 500ms;
@@ -68,7 +69,7 @@ body.brightmode {
 
 #content-wrapper {
     position: absolute;
-    left: 320px;
+    left: var(--side-width);
     margin-top: 52px;
     right: 0;
     color: var(--font);
@@ -141,37 +142,9 @@ body.brightmode {
     padding: 1px 4px;
 }
 
-#online-status.online {
-    background-color: #16ab25;
-}
+#online-status.online {background-color: #16ab25;}#online-status.online::before {content: "Online";}#online-status.starting {background-color: #dec223;}#online-status.starting::before {content: "Starting";}#online-status.stopping {background-color: #de9323;}#online-status.stopping::before {content: "Stopping"}#online-status.offline {background-color: #de2323;}#online-status.offline::before {content: "Offline";}
 
-#online-status.online::before {
-    content: "Online";
-}
-
-#online-status.starting {
-    background-color: #dec223;
-}
-
-#online-status.starting::before {
-    content: "Starting";
-}
-
-#online-status.stopping {
-    background-color: #de9323;
-}
-
-#online-status.stopping::before {
-    content: "Stopping";
-}
-
-#online-status.offline {
-    background-color: #de2323;
-}
-
-#online-status.offline::before {
-    content: "Offline";
-}
+/* ------------------------------------------- */
 
 /* The switch - the box around the slider */
 .switch {
@@ -230,6 +203,8 @@ input:checked + .slider:before {
     transform: translateX(18px);
 }
 
+/* ------------------------------------------- */
+
 #navbar-options {
     list-style-type: none;
     margin: 0;
@@ -248,6 +223,23 @@ input:checked + .slider:before {
     background-color: var(--main-bg-color);;
 }
 
-.slider-after {
-    display: inline-block;
+#console-line-container {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    background-color: #2a2f3b;
+}
+
+.console-line:not(:last-child) {
+    margin-bottom: 4px;
+}
+
+.console-line {
+    display: block;
+    padding: 6px 10px;
+    background-color: #171a1f;
+}
+
+.console-line:hover {
+    background-color: #1c1f25;
 }
