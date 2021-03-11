@@ -20,28 +20,19 @@ class ServerInfo extends React.Component {
         this.props.changeServer(parseInt(e.target.value));
     }
 
-    getCurrentServer() {
-        for (let i = 0; i < this.props.servers.length; i++) {
-            if (this.props.servers[i].id === this.props.serverId) {
-                return this.props.servers[i];
-            }
-        }
-        return null;
-    }
-
     toggleCurrentServer() {
-        const currentServer = this.getCurrentServer();
+        const currentServer = this.props.currentServer;
         if (currentServer.onlineStatus === 0) {
             this.props.setConsoleLines([]);
-            startServer(this.props.serverId);
+            startServer(this.props.currentServer.id);
         } else if (currentServer.onlineStatus === 1 | currentServer.onlineStatus === 2) {
-            stopServer(this.props.serverId);
+            stopServer(this.props.currentServer.id);
         }
     }
 
     render() {
         let serverStatus = "";
-        const currentServer = this.getCurrentServer();
+        const currentServer = this.props.currentServer;
         let ip = "127.0.0.1";
         let buttonText = "Start";
         let buttonEnabled = true;
@@ -65,13 +56,16 @@ class ServerInfo extends React.Component {
                     buttonEnabled = false;
                     break;
                 default:
+                    serverStatus = "unknown";
+                    buttonText = "Start"
+                    buttonEnabled = false;
                     break;
             };
             ip = currentServer.ip;
         }
 
         return <div id="server-information">Server: 
-                <select value={this.props.serverId} onChange={(e) => this.serverChanged(e)}>
+                <select value={this.props.currentServer ? this.props.currentServer.id : 0} onChange={(e) => this.serverChanged(e)}>
                     {this.props.servers.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
                 </select>
                     <CopyField text={ip} />

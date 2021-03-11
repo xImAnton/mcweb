@@ -95,3 +95,13 @@ export async function putServer(name, server, version, ram) {
         }
     });
 }
+
+export function getServer(servers, id) {
+    if (!servers) return null;
+    for (let i = 0; i < servers.length; i++) {
+        if (servers[i].id === id) {
+            return servers[i]
+        }
+    }
+    return null;
+}

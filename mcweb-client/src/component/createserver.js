@@ -19,7 +19,6 @@ function CreateServerButton(props) {
         </div>
 }
 
-
 class CreateServerView extends React.Component {
 
     constructor(props) {
@@ -45,6 +44,7 @@ class CreateServerView extends React.Component {
                 this.setState({versions: res.data, currentServer: server, currentVersion: version})
             }
         );
+        document.title = "MCWeb - Create New Server";
     }
 
     async createServer() {

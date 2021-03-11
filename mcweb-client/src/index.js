@@ -23,13 +23,22 @@ class App extends React.Component {
 
     constructor(props) {
         super(props);
+
+        let darkmode = localStorage.getItem("MCWeb_Darkmode");
+        if (darkmode === null) {
+            localStorage.setItem("MCWeb_Darkmode", true);
+            darkmode = true;
+        } else {
+            darkmode = (darkmode == "true");
+        }
+
         this.state = {
-            darkmode: true,
+            darkmode: darkmode,
             username: "",
             permissions: {},
-            serverId: 1,
             servers: [],
             consoleLines: [],
+            currentServer: null,
         };
 
         this.serverSocket = null;
@@ -46,11 +55,13 @@ class App extends React.Component {
     }
 
     onSocketPacket(data) {
+        console.log(data.data);
         data = JSON.parse(data.data);
         if (data.packetType === "StateChangePacket") {
-            this.setState({servers: this.state.servers.map(x => {
-                if (x.id === this.state.serverId) {
+            this.setState({servers: this.state.servers.slice().map(x => {
+                if (x.id === this.state.currentServer.id) {
                     Object.assign(x, data.update.server);
+                    this.setState({currentServer: Object.assign(x, data.update.server)});
                 }
                 return x;
             })});
@@ -76,12 +87,11 @@ class App extends React.Component {
             this.serverSocket.close();
         }
         this.setState({consoleLines: []});
-        this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + this.state.serverId + "/console?ticket=" + ticket);
+        this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + this.state.currentServer.id + "/console?ticket=" + ticket);
         this.serverSocket.onmessage = (e) => this.onSocketPacket(e);
     }
 
     changeServer(id) {
-        this.setState({serverId: id});
         fetchServer(id).then(res => {
             const newservers = [];
             for (let i = 0; i < this.state.servers.length; i++) {
@@ -89,6 +99,7 @@ class App extends React.Component {
                     newservers.push(this.state.servers[i]);
                 } else {
                     newservers.push(res.data);
+                    this.setState({currentServer: res.data});
                 }
             }
             this.setState({servers: newservers});
@@ -154,32 +165,32 @@ class App extends React.Component {
                                 </div>
                             </Route>
                             <Route path="/">
-                                <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} serverId={this.state.serverId} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})}/>
+                                <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})}/>
                                 <div id="content-wrapper">
                                     <Switch history={history} >
                                         <Route path="/general">
-                                            <GeneralView />
+                                            <GeneralView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/player">
-                                            <PlayerView />
+                                            <PlayerView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/console">
-                                            <ConsoleView lines={this.state.consoleLines} currentServer={this.state.serverId} getSessionId={() => this.getSessionId()} />
+                                            <ConsoleView lines={this.state.consoleLines} currentServer={this.state.currentServer} getSessionId={() => this.getSessionId()} />
                                         </Route>
                                         <Route path="/backups">
-                                            <BackupsView />
+                                            <BackupsView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/settings">
-                                            <SettingsView />
+                                            <SettingsView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/worlds">
-                                            <WorldsView />
+                                            <WorldsView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/dsm">
-                                            <DSMView />
+                                            <DSMView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/user">
-                                            <UserView />
+                                            <UserView currentServer={this.state.currentServer} />
                                         </Route>
                                         <Route path="/">
                                             <Redirect to="/general" />
@@ -188,7 +199,11 @@ class App extends React.Component {
                                 </div>
                             </Route>
                         </Switch>
-                    <Footer toggleDarkMode={() => this.setState({darkmode: !this.state.darkmode})}/>
+                    <Footer toggleDarkMode={() => {
+                        let darkmode = !this.state.darkmode;
+                        this.setState({darkmode: darkmode});
+                        localStorage.setItem("MCWeb_Darkmode", darkmode);
+                    }} darkmode={this.state.darkmode} />
                 </div>
         </div>
     }

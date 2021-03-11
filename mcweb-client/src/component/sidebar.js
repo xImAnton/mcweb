@@ -8,7 +8,7 @@ class Sidebar extends React.Component {
         return <div id="sidebar-wrapper">
                     <aside>
                         <div id="sidebar-content">
-                            <ServerInfo servers={this.props.servers} serverId={this.props.serverId} changeServer={this.props.changeServer} sessionId={this.props.sessionId} setConsoleLines={this.props.setConsoleLines} />
+                            <ServerInfo servers={this.props.servers} currentServer={this.props.currentServer} changeServer={this.props.changeServer} sessionId={this.props.sessionId} setConsoleLines={this.props.setConsoleLines} />
                             <Navbar logout={this.props.logout} getUserName={this.props.getUserName}/>
                         </div>
                     </aside>

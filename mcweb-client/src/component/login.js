@@ -14,6 +14,10 @@ class LoginView extends React.Component {
         };
     }
 
+    componentDidMount() {
+        document.title = "MCWeb - Login";
+    }
+
     render() {
         return <div id="login-wrapper">
             <div id="login-field">

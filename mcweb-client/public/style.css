@@ -154,7 +154,7 @@ body {
     padding: 1px 4px;
 }
 
-#online-status.online {background-color: #16ab25;}#online-status.online::before {content: "Online";}#online-status.starting {background-color: #dec223;}#online-status.starting::before {content: "Starting";}#online-status.stopping {background-color: #de9323;}#online-status.stopping::before {content: "Stopping"}#online-status.offline {background-color: #de2323;}#online-status.offline::before {content: "Offline";}
+#online-status.online {background-color: #16ab25;}#online-status.online::before {content: "Online";}#online-status.starting {background-color: #dec223;}#online-status.starting::before {content: "Starting";}#online-status.stopping {background-color: #de9323;}#online-status.stopping::before {content: "Stopping"}#online-status.offline {background-color: #de2323;}#online-status.offline::before {content: "Offline";}#online-status.unknown {background-color: #de2323;}#online-status.unknown::before {content: "No Information";}
 
 /* ------------------------------------------- */
 
@@ -358,7 +358,7 @@ span.logout {
     width: 6px;
     height: 18px;
     border-radius: 20%;
-    background: #fff;
+    background: var(--font);
   }
   .lds-spinner div:nth-child(1) {
     transform: rotate(0deg);
@@ -416,7 +416,7 @@ span.logout {
       opacity: 0;
     }
   }
-  
+
 
 #loading-wrapper {
     position: absolute;
@@ -460,4 +460,5 @@ span.logout {
     font-weight: 500;
     font-size: 16px;
     transition: background-color 500ms;
+    cursor: default;
 }

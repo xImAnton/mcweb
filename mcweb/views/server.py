@@ -48,7 +48,6 @@ async def console_websocket(req, ws, i):
     """
     websocket endpoints for console output and server state change
     """
-    print("ws tried to connect")
     if not req.ctx.user:
         await ws.send(json_dumps({
             "packetType": "ConsoleInfoPacket",
@@ -59,7 +58,6 @@ async def console_websocket(req, ws, i):
         await ws.close()
         return
     await req.ctx.server.connections.connected(ws)
-    print("ws connected")
     await ws.send(json_dumps({
             "packetType": "ConsoleConnectedPacket",
             "data": {

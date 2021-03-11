@@ -11,7 +11,7 @@ function ConsoleInput(props) {
         if (text === "") {
             return
         }
-        await sendCommand(props.currentServer, text)
+        await sendCommand(props.currentServer.id, text)
         inputRef.current.value = "";
     }
 
@@ -26,7 +26,11 @@ function ConsoleView(props) {
     const textRef = useRef(null);
 
     // scroll to bottom after render
-    useEffect(() => textRef.current.scrollTop = textRef.current.scrollHeight)
+    useEffect(() => {
+        textRef.current.scrollTop = textRef.current.scrollHeight;
+        if (props.currentServer) 
+        document.title = props.currentServer.name + " - Console";
+    })
 
     return <div id="page-content">
                 <h1 id="page-headline">Console</h1>
