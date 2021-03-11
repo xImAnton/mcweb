@@ -41,7 +41,7 @@ async def login_get(req):
     if not req.ctx.session:
         return json_res({"error": "Not Logged In", "status": 401, "description": "please login using POST to /account/login"}, status=401)
     else:
-        return json_res({"info": "you are logged in", "status": 200})
+        return json_res({"info": "you are already logged in", "status": 200})
 
 
 @account_blueprint.get("/logout")

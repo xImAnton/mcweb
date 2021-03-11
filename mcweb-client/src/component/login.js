@@ -1,5 +1,6 @@
 import React from "react";
-import { login } from "../services";
+import { login, getLogin } from "../services";
+import history from "../history";
 
 
 class LoginView extends React.Component {
@@ -16,6 +17,9 @@ class LoginView extends React.Component {
 
     componentDidMount() {
         document.title = "MCWeb - Login";
+        getLogin().then(res => {
+            history.push("/general");
+        })
     }
 
     render() {
@@ -36,10 +40,10 @@ class LoginView extends React.Component {
     async loginUser() {
         if (this.state.username === "" | this.state.password === "") {
             this.setState({ alert: "Please enter your credentials!", alertColor: "yellow"})
-            return
         }
         login(this.state.username, this.state.password).then(res => {
             this.props.setSessionId(res.data.data.sessionId);
+            history.push("/general");
         }).catch(e => this.setState({ alert: "Please check your username and password!", alertColor: "red"}));
     }
 }

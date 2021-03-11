@@ -1,8 +1,46 @@
 import axios from "axios";
+import history from "./history";
 
+
+async function get(url) {
+    return catchNotAuthorized(axios.get(url, {
+        headers: {
+            "Authorization": "Token " + getSessionId()
+        }
+    }));
+}
+
+async function post(url, data) {
+    return catchNotAuthorized(axios.post(url, data, {
+        headers: {
+            "Authorization": "Token " + getSessionId()
+        }
+    }));
+}
+
+async function put(url, data) {
+    return catchNotAuthorized(axios.put(url, data, {
+        headers: {
+            "Authorization": "Token " + getSessionId()
+        }
+    }));
+}
+
+function catchNotAuthorized(promise) {
+    return promise.catch((e => {
+        if (e.response.status === 401) {
+            if (!(history.location.pathname === "/login")) {
+                console.log("push");
+                history.push("/login");
+            }
+        }
+        throw e;
+    }));
+}
 
 function getSessionId() {
-    return sessionStorage.getItem("MCWeb_Session");
+    let sid = sessionStorage.getItem("MCWeb_Session");
+    return sid;
 }
 
 export function getApiBase() {
@@ -10,90 +48,50 @@ export function getApiBase() {
 }
 
 export async function sendCommand(server, command) {
-    return axios.post(getApiBase() + "/server/" + server + "/command", JSON.stringify({command: command}), {
-            headers: {
-                "Authorization": "Token " + getSessionId()
-            }
-    });
+    return post(getApiBase() + "/server/" + server + "/command", JSON.stringify({command: command}));
 }
 
 export async function login(user, password) {
     return axios.post(getApiBase() + "/account/login/", JSON.stringify({username: user, password: password }))
 }
 
-export async function startServer(server) {
-    return axios.get(getApiBase() + "/server/" + server + "/start", {
-            headers: {
-                "Authorization": "Token " + getSessionId()
-            }
-    });
+export function startServer(server) {
+    return get(getApiBase() + "/server/" + server + "/start");
 }
 
-export async function stopServer(server) {
-    return axios.get(getApiBase() + "/server/" + server + "/stop", {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-});
+export function stopServer(server) {
+    return get(getApiBase() + "/server/" + server + "/stop");
 }
 
-export async function fetchServer(server) {
-    return axios.get(getApiBase() + "/server/" + server, {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+export function fetchServer(server) {
+    return get(getApiBase() + "/server/" + server);
 }
 
-export async function getConsoleTicket() {
-    return axios.get(getApiBase() + "/account/ticket/server/console", {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+export function getConsoleTicket() {
+    return get(getApiBase() + "/account/ticket/server/console");
 }
 
-export async function logoutUser() {
-    return axios.get(getApiBase() + "/account/logout", {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+export function logoutUser() {
+    return get(getApiBase() + "/account/logout");
 }
 
-export async function fetchUser() {
-    return axios.get(getApiBase() + "/account", {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+export function fetchUser() {
+    return get(getApiBase() + "/account");
 }
 
-export async function fetchAllServers() {
-    return axios.get(getApiBase() + "/server", {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+export function fetchAllServers() {
+    return get(getApiBase() + "/server");
 }
 
-export async function fetchVersions() {
-    return axios.get(getApiBase() + "/server/versions", {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+export function fetchVersions() {
+    return get(getApiBase() + "/server/versions");
 }
 
 export async function putServer(name, server, version, ram) {
-    return axios.put(getApiBase() + "/server/create/" + server + "/" + version, JSON.stringify({
+    return put(getApiBase() + "/server/create/" + server + "/" + version, JSON.stringify({
         name: name,
         ram: ram
-    }), {
-        headers: {
-            "Authorization": "Token " + getSessionId()
-        }
-    });
+    }));
 }
 
 export function getServer(servers, id) {
@@ -104,4 +102,8 @@ export function getServer(servers, id) {
         }
     }
     return null;
+}
+
+export function getLogin() {
+    return get(getApiBase() + "/account/login");
 }

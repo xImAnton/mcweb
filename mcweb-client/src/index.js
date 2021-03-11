@@ -29,7 +29,7 @@ class App extends React.Component {
             localStorage.setItem("MCWeb_Darkmode", true);
             darkmode = true;
         } else {
-            darkmode = (darkmode == "true");
+            darkmode = (darkmode === "true");
         }
 
         this.state = {
@@ -84,6 +84,10 @@ class App extends React.Component {
     }
 
     openWs(serverId, ticket) {
+        if (!this.state.currentServer) {
+            console.error("current server not set");
+            return;
+        }
         if (this.serverSocket) {
             this.serverSocket.close();
         }
@@ -143,72 +147,83 @@ class App extends React.Component {
         this.refetch();
     }
 
-    render() {
+    /*shouldComponentUpdate() {
+        const sid = this.getSessionId();
+        if (!sid) {
+            history.push("/login");
+        }
+        return true;
+    }*/
 
+    render() {
         const sid = this.getSessionId();
 
-        if (!sid) {
-            return <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-                <LoginView setSessionId={(i) => this.setSessionId(i)}/>
-            </div>
-        }
-
         return <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-                <div className="content-wrapper">
-                    <Header />
-                        <Switch history={history} >
-                            <Route path="/createserver">
-                                <div id="content-wrapper" className="full">
-                                    <CreateServerView addServer={(s) => {
-                                        const servers = this.state.servers.slice();
-                                        servers.push(s);
-                                        this.setState({servers: servers});
-                                    }} cancellable={this.state.serverCreationCancellable}
-                                    changeServer={(i) => this.changeServer(i)}
-                                    />
-                                </div>
-                            </Route>
-                            <Route path="/">
-                                <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})} setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})} />
-                                <div id="content-wrapper">
-                                    <Switch history={history} >
-                                        <Route path="/general">
-                                            <GeneralView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/player">
-                                            <PlayerView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/console">
-                                            <ConsoleView lines={this.state.consoleLines} currentServer={this.state.currentServer} getSessionId={() => this.getSessionId()} />
-                                        </Route>
-                                        <Route path="/backups">
-                                            <BackupsView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/settings">
-                                            <SettingsView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/worlds">
-                                            <WorldsView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/dsm">
-                                            <DSMView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/user">
-                                            <UserView currentServer={this.state.currentServer} />
-                                        </Route>
-                                        <Route path="/">
-                                            <Redirect to="/general" />
-                                        </Route>
-                                    </Switch>
-                                </div>
-                            </Route>
-                        </Switch>
-                    <Footer toggleDarkMode={() => {
-                        let darkmode = !this.state.darkmode;
-                        this.setState({darkmode: darkmode});
-                        localStorage.setItem("MCWeb_Darkmode", darkmode);
-                    }} darkmode={this.state.darkmode} />
-                </div>
+            <Switch>
+                <Route path="/login">
+                    <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
+                        <LoginView setSessionId={(i) => this.setSessionId(i)}/>
+                    </div>
+                </Route>
+                <Route path="/">
+                    {!sid && <Redirect to="/login" />}
+                    <div className="content-wrapper">
+                        <Header />
+                            <Switch history={history} >
+                                <Route path="/createserver">
+                                    <div id="content-wrapper" className="full">
+                                        <CreateServerView addServer={(s) => {
+                                            const servers = this.state.servers.slice();
+                                            servers.push(s);
+                                            this.setState({servers: servers});
+                                        }} cancellable={this.state.serverCreationCancellable}
+                                        changeServer={(i) => this.changeServer(i)}
+                                        />
+                                    </div>
+                                </Route>
+                                <Route path="/">
+                                    <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})} setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})} />
+                                    <div id="content-wrapper">
+                                        <Switch history={history} >
+                                            <Route path="/general">
+                                                <GeneralView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/player">
+                                                <PlayerView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/console">
+                                                <ConsoleView lines={this.state.consoleLines} currentServer={this.state.currentServer} getSessionId={() => this.getSessionId()} />
+                                            </Route>
+                                            <Route path="/backups">
+                                                <BackupsView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/settings">
+                                                <SettingsView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/worlds">
+                                                <WorldsView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/dsm">
+                                                <DSMView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/user">
+                                                <UserView currentServer={this.state.currentServer} />
+                                            </Route>
+                                            <Route path="/">
+                                                <Redirect to="/general" />
+                                            </Route>
+                                        </Switch>
+                                    </div>
+                                </Route>
+                            </Switch>
+                        <Footer toggleDarkMode={() => {
+                            let darkmode = !this.state.darkmode;
+                            this.setState({darkmode: darkmode});
+                            localStorage.setItem("MCWeb_Darkmode", darkmode);
+                        }} darkmode={this.state.darkmode} />
+                    </div>
+                </Route>
+            </Switch>
         </div>
     }
 }
