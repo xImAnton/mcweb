@@ -1,21 +1,23 @@
 import React from "react";
 import { fetchVersions, putServer } from "../services";
-import { useHistory } from "react-router-dom";
+import history from "../history";
 
 
 function CreateServerButton(props) {
 
-    const history = useHistory();
-
     async function createServer() {
-        if (await props.createServer()) {
+        let id = await props.createServer()
+        if (id) {
+            props.changeServer(id);
             history.push("/general");
         }
     }
 
     return <div className="server-create-btns">
             <button onClick={createServer}>Create Server</button>
-            <button onClick={() => history.push("/general")}>Cancel</button>
+            { props.cancellable &&
+                <button onClick={() => history.push("/general")}>Cancel</button>
+            }
         </div>
 }
 
@@ -56,9 +58,10 @@ class CreateServerView extends React.Component {
             this.setState({alert: "Plase specify how much ram the server should have!"})
             return false;
         }
-        var status = true;
+        var status = 0;
         this.setState({loading: true});
         await putServer(this.state.currentName, this.state.currentServer, this.state.currentVersion, this.state.currentRam).then(res => {
+            status = res.data.add.server.id;
             this.setState({loading: false});
             this.props.addServer(res.data.add.server);
         }).catch((e) => {
@@ -125,7 +128,7 @@ class CreateServerView extends React.Component {
                     <br />
                     Ram: <input type="number" min={1} defaultValue={this.state.currentRam} max={this.state.maxRam} onChange={e => this.setState({currentRam: parseInt(e.target.value)})} />
                     <br />
-                    <CreateServerButton createServer={() => this.createServer()} />
+                    <CreateServerButton createServer={() => this.createServer()} cancellable={this.props.cancellable} changeServer={this.props.changeServer}/>
                 </div>
             }
             { this.state.loading && 

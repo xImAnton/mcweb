@@ -39,6 +39,7 @@ class App extends React.Component {
             servers: [],
             consoleLines: [],
             currentServer: null,
+            serverCreationCancellable: true,
         };
 
         this.serverSocket = null;
@@ -128,6 +129,7 @@ class App extends React.Component {
             // refetch servers
             fetchAllServers().then(res => {
                 if (res.data.length === 0) {
+                    this.setState({serverCreationCancellable: false});
                     history.push("/createserver");
                     return;
                 }
@@ -161,11 +163,13 @@ class App extends React.Component {
                                         const servers = this.state.servers.slice();
                                         servers.push(s);
                                         this.setState({servers: servers});
-                                    }}/>
+                                    }} cancellable={this.state.serverCreationCancellable}
+                                    changeServer={(i) => this.changeServer(i)}
+                                    />
                                 </div>
                             </Route>
                             <Route path="/">
-                                <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})}/>
+                                <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})} setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})} />
                                 <div id="content-wrapper">
                                     <Switch history={history} >
                                         <Route path="/general">

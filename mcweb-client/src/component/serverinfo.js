@@ -8,6 +8,7 @@ function AddServerButton(props) {
     const history = useHistory();
 
     function clicked(e) {
+        props.setCreationCancellable(true);
         history.push("/createserver");
     }
 
@@ -71,7 +72,7 @@ class ServerInfo extends React.Component {
                     <CopyField text={ip} />
                     Status: <div id="online-status" className={serverStatus}></div>
                     <button id="control-server" onClick={() => this.toggleCurrentServer()} disabled={!buttonEnabled} >{buttonText}</button>
-                    <AddServerButton />
+                    <AddServerButton setCreationCancellable={this.props.setCreationCancellable} />
                 </div>;
     }
 }
