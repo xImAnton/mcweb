@@ -6,7 +6,7 @@ import Sidebar from "./component/sidebar";
 import GeneralView from "./component/general";
 import Footer from "./component/footer";
 import LoginView from "./component/login"
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch, Redirect, Router } from "react-router-dom";
 import PlayerView from "./component/player";
 import ConsoleView from "./component/console";
 import BackupsView from "./component/backups";
@@ -16,6 +16,7 @@ import DSMView from "./component/dsm";
 import UserView from "./component/user";
 import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser } from "./services";
 import CreateServerView from "./component/createserver";
+import history from "./history"
 
 
 class App extends React.Component {
@@ -115,6 +116,10 @@ class App extends React.Component {
             });
             // refetch servers
             fetchAllServers().then(res => {
+                if (res.data.length === 0) {
+                    history.push("/createserver");
+                    return;
+                }
                 this.setState({servers: res.data});
                 this.changeServer(1);
             })
@@ -136,10 +141,9 @@ class App extends React.Component {
         }
 
         return <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-            <BrowserRouter>
                 <div className="content-wrapper">
                     <Header />
-                        <Switch>
+                        <Switch history={history} >
                             <Route path="/createserver">
                                 <div id="content-wrapper" className="full">
                                     <CreateServerView addServer={(s) => {
@@ -152,7 +156,7 @@ class App extends React.Component {
                             <Route path="/">
                                 <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} serverId={this.state.serverId} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})}/>
                                 <div id="content-wrapper">
-                                    <Switch>
+                                    <Switch history={history} >
                                         <Route path="/general">
                                             <GeneralView />
                                         </Route>
@@ -186,9 +190,9 @@ class App extends React.Component {
                         </Switch>
                     <Footer toggleDarkMode={() => this.setState({darkmode: !this.state.darkmode})}/>
                 </div>
-            </BrowserRouter>
         </div>
     }
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(
+    <Router history={history}><App /></Router>, document.getElementById("root"));

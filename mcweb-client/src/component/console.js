@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { sendCommand } from "../services"
 
 
@@ -23,18 +23,17 @@ function ConsoleInput(props) {
 
 function ConsoleView(props) {
 
-    let lines = [];
-    for (let i = 0; i < props.lines.length; i++) {
-        lines.push(<div className={"console-line"} key={i}>{props.lines[i]}</div>)
-    }
+    const textRef = useRef(null);
+
+    // scroll to bottom after render
+    useEffect(() => textRef.current.scrollTop = textRef.current.scrollHeight)
 
     return <div id="page-content">
                 <h1 id="page-headline">Console</h1>
-                <div id="console-line-container">
-                    {lines}
-                    <ConsoleInput currentServer={props.currentServer} getSessionId={props.getSessionId}/>
+                <div id="console-wrapper">
+                    <textarea id="console-out" readOnly value={props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />
+                    <ConsoleInput currentServer={props.currentServer} getSessionId={props.getSessionId} />
                 </div>
-                
             </div>;
 }
 

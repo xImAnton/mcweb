@@ -103,4 +103,7 @@ eula=true
 """)
 
     async def get_first_free_id(self):
-        return max([s.id for s in self.servers]) + 1
+        ids = [s.id for s in self.servers]
+        if len(ids) == 0:
+            return 1
+        return max(ids) + 1

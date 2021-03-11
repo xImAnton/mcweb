@@ -1,10 +1,13 @@
 from typing import Any, Dict
-
 from ..mc.communication import ServerCommunication
 from ..io.wsmanager import WebsocketConnectionManager
 from json import dumps as json_dumps
 import asyncio
 import re
+
+
+timings_reset = re.compile(r"^\[[0-9]+:[0-9]+:[0-9]+ .*\]: Timings Reset$")
+advanced_terminal_features = re.compile("[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*,[0-9]* main WARN Advanced terminal features are not available in this environment")
 
 
 class MinecraftServer:
@@ -20,7 +23,7 @@ class MinecraftServer:
         self.run_dir = record[3]
         self.jar = record[4]
         self.status = record[5]
-        self.communication = ServerCommunication(f"java -Xmx{self.ram}G -jar {self.jar}", self.run_dir, on_close=self.on_stop, on_output=self.on_output)
+        self.communication = ServerCommunication(f"java -Xmx{self.ram}G -jar {self.jar}", self.run_dir, on_close=self.on_stop, on_output=self.on_output, on_stderr=self.on_output)
         self.output = []
 
     async def refetch(self) -> None:
@@ -89,9 +92,10 @@ class MinecraftServer:
         :param line: the line that is printed
         """
         self.output.append(line)
-        timings_reset = re.compile(r"^\[[0-9]+:[0-9]+:[0-9]+ .*\]: Timings Reset$")
         if timings_reset.match(line.strip()):
             asyncio.run(self.set_online_status(2))
+        if advanced_terminal_features.match(line.strip()):
+            return
         self.connections.broadcast_sync(json_dumps({
             "packetType": "ServerConsoleMessagePacket",
             "data": {

@@ -7,7 +7,7 @@ class Footer extends React.Component {
                     <footer>
                         <div id="footer">
                             <label className="switch">
-                                <input type="checkbox" onChange={this.props.toggleDarkMode} id="darkmode-switch" />
+                                <input type="checkbox" onChange={this.props.toggleDarkMode} id="darkmode-switch" defaultChecked={true} />
                                 <span className="slider"></span>
                             </label>
                             enable Darkmode
