@@ -83,6 +83,7 @@ class CreateServerView extends React.Component {
                     this.setState({maxRam: e.response.data.maxRam})
                     break;
                 default:
+                    alert = "There was an server error creating your server"
                     break;
             }
             this.setState({loading: false, alert: alert});
@@ -126,7 +127,7 @@ class CreateServerView extends React.Component {
                         {versions}
                     </select>
                     <br />
-                    Ram: <input type="number" min={1} defaultValue={this.state.currentRam} max={this.state.maxRam} onChange={e => this.setState({currentRam: parseInt(e.target.value)})} />
+                    Ram: <input type="number" min={1} className={"gb-selection"} defaultValue={this.state.currentRam} max={this.state.maxRam} onChange={e => this.setState({currentRam: parseInt(e.target.value)})} />
                     <br />
                     <CreateServerButton createServer={() => this.createServer()} cancellable={this.props.cancellable} changeServer={this.props.changeServer}/>
                 </div>

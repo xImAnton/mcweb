@@ -47,11 +47,11 @@ export function getApiBase() {
     return window.location.protocol + "//" + window.location.host + "/api";
 }
 
-export async function sendCommand(server, command) {
+export function sendCommand(server, command) {
     return post(getApiBase() + "/server/" + server + "/command", JSON.stringify({command: command}));
 }
 
-export async function login(user, password) {
+export function login(user, password) {
     return axios.post(getApiBase() + "/account/login/", JSON.stringify({username: user, password: password }))
 }
 
@@ -87,7 +87,7 @@ export function fetchVersions() {
     return get(getApiBase() + "/server/versions");
 }
 
-export async function putServer(name, server, version, ram) {
+export function putServer(name, server, version, ram) {
     return put(getApiBase() + "/server/create/" + server + "/" + version, JSON.stringify({
         name: name,
         ram: ram

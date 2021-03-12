@@ -1,11 +1,9 @@
 import aiohttp
 from ...config import Config
+from .base import VersionProvider
 
 
-class PaperVersionProvider:
-    def __init__(self):
-        self.versions = {}
-
+class PaperVersionProvider(VersionProvider):
     async def reload(self):
         # TODO: Cache Versions <-- Too many requests per start
         async with aiohttp.ClientSession() as session:

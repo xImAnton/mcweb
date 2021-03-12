@@ -462,3 +462,7 @@ span.logout {
     transition: background-color 500ms;
     cursor: default;
 }
+
+.gb-selection:after {
+    content: "GB";
+}

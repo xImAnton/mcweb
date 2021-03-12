@@ -7,7 +7,8 @@ import re
 
 
 timings_reset = re.compile(r"^\[[0-9]+:[0-9]+:[0-9]+ .*\]: Timings Reset$")
-advanced_terminal_features = re.compile("[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*,[0-9]* main WARN Advanced terminal features are not available in this environment")
+advanced_terminal_features = re.compile(r"[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*,[0-9]* main WARN Advanced terminal features are not available in this environment")
+forge_done = re.compile(r'\[[0-9]*:[0-9]*:[0-9]*\] \[.*\]: Done \([0-9]*\.[0-9]*s\)! For help, type "help"')
 
 
 class MinecraftServer:
@@ -92,7 +93,7 @@ class MinecraftServer:
         :param line: the line that is printed
         """
         self.output.append(line)
-        if timings_reset.match(line.strip()):
+        if timings_reset.match(line.strip()) or forge_done.match(line.strip()):
             asyncio.run(self.set_online_status(2))
         if advanced_terminal_features.match(line.strip()):
             return

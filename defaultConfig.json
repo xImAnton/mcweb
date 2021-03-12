@@ -8,6 +8,10 @@
       "getBuilds": "https://papermc.io/api/v2/projects/paper/versions/{version}",
       "getBuildDownload": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}",
       "downloadBuild": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}/downloads/{download}"
+    },
+    "forge": {
+      "getVersions": "http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml",
+      "downloadBuild": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{build}/forge-{build}-installer.jar"
     }
   },
   "maxRam": 6

@@ -6,6 +6,7 @@ from ..config import Config
 import os
 from .versions.manager import VersionManager
 from ..views.deco import json_res
+import subprocess
 
 
 class ServerManager:
@@ -63,7 +64,10 @@ class ServerManager:
         os.mkdir(dir_)
 
         # Download Server jar
-        await ServerManager.download_and_save(versions[server][version], os.path.join(dir_, "server.jar"))
+        out_file = "server.jar"
+        if server == "forge":
+            out_file = "installer.jar"
+        await ServerManager.download_and_save(versions[server][version], os.path.join(dir_, out_file))
         # save agreed eula
         await ServerManager.save_eula(dir_)
 
@@ -77,7 +81,25 @@ class ServerManager:
         await s.set_online_status(0)
         self.servers.append(s)
 
+        if server == "forge":
+            await self.install_forge_server(dir_, version)
+
         return json_res({"success": "Server successfully created", "add": {"server": s.json()}})
+
+    async def install_forge_server(self, path, forge_version):
+        null = open(os.devnull, "w")
+        subprocess.call("java -jar installer.jar --installServer", stdout=null, stderr=null, cwd=path)
+        files_to_try = [f"forge-{forge_version}-universal.jar", f"forge-{forge_version}.jar"]
+        renamed = False
+        for file in files_to_try:
+            try:
+                os.rename(os.path.join(path, file), os.path.join(path, "server.jar"))
+                renamed = True
+                break
+            except FileNotFoundError:
+                pass
+        if not renamed:
+            raise FileNotFoundError("couldn't find server file")
 
     async def is_name_available(self, name):
         return not bool(await self.mc.db_connection.fetch_one(f"SELECT * FROM servers WHERE name=\"{name}\";"))

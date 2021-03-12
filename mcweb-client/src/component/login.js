@@ -12,6 +12,7 @@ class LoginView extends React.Component {
             password: "",
             alert: "",
             alertColor: "yellow",
+            loggedIn: false
         };
     }
 

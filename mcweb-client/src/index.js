@@ -125,6 +125,7 @@ class App extends React.Component {
     }
 
     refetch() {
+        console.log("refetch");
         if (this.getSessionId()) {
             // refetch user informations
             fetchUser().then(res => {
@@ -140,6 +141,8 @@ class App extends React.Component {
                 this.setState({servers: res.data});
                 this.changeServer(1);
             })
+        } else {
+            history.push("/login");
         }
     }
 
@@ -162,7 +165,7 @@ class App extends React.Component {
             <Switch>
                 <Route path="/login">
                     <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-                        <LoginView setSessionId={(i) => this.setSessionId(i)}/>
+                        <LoginView setSessionId={(i) => this.setSessionId(i)} logout={() => this.logout()} />
                     </div>
                 </Route>
                 <Route path="/">
