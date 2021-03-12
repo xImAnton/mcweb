@@ -12,6 +12,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 * use regex to validate api input, filter code injections
 
 ## Todo Client
+* add more documentation comments
 
 ## Coming Features
 * backups
