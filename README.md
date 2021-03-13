@@ -13,6 +13,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 ## Todo Client
 * add more documentation comments
+* loading/ fetching/ logging in animation
 
 ## Coming Features
 * backups
