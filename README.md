@@ -16,6 +16,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 * add more documentation comments
 * loading/ fetching/ logging in animation
 * loading animation component
+* design ui components
 
 ## Coming Features
 * backups
