@@ -9,6 +9,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 ## Todo Server
 * add global ws broadcast for e.g. server creation
+* migrate to some nosql db <-- permissions for users for each server coming
 * use regex to validate api input, filter code injections
 
 ## Todo Client
