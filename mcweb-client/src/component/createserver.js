@@ -1,6 +1,7 @@
 import React from "react";
 import { fetchVersions, putServer } from "../services";
 import history from "../history";
+import LoadingAnimation from "./loading"
 
 
 function CreateServerButton(props) {
@@ -34,6 +35,7 @@ class CreateServerView extends React.Component {
             alert: "",
             loading: false,
             maxRam: 32,
+            versionsLoaded: false
         }
     }
 
@@ -43,7 +45,7 @@ class CreateServerView extends React.Component {
                 let server = Object.keys(res.data)[0];
                 let serverVersions = res.data[server];
                 let version = serverVersions[serverVersions.length - 1];
-                this.setState({versions: res.data, currentServer: server, currentVersion: version})
+                this.setState({versions: res.data, currentServer: server, currentVersion: version, versionsLoaded: true})
             }
         );
         document.title = "MCWeb - Create New Server";
@@ -112,8 +114,8 @@ class CreateServerView extends React.Component {
             versions = [];
         }
 
-        return <div id="page-content">
-            { !this.state.loading &&
+        return <>{this.state.versionsLoaded ? (<div id="page-content">
+            { !this.state.loading ? (
                 <div className="page-full">
                     <h1 id="page-headline">Create a new Server</h1>
                     { this.state.alert && <div className={"alert-box red"}>{this.state.alert}</div> }
@@ -131,17 +133,9 @@ class CreateServerView extends React.Component {
                     <br />
                     <CreateServerButton createServer={() => this.createServer()} cancellable={this.props.cancellable} changeServer={this.props.changeServer}/>
                 </div>
-            }
-            { this.state.loading && 
-                <div id="loading-wrapper">
-                    <div id="loading-content">
-                        <div className="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-                        <div>Creating Server...</div>
-                    </div>
-                </div>
-            }
+            ) : (<LoadingAnimation loadingText="Creating Server" />)}
 
-        </div>
+        </div>) : (<LoadingAnimation loadingText="Loading Versions" />)}</>
     }
 }
 

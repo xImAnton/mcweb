@@ -17,6 +17,8 @@ import UserView from "./component/user";
 import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser } from "./services";
 import CreateServerView from "./component/createserver";
 import history from "./history"
+import NoBackend from "./component/nobackend";
+import LoadingAnimation from "./component/loading";
 
 
 class App extends React.Component {
@@ -24,13 +26,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        let darkmode = localStorage.getItem("MCWeb_Darkmode");
-        if (darkmode === null) {
-            localStorage.setItem("MCWeb_Darkmode", true);
-            darkmode = true;
-        } else {
-            darkmode = (darkmode === "true");
-        }
+        let darkmode = (localStorage.getItem("MCWeb_Darkmode") === "true");
 
         this.state = {
             darkmode: darkmode,
@@ -40,9 +36,11 @@ class App extends React.Component {
             consoleLines: [],
             currentServer: null,
             serverCreationCancellable: true,
+            missingFetches: 0
         };
 
         this.serverSocket = null;
+        this.ignoreSocketClose = false;
     }
 
     setSessionId(sid) {
@@ -89,14 +87,24 @@ class App extends React.Component {
             return;
         }
         if (this.serverSocket) {
+            this.ignoreSocketClose = true;
             this.serverSocket.close();
         }
         this.setState({consoleLines: []});
         this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + this.state.currentServer.id + "/console?ticket=" + ticket);
+        this.serverSocket.onopen = (e) => this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
         this.serverSocket.onmessage = (e) => this.onSocketPacket(e);
+        this.serverSocket.onclose = (e) => this.onSocketClose(e);
+    }
+
+    onSocketClose(e) {
+        if (e.code === 1000) { // Closed by server
+            history.push("/apierror");
+        }
     }
 
     changeServer(id) {
+        this.setState((s) => { return {missingFetches: s.missingFetches + 3} });
         fetchServer(id).then(res => {
             const newservers = [];
             for (let i = 0; i < this.state.servers.length; i++) {
@@ -107,10 +115,11 @@ class App extends React.Component {
                     this.setState({currentServer: res.data});
                 }
             }
-            this.setState({servers: newservers});
+            this.setState((s) => { return {missingFetches: s.missingFetches - 1, servers: newservers} });
         });
 
         getConsoleTicket().then(res => {
+            this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             this.openWs(id, res.data.ticket);
         })
     }
@@ -130,6 +139,7 @@ class App extends React.Component {
             // refetch user informations
             fetchUser().then(res => {
                 this.setState({username: res.data.username, permissions: res.data.permissions})
+                this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             });
             // refetch servers
             fetchAllServers().then(res => {
@@ -140,6 +150,8 @@ class App extends React.Component {
                 }
                 this.setState({servers: res.data});
                 this.changeServer(1);
+            }).finally(() => {
+                this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             })
         } else {
             history.push("/login");
@@ -147,32 +159,26 @@ class App extends React.Component {
     }
 
     componentDidMount() {
+        this.setState({missingFetches: 2});
         this.refetch();
     }
-
-    /*shouldComponentUpdate() {
-        const sid = this.getSessionId();
-        if (!sid) {
-            history.push("/login");
-        }
-        return true;
-    }*/
 
     render() {
         const sid = this.getSessionId();
 
         return <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-            <Switch>
+            <Switch history={history} >
                 <Route path="/login">
-                    <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-                        <LoginView setSessionId={(i) => this.setSessionId(i)} logout={() => this.logout()} />
-                    </div>
+                    <LoginView setSessionId={(i) => this.setSessionId(i)} logout={() => this.logout()} />
                 </Route>
                 <Route path="/">
-                    {!sid && <Redirect to="/login" />}
                     <div className="content-wrapper">
                         <Header />
                             <Switch history={history} >
+                                <Route path="/apierror">
+                                    <NoBackend refetch={() => this.refetch()} />
+                                </Route>
+                                {!sid && <Redirect to="/login" />}
                                 <Route path="/createserver">
                                     <div id="content-wrapper" className="full">
                                         <CreateServerView addServer={(s) => {
@@ -185,6 +191,7 @@ class App extends React.Component {
                                     </div>
                                 </Route>
                                 <Route path="/">
+                                    <>{ this.state.missingFetches <= 0 ? (<>
                                     <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})} setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})} />
                                     <div id="content-wrapper">
                                         <Switch history={history} >
@@ -216,7 +223,7 @@ class App extends React.Component {
                                                 <Redirect to="/general" />
                                             </Route>
                                         </Switch>
-                                    </div>
+                                    </div></>) : (<LoadingAnimation loadingText="Loading Server Information" />)}</>
                                 </Route>
                             </Switch>
                         <Footer toggleDarkMode={() => {

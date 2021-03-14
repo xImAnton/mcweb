@@ -14,7 +14,20 @@ function NavbarEntry(props) {
 
 
 class Navbar extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.unLoaded = false;
+    }
+
     render() {
+
+        if (!this.unLoaded) {
+            if (this.props.getUserName()) {
+                this.unLoaded = true;
+            }
+        }
+        
         return <ul id="navbar-options">
                     <NavbarEntry name="General" href="general" index={1}/>
                     <NavbarEntry name="Player" href="player" index={2}/>
