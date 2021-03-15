@@ -15,6 +15,7 @@ UI gets better sometime
 ## Todo Server
 * add global ws broadcast for e.g. server creation
 * use regex to validate api input, filter code injections
+* add {supports: {mods: true, plugins: false}} attribute to server for mod/ plugin adding on client
 
 ## Todo Client
 * design ui components
