@@ -9,22 +9,24 @@ class LoginView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: "",
-            password: "",
-            alert: "",
-            alertColor: "yellow",
-            loggedIn: false,
-            loading: true,
-            loggingIn: false,
+            username: "", // current entered username
+            password: "", // current entered password
+            alert: "", // displayed alert, not displayed when empty
+            alertColor: "yellow", // color of alert
+            loggedIn: false, // whether user is logged in or not
+            loading: true, // whether the app is trying to connect to backend, display loading animation
+            loggingIn: false, // whether the app is currently trying to log in, displays logging in animation
         };
     }
 
     componentDidMount() {
         this.setState({loading: true, loggedIn: false});
-        document.title = "MCWeb - Login";
+        // check if current session is valid
         getLogin().then(res => {
+            // is yes, redirect to app
             history.push("/general");
         }).finally(() => {
+            // if no, show login prompt
             this.setState({loading: false});
         });
     }
@@ -45,16 +47,22 @@ class LoginView extends React.Component {
     }
 
     async loginUser() {
+        // check if username or password are empty
         if (this.state.username === "" | this.state.password === "") {
             this.setState({ alert: "Please enter your credentials!", alertColor: "yellow"})
         }
+        // display logging in animation
         this.setState({loggingIn: true});
+        // try to log in
         login(this.state.username, this.state.password).then(res => {
+            // if success, set session id and redirect to app
             this.props.setSessionId(res.data.data.sessionId);
             history.push("/general");
         })
+        // if not, display alert
         .catch(e => this.setState({ alert: "Please check your username and password!", alertColor: "red"}))
         .finally(() => {
+            // cancel animation
             this.setState({loggingIn: false});
         })
     }

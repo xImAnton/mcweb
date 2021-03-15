@@ -1,17 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { sendCommand } from "../services"
 
-
+/**
+ * Input field and button of console
+ */
 function ConsoleInput(props) {
 
     const [text, setText] = useState("");
+    // keep ref to input to clear value on submit
     const inputRef = useRef(null);
 
+    // called when send button clicked
     async function submitCommand() {
+        // do nothing when no command
         if (text === "") {
             return
         }
+        // send command
         await sendCommand(props.currentServer.id, text)
+        // clear input field
         inputRef.current.value = "";
     }
 
@@ -21,15 +28,16 @@ function ConsoleInput(props) {
     </div>
 }
 
+/**
+ * Console Page of Webinterface
+ */
 function ConsoleView(props) {
 
     const textRef = useRef(null);
 
-    // scroll to bottom after render
+    // scroll to bottom of textarea after render
     useEffect(() => {
         textRef.current.scrollTop = textRef.current.scrollHeight;
-        if (props.currentServer) 
-        document.title = props.currentServer.name + " - Console";
     })
 
     return <div id="page-content">

@@ -2,6 +2,9 @@ import React from "react";
 import history from "../history";
 
 
+/**
+ * page to display when server error, server not responding or websocket closed by server
+ */
 class NoBackend extends React.Component {
 
     retry() {

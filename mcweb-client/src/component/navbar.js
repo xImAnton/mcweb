@@ -1,10 +1,8 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import history from "../history"
 
 
 function NavbarEntry(props) {
-    const history = useHistory();
-
     function handleClick() {
         history.push("/" + props.href);
     }
@@ -17,17 +15,9 @@ class Navbar extends React.Component {
 
     constructor(props) {
         super(props);
-        this.unLoaded = false;
     }
 
-    render() {
-
-        if (!this.unLoaded) {
-            if (this.props.getUserName()) {
-                this.unLoaded = true;
-            }
-        }
-        
+    render() {        
         return <ul id="navbar-options">
                     <NavbarEntry name="General" href="general" index={1}/>
                     <NavbarEntry name="Player" href="player" index={2}/>
