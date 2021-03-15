@@ -1,13 +1,14 @@
 from sanic.blueprints import Blueprint
 from websockets.exceptions import ConnectionClosed
-from .deco import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, ws_with_ticket
+from .deco import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws
 from json import dumps as json_dumps
+from time import strftime
 
 
 server_blueprint = Blueprint("server", url_prefix="server")
 
 
-@server_blueprint.route("/<i>")
+@server_blueprint.route("/<i:string>")
 @requires_login()
 @server_endpoint()
 async def get_server(req, i):
@@ -42,8 +43,8 @@ async def start_server(req, i):
 
 
 @server_blueprint.websocket("/<i>/console")
-@ws_with_ticket("server/console")
 @server_endpoint()
+@console_ws()
 async def console_websocket(req, ws, i):
     """
     websocket endpoints for console output and server state change
@@ -92,7 +93,9 @@ async def execute_console_command(req, i):
     """
     endpoints for sending console commands to the server
     """
-    await req.ctx.server.send_command(req.json["command"])
+    command = req.json["command"]
+    req.ctx.server.output.append(f"[{strftime('%H:%M:%S')} MCWEB CONSOLE COMMAND]: " + command)
+    await req.ctx.server.send_command(command)
     return json_res({"success": "command sent", "update": {}})
 
 

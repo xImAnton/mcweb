@@ -18,7 +18,7 @@ function AddServerButton(props) {
 class ServerInfo extends React.Component {
 
     serverChanged(e) {
-        this.props.changeServer(parseInt(e.target.value));
+        this.props.changeServer(e.target.value);
     }
 
     toggleCurrentServer() {

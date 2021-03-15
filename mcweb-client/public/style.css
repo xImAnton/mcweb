@@ -428,6 +428,9 @@ span.logout {
     width: 100%;
     left: 0;
     right: 0;
+    background-color: var(--bg);
+    transition: background-color 500ms;
+    color: var(--font);
 }
 
 #loading-content {
@@ -465,4 +468,9 @@ span.logout {
 
 .gb-selection:after {
     content: "GB";
+}
+
+.loading-animation {
+    background-color: var(--bg);
+    transition: background-color 500ms;
 }

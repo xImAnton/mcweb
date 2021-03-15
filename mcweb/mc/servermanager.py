@@ -7,6 +7,7 @@ import os
 from .versions.manager import VersionManager
 from ..views.deco import json_res
 import subprocess
+from bson.objectid import ObjectId
 
 
 class ServerManager:
@@ -21,10 +22,9 @@ class ServerManager:
     async def init(self) -> None:
         """
         fetches all servers and adds them to its server list
-        :return:
         """
-        servers = await self.mc.db_connection.fetch_all("SELECT * FROM servers;")
-        for server in servers:
+
+        async for server in self.mc.mongo["server"].find({}):
             s = MinecraftServer(self.mc, server)
             await s.set_online_status(0)
             self.servers.append(s)
@@ -34,10 +34,9 @@ class ServerManager:
         """
         returns a server for the given id
         :param i: the id of the server
-        :return:
         """
         for server in self.servers:
-            if server.id == i:
+            if str(server.id) == i:
                 return server
         return None
 
@@ -72,21 +71,22 @@ class ServerManager:
         await ServerManager.save_eula(dir_)
 
         # insert into db
-        id_ = await self.get_first_free_id()
-        await self.mc.db_connection.execute(f"INSERT INTO servers (name, allocated_ram, data_dir, jar_file) VALUES (\"{name}\", {ram}, \"{dir_}\", \"server.jar\");")
+        id_ = ObjectId()
+        doc = {"_id": id_, "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": server, "version": version}, "displayName": name}
+        await self.mc.mongo["server"].insert_one(doc)
 
         # add server record to db and register to server manager
-        rec = await self.mc.db_connection.fetch_one(f"SELECT * FROM servers WHERE id={id_};")
-        s = MinecraftServer(self.mc, rec)
+        s = MinecraftServer(self.mc, doc)
         await s.set_online_status(0)
         self.servers.append(s)
 
         if server == "forge":
-            await self.install_forge_server(dir_, version)
+            await ServerManager.install_forge_server(dir_, version)
 
         return json_res({"success": "Server successfully created", "add": {"server": s.json()}})
 
-    async def install_forge_server(self, path, forge_version):
+    @staticmethod
+    async def install_forge_server(path, forge_version):
         null = open(os.devnull, "w")
         subprocess.call("java -jar installer.jar --installServer", stdout=null, stderr=null, cwd=path)
         files_to_try = [f"forge-{forge_version}-universal.jar", f"forge-{forge_version}.jar"]
@@ -102,7 +102,7 @@ class ServerManager:
             raise FileNotFoundError("couldn't find server file")
 
     async def is_name_available(self, name):
-        return not bool(await self.mc.db_connection.fetch_one(f"SELECT * FROM servers WHERE name=\"{name}\";"))
+        return await self.mc.mongo["server"].find_one({"name": name}) is None
 
     @staticmethod
     async def download_and_save(url, path):
@@ -129,3 +129,11 @@ eula=true
         if len(ids) == 0:
             return 1
         return max(ids) + 1
+
+    async def global_broadcast(self, msg):
+        for server in self.servers:
+            await server.connections.broadcast(msg)
+
+    async def disconnect_websockets(self):
+        for server in self.servers:
+            await server.connections.disconnect_all()

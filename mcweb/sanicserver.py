@@ -1,6 +1,4 @@
 from sanic import Sanic
-from .io.database import DatabaseConnector
-from .config import Config
 from .mc.servermanager import ServerManager
 from .views.server import server_blueprint
 from .views.auth import account_blueprint
@@ -9,6 +7,7 @@ import time
 from .views.deco import json_res
 import aiohttp
 import os
+from .io.mongo import MongoClient
 
 
 class MCWeb(Sanic):
@@ -17,10 +16,11 @@ class MCWeb(Sanic):
     """
     def __init__(self):
         super().__init__(__name__)
-        self.db_connection = DatabaseConnector(Config.DB_PATH)
+        # self.db_connection = DatabaseConnector(Config.DB_PATH)
         self.server_manager = ServerManager(self)
         self.register_routes()
         self.public_ip = ""
+        self.mongo = None
 
     def register_routes(self) -> None:
         """
@@ -36,6 +36,7 @@ class MCWeb(Sanic):
         """
         listener to be called after server start
         """
+        self.mongo = MongoClient(self).db
         await self.server_manager.init()
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.ipify.org/") as resp:
@@ -47,10 +48,10 @@ class MCWeb(Sanic):
         """
         sid = req.token
         if sid:
-            session = Session(self.db_connection)
+            session = Session(self.mongo)
             await session.fetch_by_sid(sid)
             if session.expiration > time.time():
-                user = User(self.db_connection)
+                user = User(self.mongo)
                 req.ctx.user = await user.fetch_by_sid(sid)
                 req.ctx.session = session
             else:

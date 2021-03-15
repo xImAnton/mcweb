@@ -4,6 +4,7 @@ from ..io.wsmanager import WebsocketConnectionManager
 from json import dumps as json_dumps
 import asyncio
 import re
+from time import strftime
 
 
 timings_reset = re.compile(r"^\[[0-9]+:[0-9]+:[0-9]+ .*\]: Timings Reset$")
@@ -18,12 +19,14 @@ class MinecraftServer:
     def __init__(self, mc, record):
         self.mc = mc
         self.connections = WebsocketConnectionManager()
-        self.id = record[0]
-        self.name = record[1]
-        self.ram = record[2]
-        self.run_dir = record[3]
-        self.jar = record[4]
-        self.status = record[5]
+        self.id = record["_id"]
+        self.name = record["name"]
+        self.displayName = record["displayName"]
+        self.ram = record["allocatedRAM"]
+        self.run_dir = record["dataDir"]
+        self.jar = record["jarFile"]
+        self.status = record["onlineStatus"]
+        self.software = record["software"]
         self.communication = ServerCommunication(f"java -Xmx{self.ram}G -jar {self.jar}", self.run_dir, on_close=self.on_stop, on_output=self.on_output, on_stderr=self.on_output)
         self.output = []
 
@@ -31,12 +34,14 @@ class MinecraftServer:
         """
         refetches the current server from the database
         """
-        record = await self.mc.db_connection.fetch_one(f"SELECT * FROM servers WHERE id = {self.id};")
-        self.name = record[1]
-        self.ram = record[2]
-        self.run_dir = record[3]
-        self.jar = record[4]
-        self.status = record[5]
+        record = await self.mc.mongo["server"].find_one({"_id": self.id})
+        self.name = record["name"]
+        self.displayName = record["displayName"]
+        self.ram = record["allocatedRAM"]
+        self.run_dir = record["dataDir"]
+        self.jar = record["jarFile"]
+        self.status = record["onlineStatus"]
+        self.software = record["software"]
 
     async def set_online_status(self, status) -> None:
         """
@@ -47,7 +52,7 @@ class MinecraftServer:
         3 - stopping
         :param status: the server status to update
         """
-        await self.mc.db_connection.update("servers", "id = " + str(self.id), {"online_status": status})
+        self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": {"onlineStatus": status}})
         await self.connections.broadcast(json_dumps({"packetType": "StateChangePacket", "update": {"server": {"onlineStatus": status}}}))
 
     @property
@@ -101,7 +106,7 @@ class MinecraftServer:
             "packetType": "ServerConsoleMessagePacket",
             "data": {
                 "message": line,
-                "serverId": self.id
+                "serverId": str(self.id)
             }
         }))
 
@@ -110,6 +115,13 @@ class MinecraftServer:
         prints a command to the server stdin and flushes it
         :param cmd: the command to print
         """
+        await self.connections.broadcast(json_dumps({
+            "packetType": "ServerConsoleMessagePacket",
+            "data": {
+                "message": f"[{strftime('%H:%M:%S')} MCWEB CONSOLE COMMAND]: " + cmd,
+                "serverId": str(self.id)
+            }
+        }))
         if cmd.startswith("stop"):
             await self.set_online_status(3)
         self.communication.write_stdin(cmd)
@@ -119,7 +131,7 @@ class MinecraftServer:
         convert the server to a json object
         :return: a json dict
         """
-        return {"id": self.id,
+        return {"id": str(self.id),
                 "name": self.name,
                 "ram": self.ram,
                 "run_dir": self.run_dir,

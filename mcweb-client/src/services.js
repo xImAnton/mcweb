@@ -3,7 +3,7 @@ import history from "./history";
 
 
 async function get(url) {
-    return catchNotAuthorized(axios.get(url, {
+    return catchApiErrors(axios.get(url, {
         headers: {
             "Authorization": "Token " + getSessionId()
         }
@@ -11,7 +11,7 @@ async function get(url) {
 }
 
 async function post(url, data) {
-    return catchNotAuthorized(axios.post(url, data, {
+    return catchApiErrors(axios.post(url, data, {
         headers: {
             "Authorization": "Token " + getSessionId()
         }
@@ -19,18 +19,33 @@ async function post(url, data) {
 }
 
 async function put(url, data) {
-    return catchNotAuthorized(axios.put(url, data, {
+    return catchApiErrors(axios.put(url, data, {
         headers: {
             "Authorization": "Token " + getSessionId()
         }
     }));
 }
 
-function catchNotAuthorized(promise) {
+function catchApiErrors(promise) {
+    return catchTimeoutError(catchUnauthorized(promise));
+}
+
+function catchTimeoutError(promise) {
     return promise.catch((e => {
-        if (e.response.status === 401) {
+        console.error("Error while fetching url " + e.response.url);
+        if (e.response.status === 504) { // Gateway Timeout
+            if (!(history.location.pathname === "/apierror")) {
+                history.push("/apierror");
+            }
+        }
+        throw e;
+    }));
+}
+
+function catchUnauthorized(promise) {
+    return promise.catch((e => {
+        if (e.response.status === 401) { // Unauthorized
             if (!(history.location.pathname === "/login")) {
-                console.log("push");
                 history.push("/login");
             }
         }
@@ -52,7 +67,7 @@ export function sendCommand(server, command) {
 }
 
 export function login(user, password) {
-    return axios.post(getApiBase() + "/account/login/", JSON.stringify({username: user, password: password }))
+    return catchTimeoutError(axios.post(getApiBase() + "/account/login/", JSON.stringify({username: user, password: password })));
 }
 
 export function startServer(server) {
@@ -67,8 +82,8 @@ export function fetchServer(server) {
     return get(getApiBase() + "/server/" + server);
 }
 
-export function getConsoleTicket() {
-    return get(getApiBase() + "/account/ticket/server/console");
+export function getConsoleTicket(server) {
+    return post(getApiBase() + "/account/ticket", {"type": "server.console", "data": {"serverId": server}});
 }
 
 export function logoutUser() {

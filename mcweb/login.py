@@ -3,7 +3,6 @@ import hashlib
 import secrets
 import time
 from typing import Optional, Tuple
-
 from .config import Config
 
 
@@ -24,12 +23,12 @@ class User:
         :param name: the username to search for
         :return: User if user was found, None if not
         """
-        user = await self.db.fetch_one(f"SELECT * FROM users WHERE name='{name}';")
+        user = await self.db["user"].find_one({"name": name})
         if user:
-            self.id = user[0]
-            self.name = user[1]
-            self.password = user[2]
-            self.perms = user[3]
+            self.id = user["_id"]
+            self.name = user["name"]
+            self.password = user["password"]
+            self.perms = user["permissions"]
             return self
         else:
             return None
@@ -40,12 +39,12 @@ class User:
         :param i: the user id to search for
         :return: User if user was found, None if not
         """
-        user = await self.db.fetch_one(f"SELECT * FROM users WHERE id={i};")
+        user = await self.db["user"].find_one({"_id": i})
         if user:
-            self.id = user[0]
-            self.name = user[1]
-            self.password = user[2]
-            self.perms = user[3]
+            self.id = user["_id"]
+            self.name = user["name"]
+            self.password = user["password"]
+            self.perms = user["permissions"]
             return self
         else:
             return None
@@ -65,7 +64,7 @@ class User:
         """
         sess_id = secrets.token_urlsafe(32)
         expires = int(time.time() + Config.SESSION_EXPIRATION)
-        await self.db.execute(f"INSERT INTO sessions VALUES (\"{sess_id}\", {self.id}, {expires});")
+        await self.db["session"].insert_one({"sid": sess_id, "userId": self.id, "expiration": expires})
         return sess_id
 
     async def fetch_by_sid(self, sid) -> Optional[User]:
@@ -79,11 +78,14 @@ class User:
         return await self.fetch_by_id(session.user_id)
 
     async def fetch_by_ticket(self, ticket):
-        user_id = await self.db.fetch_one(f"SELECT * FROM ws_tickets WHERE id=\"{ticket}\";")
-        if not user_id:
+        ticket = await self.db["wsticket"].find_one({"ticket": ticket})
+        if not ticket:
             return None
-        user = await self.db.fetch_one(f"SELECT * FROM users WHERE id={user_id[1]};")
+        user = await self.db["user"].find_one({"_id": ticket["userId"]})
         return user
+
+    def __repr__(self):
+        return f"User[name={self.name}]"
 
 
 class Session:
@@ -102,11 +104,11 @@ class Session:
         :param sid: the session id to search for
         :return: Session if session was found, None if not
         """
-        s = await self.db.fetch_one(f"SELECT * FROM sessions WHERE id=\"{sid}\";")
+        s = await self.db["session"].find_one({"sid": sid})
         if s:
-            self.sid = s[0]
-            self.user_id = s[1]
-            self.expiration = s[2]
+            self.sid = s["sid"]
+            self.user_id = s["userId"]
+            self.expiration = s["expiration"]
             return self
         return None
 
@@ -122,4 +124,7 @@ class Session:
         """
         deletes this session
         """
-        await self.db.execute(f"DELETE FROM sessions WHERE id=\"{self.sid}\";")
+        await self.db["session"].delete_one({"sid": self.sid})
+
+    def __repr__(self):
+        return f"Session[id={self.sid}]"

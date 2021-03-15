@@ -14,5 +14,12 @@
       "downloadBuild": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{build}/forge-{build}-installer.jar"
     }
   },
-  "maxRam": 6
+  "maxRam": 6,
+  "mongoDB": {
+    "host": "localhost",
+    "port": 27017,
+    "username": "",
+    "password": "",
+    "database": "mcweb"
+  }
 }
