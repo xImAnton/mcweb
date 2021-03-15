@@ -2,6 +2,7 @@ from sanic.blueprints import Blueprint
 from .deco import json_res, requires_post_params, requires_login, catch_keyerrors
 from ..login import User
 import secrets
+from bson.objectid import ObjectId
 
 
 def remove_lead_and_trail_slash(s):
@@ -68,16 +69,20 @@ async def fetch_me(req):
 @catch_keyerrors()
 async def open_ticket(req):
     user = req.ctx.user
-    type = req.json["type"].lower()
+    type_ = req.json["type"].lower()
     data = req.json["data"]
-    if type == "server.console" and "serverId" not in data.keys():
-        return json_res({"error": "Missing Server Id", "description": "you have to specify the server id for the type server.console", "status": 400}, status=400)
-    rec = await req.app.mongo["wsticket"].find_one({"userId": user.id, "endpoint": {"type": type, "data": data}})
+    if type_ == "server.console":
+        if "serverId" not in data.keys():
+            return json_res({"error": "Missing Server Id", "description": "you have to specify the server id for the type server.console", "status": 400}, status=400)
+        # Check if serverId is valid bson ObjectId and if a server with that id exists
+        if (not ObjectId.is_valid(data["serverId"])) | (ObjectId(data["serverId"]) not in await req.app.server_manager.get_ids()):
+            return json_res({"error": "Invalid Server Id", "description": "the server id you entered is either no valid bson ObjectId or does not match a server", "status": 400}, status=400)
+        # save ObjectId string from request as ObjectId in mongo
+        data["serverId"] = ObjectId(data["serverId"])
+    rec = await req.app.mongo["wsticket"].find_one({"userId": user.id, "endpoint": {"type": type_, "data": data}})
     if rec:
-        rec["userId"] = str(rec["userId"])
         return json_res(rec)
     ticket = secrets.token_urlsafe(24)
-    doc = {"ticket": ticket, "userId": user.id, "endpoint": {"type": type, "data": data}}
+    doc = {"ticket": ticket, "userId": user.id, "endpoint": {"type": type_, "data": data}}
     await req.app.mongo["wsticket"].insert_one(doc)
-    doc["userId"] = str(doc["userId"])
     return json_res(doc)

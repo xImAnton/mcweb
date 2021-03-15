@@ -149,7 +149,7 @@ def console_ws():
                                  "description": "open a ticket using /account/ticket/<endpoint>"}, status=401)
             server = req.ctx.server
             endpoint = rec["endpoint"]
-            if endpoint["type"] == "server.console" and endpoint["data"]["serverId"] != str(server.id):
+            if endpoint["type"] == "server.console" and endpoint["data"]["serverId"] != server.id:
                 return json_res({"error": "Invalid Ticket", "status": 401, "description": "the ticket you provided is not opened for this server"})
             await req.app.mongo["server"].delete_one({"ticket": t})
             response = await f(req, *args, **kwargs)

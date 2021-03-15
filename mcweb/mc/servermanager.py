@@ -30,6 +30,9 @@ class ServerManager:
             self.servers.append(s)
         await self.versions.reload_all()
 
+    async def get_ids(self):
+        return [x.id for x in self.servers]
+
     async def get_server(self, i) -> Optional[MinecraftServer]:
         """
         returns a server for the given id
