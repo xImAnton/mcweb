@@ -10,6 +10,7 @@ UI gets better sometime
 
 ## Todo
 * implement more server types (forge, vanilla)
+* let get all servers endpoint only return server ids and display names, fetch server on server change
 
 ## Todo Server
 * add global ws broadcast for e.g. server creation
