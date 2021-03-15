@@ -1,5 +1,5 @@
 import motor.motor_asyncio
-from ..config import Config
+from mcweb.io.config import Config
 
 
 class MongoClient(motor.motor_asyncio.AsyncIOMotorClient):

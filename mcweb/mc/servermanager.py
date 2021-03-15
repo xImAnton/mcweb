@@ -2,10 +2,10 @@ from typing import Optional
 from .server import MinecraftServer
 import aiohttp
 import aiofiles
-from ..config import Config
+from mcweb.io.config import Config
 import os
 from .versions.manager import VersionManager
-from ..views.deco import json_res
+from mcweb.util import json_res
 import subprocess
 from bson.objectid import ObjectId
 
@@ -45,19 +45,23 @@ class ServerManager:
 
     async def create_server(self, name, server, version, ram):
         # check if version existing
-        versions = await self.versions.get_json(True)
+        versions = await self.versions.get_json()
         if server not in versions.keys():
             return json_res({"error": "Invalid Server", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
-        if isinstance(versions[server], list) or version not in versions[server].keys():
+        if version not in versions[server]:
             return json_res({"error": "Invalid Version", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
 
         # Check ram
         if ram > Config.MAX_RAM:
             return json_res({"error": "Too Much RAM", "description": "maximal ram is " + str(Config.MAX_RAM), "status": 400, "maxRam": Config.MAX_RAM}, status=400)
 
+        # Lowercase, no special char server name
+        display_name = name
+        name = ServerManager.format_name(name)
+
         # check if server with name is existing
-        if not await self.is_name_available(name):
-            return json_res({"error": "Duplicate Name", "description": "the server name you specified is already existing", "status": 400}, status=400)
+        while not await self.is_name_available(name):
+            name += "-"
 
         # generate path name and dir
         dir_ = os.path.join(os.path.join(os.getcwd(), "servers"), name)
@@ -69,13 +73,13 @@ class ServerManager:
         out_file = "server.jar"
         if server == "forge":
             out_file = "installer.jar"
-        await ServerManager.download_and_save(versions[server][version], os.path.join(dir_, out_file))
+        await ServerManager.download_and_save(await (await self.versions.get_provider())[server].get_download(version), os.path.join(dir_, out_file))
         # save agreed eula
         await ServerManager.save_eula(dir_)
 
         # insert into db
         id_ = ObjectId()
-        doc = {"_id": id_, "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": server, "version": version}, "displayName": name}
+        doc = {"_id": id_, "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": server, "version": version}, "displayName": display_name}
         await self.mc.mongo["server"].insert_one(doc)
 
         # add server record to db and register to server manager
@@ -140,3 +144,19 @@ eula=true
     async def disconnect_websockets(self):
         for server in self.servers:
             await server.connections.disconnect_all()
+
+    @staticmethod
+    def format_name(s):
+        """
+        removes special characters from string
+        :param s: string to format
+        :return: reformatted string
+        """
+        s = s.lower().replace(" ", "-")
+        o = []
+        for e in s:
+            if e.isalnum() | (e == "-"):
+                o.append(e)
+            else:
+                o.append("_")
+        return "".join(o)

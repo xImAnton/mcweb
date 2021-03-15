@@ -3,13 +3,8 @@ from ..mc.communication import ServerCommunication
 from ..io.wsmanager import WebsocketConnectionManager
 from json import dumps as json_dumps
 import asyncio
-import re
 from time import strftime
-
-
-timings_reset = re.compile(r"^\[[0-9]+:[0-9]+:[0-9]+ .*\]: Timings Reset$")
-advanced_terminal_features = re.compile(r"[0-9]*-[0-9]*-[0-9]* [0-9]*:[0-9]*:[0-9]*,[0-9]* main WARN Advanced terminal features are not available in this environment")
-forge_done = re.compile(r'\[[0-9]*:[0-9]*:[0-9]*\] \[.*\]: Done \([0-9]*\.[0-9]*s\)! For help, type "help"')
+from ..io.regexes import Regexes
 
 
 class MinecraftServer:
@@ -21,7 +16,7 @@ class MinecraftServer:
         self.connections = WebsocketConnectionManager()
         self.id = record["_id"]
         self.name = record["name"]
-        self.displayName = record["displayName"]
+        self.display_name = record["displayName"]
         self.ram = record["allocatedRAM"]
         self.run_dir = record["dataDir"]
         self.jar = record["jarFile"]
@@ -36,7 +31,7 @@ class MinecraftServer:
         """
         record = await self.mc.mongo["server"].find_one({"_id": self.id})
         self.name = record["name"]
-        self.displayName = record["displayName"]
+        self.display_name = record["displayName"]
         self.ram = record["allocatedRAM"]
         self.run_dir = record["dataDir"]
         self.jar = record["jarFile"]
@@ -98,9 +93,9 @@ class MinecraftServer:
         :param line: the line that is printed
         """
         self.output.append(line)
-        if timings_reset.match(line.strip()) or forge_done.match(line.strip()):
+        if Regexes.TIMINGS_RESET_PAPER.match(line.strip()) or Regexes.DONE_FORGE.match(line.strip()):
             asyncio.run(self.set_online_status(2))
-        if advanced_terminal_features.match(line.strip()):
+        if Regexes.ADVANCED_TERMINAL_FEATURES.match(line.strip()):
             return
         self.connections.broadcast_sync(json_dumps({
             "packetType": "ServerConsoleMessagePacket",
@@ -137,4 +132,7 @@ class MinecraftServer:
                 "run_dir": self.run_dir,
                 "jar": self.jar,
                 "onlineStatus": self.status,
-                "ip": self.mc.public_ip}
+                "ip": self.mc.public_ip,
+                "displayName": self.display_name,
+                "software": self.software
+                }

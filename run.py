@@ -1,5 +1,5 @@
 from mcweb import MCWeb
-from mcweb.config import Config
+from mcweb.io.config import Config
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import hashlib
 import secrets
 import time
 from typing import Optional, Tuple
-from .config import Config
+from mcweb.io.config import Config
 
 
 class User:

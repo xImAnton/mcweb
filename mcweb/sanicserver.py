@@ -2,9 +2,9 @@ from sanic import Sanic
 from .mc.servermanager import ServerManager
 from .views.server import server_blueprint
 from .views.auth import account_blueprint
-from .login import User, Session
+from mcweb.views.login import User, Session
 import time
-from .views.deco import json_res
+from mcweb.util import json_res
 import aiohttp
 import os
 from .io.mongo import MongoClient

@@ -1,7 +1,7 @@
 from functools import wraps
 from sanic.response import json, redirect
 from json import dumps as json_dumps, loads as json_loads
-from ..login import User
+from mcweb.views.login import User
 from bson.objectid import ObjectId
 
 
@@ -15,6 +15,11 @@ def json_res(di, **kwargs):
 
 
 def objid_to_str(d):
+    """
+    converts all object id object in a json response to str
+    :param d: dict to convert
+    :return: converted  dict
+    """
     if isinstance(d, dict):
         out = {}
         for k, v in d.items():
@@ -132,6 +137,9 @@ def requires_permission(*perms):
 
 
 def console_ws():
+    """
+    verifies tickets for the console websocket endpoint
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
@@ -159,6 +167,9 @@ def console_ws():
 
 
 def catch_keyerrors():
+    """
+    catches all keyerrors in the decorated route and cancels request
+    """
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
@@ -169,3 +180,11 @@ def catch_keyerrors():
                 return json_res({"error": "KeyError", "description": str(e)})
         return decorated_function
     return decorator
+
+
+def check_regexes(data):
+    for field_name, vr in data.items():
+        v, r = vr
+        if not r.match(v):
+            return json_res({"error": "Format Error", "description": f"Field {field_name} has to match regex {r}", "status": 400}, status=400)
+    return None

@@ -1,9 +1,9 @@
 class VersionProvider:
-    def __init__(self):
-        self.versions = {}
-
     async def reload(self):
         pass
 
-    def get_json(self, links=False):
-        return self.versions if links else list(self.versions.keys())
+    async def get_download(self, version):
+        return ""
+
+    async def get_versions(self):
+        return []

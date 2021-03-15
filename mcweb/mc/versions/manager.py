@@ -11,5 +11,8 @@ class VersionManager:
         await self.paper_provider.reload()
         await self.forge_provider.reload()
 
-    async def get_json(self, links=False):
-        return {"paper": self.paper_provider.get_json(links), "forge": self.forge_provider.get_json(links)}
+    async def get_json(self):
+        return {"paper": await self.paper_provider.get_versions(), "forge": await self.forge_provider.get_versions()}
+
+    async def get_provider(self):
+        return {"paper": self.paper_provider, "forge": self.forge_provider}

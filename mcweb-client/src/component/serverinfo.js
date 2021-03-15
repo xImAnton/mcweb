@@ -67,7 +67,7 @@ class ServerInfo extends React.Component {
 
         return <div id="server-information">Server: 
                 <select value={this.props.currentServer ? this.props.currentServer.id : 0} onChange={(e) => this.serverChanged(e)}>
-                    {this.props.servers.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
+                    {this.props.servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
                 </select>
                     <CopyField text={ip} />
                     Status: <div id="online-status" className={serverStatus}></div>

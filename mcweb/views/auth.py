@@ -1,16 +1,9 @@
 from sanic.blueprints import Blueprint
-from .deco import json_res, requires_post_params, requires_login, catch_keyerrors
-from ..login import User
+from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors, check_regexes
+from mcweb.views.login import User
 import secrets
 from bson.objectid import ObjectId
-
-
-def remove_lead_and_trail_slash(s):
-    if s.startswith('/'):
-        s = s[1:]
-    if s.endswith('/'):
-        s = s[:-1]
-    return s
+from ..io.regexes import Regexes
 
 
 account_blueprint = Blueprint("account", url_prefix="account")

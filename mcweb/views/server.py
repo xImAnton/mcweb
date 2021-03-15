@@ -1,6 +1,6 @@
 from sanic.blueprints import Blueprint
 from websockets.exceptions import ConnectionClosed
-from .deco import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws
+from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws
 from json import dumps as json_dumps
 from time import strftime
 
