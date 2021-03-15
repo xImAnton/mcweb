@@ -11,7 +11,8 @@ class Config:
         "RESET_DB": ("resetDB", False),
         "SESSION_EXPIRATION": ("sessionExpiration", 7200),
         "DOWNLOADS": ("downloads", {}),
-        "MAX_RAM": ("maxRam", 2)
+        "MAX_RAM": ("maxRam", 2),
+        "MONGO":  ("mongoDB", {})
     }
 
     DB_PATH = "data.db"
@@ -19,13 +20,14 @@ class Config:
     DOWNLOADS = {}
     SESSION_EXPIRATION = 7200
     MAX_RAM = 2
+    MONGO = {}
 
     @staticmethod
     def load() -> None:
         """
         loads the config file and stores it's values as class attributes
         """
-        with open("config.json") as f:
+        with open("config.json", "r", encoding="utf-8") as f:
             data = json.loads(f.read())
 
         for attr, key in Config.ATTR_KEYS.items():

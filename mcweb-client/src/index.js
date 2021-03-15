@@ -40,11 +40,11 @@ class App extends React.Component {
         };
 
         this.serverSocket = null;
-        this.ignoreSocketClose = false;
     }
 
     setSessionId(sid) {
         sessionStorage.setItem("MCWeb_Session", sid);
+        this.setState({missingFetches: 2});
         this.refetch();
         this.forceUpdate();
     }
@@ -82,7 +82,7 @@ class App extends React.Component {
     }
 
     openWs(serverId, ticket) {
-        if (!this.state.currentServer) {
+        if (!serverId) {
             console.error("current server not set");
             return;
         }
@@ -91,7 +91,7 @@ class App extends React.Component {
             this.serverSocket.close();
         }
         this.setState({consoleLines: []});
-        this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + this.state.currentServer.id + "/console?ticket=" + ticket);
+        this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + serverId + "/console?ticket=" + ticket);
         this.serverSocket.onopen = (e) => this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
         this.serverSocket.onmessage = (e) => this.onSocketPacket(e);
         this.serverSocket.onclose = (e) => this.onSocketClose(e);
@@ -99,6 +99,7 @@ class App extends React.Component {
 
     onSocketClose(e) {
         if (e.code === 1000) { // Closed by server
+            console.error("Server closed websocket")
             history.push("/apierror");
         }
     }
@@ -118,9 +119,9 @@ class App extends React.Component {
             this.setState((s) => { return {missingFetches: s.missingFetches - 1, servers: newservers} });
         });
 
-        getConsoleTicket().then(res => {
+        getConsoleTicket(id).then(ticket => {
             this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
-            this.openWs(id, res.data.ticket);
+            this.openWs(id, ticket.data.ticket);
         })
     }
 
@@ -134,7 +135,6 @@ class App extends React.Component {
     }
 
     refetch() {
-        console.log("refetch");
         if (this.getSessionId()) {
             // refetch user informations
             fetchUser().then(res => {
@@ -149,11 +149,12 @@ class App extends React.Component {
                     return;
                 }
                 this.setState({servers: res.data});
-                this.changeServer(1);
+                this.changeServer(this.state.servers[0].id);
             }).finally(() => {
                 this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             })
         } else {
+            this.setState({missingFetches: 0})
             history.push("/login");
         }
     }
@@ -184,7 +185,7 @@ class App extends React.Component {
                                         <CreateServerView addServer={(s) => {
                                             const servers = this.state.servers.slice();
                                             servers.push(s);
-                                            this.setState({servers: servers});
+                                            this.setState((s) => {return {servers: servers, missingFetches: s.missingFetches}});
                                         }} cancellable={this.state.serverCreationCancellable}
                                         changeServer={(i) => this.changeServer(i)}
                                         />
@@ -239,4 +240,7 @@ class App extends React.Component {
 }
 
 ReactDOM.render(
-    <Router history={history}><App /></Router>, document.getElementById("root"));
+    <Router history={history}>
+        <App />
+    </Router>,
+document.getElementById("root"));

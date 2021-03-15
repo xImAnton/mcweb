@@ -48,7 +48,7 @@ represents a user that is able to login to the webinterface
         ],
         "server.*": [                       -- permissions for all servers, additional overridden by permisions for specific server that are not negated
             "server.*.*",                   -- admin for all servers
-            "server.*.op"                   -- user can although not use op command for server.myserver because he has negated permission there
+            "server.*.command.op"                   -- user can although not use op command for server.myserver because he has negated permission there
         ]                      
 	}
 }

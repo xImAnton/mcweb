@@ -1,7 +1,6 @@
 from sanic.blueprints import Blueprint
-from .deco import json_res, requires_post_params, requires_login
+from .deco import json_res, requires_post_params, requires_login, catch_keyerrors
 from ..login import User
-from json import loads as json_loads
 import secrets
 
 
@@ -23,7 +22,7 @@ async def login_post(req):
     """
     post endpoint for logging in a user
     """
-    user = User(req.app.db_connection)
+    user = User(req.app.mongo)
     user = await user.fetch_by_name(req.json["username"])
     if user:
         if await user.check_password(req.json["password"]):
@@ -60,17 +59,25 @@ async def fetch_me(req):
     """
     sends information about the current user to the client
     """
-    return json_res({"username": req.ctx.user.name, "permissions": json_loads(req.ctx.user.perms)})
+    return json_res({"username": req.ctx.user.name, "permissions": req.ctx.user.perms})
 
 
-@account_blueprint.get("/ticket/<ep:path>")
+@account_blueprint.post("/ticket")
 @requires_login()
-async def open_ticket(req, ep):
+@requires_post_params("type", "data")
+@catch_keyerrors()
+async def open_ticket(req):
     user = req.ctx.user
-    ep = remove_lead_and_trail_slash(ep)
-    rec = await req.app.db_connection.fetch_one(f"SELECT * FROM ws_tickets WHERE user_id={user.id} AND endpoint=\"{ep}\";")
+    type = req.json["type"].lower()
+    data = req.json["data"]
+    if type == "server.console" and "serverId" not in data.keys():
+        return json_res({"error": "Missing Server Id", "description": "you have to specify the server id for the type server.console", "status": 400}, status=400)
+    rec = await req.app.mongo["wsticket"].find_one({"userId": user.id, "endpoint": {"type": type, "data": data}})
     if rec:
-        return json_res({"ticket": rec[0], "endpoint": ep})
+        rec["userId"] = str(rec["userId"])
+        return json_res(rec)
     ticket = secrets.token_urlsafe(24)
-    await req.app.db_connection.execute(f"INSERT INTO ws_tickets (id, user_id, endpoint) VALUES (\"{ticket}\", {user.id}, \"{ep}\");")
-    return json_res({"ticket": ticket, "endpoint": ep})
+    doc = {"ticket": ticket, "userId": user.id, "endpoint": {"type": type, "data": data}}
+    await req.app.mongo["wsticket"].insert_one(doc)
+    doc["userId"] = str(doc["userId"])
+    return json_res(doc)

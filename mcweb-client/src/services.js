@@ -32,9 +32,9 @@ function catchApiErrors(promise) {
 
 function catchTimeoutError(promise) {
     return promise.catch((e => {
+        console.error("Error while fetching url " + e.response.url);
         if (e.response.status === 504) { // Gateway Timeout
             if (!(history.location.pathname === "/apierror")) {
-                console.log("puush");
                 history.push("/apierror");
             }
         }
@@ -82,8 +82,8 @@ export function fetchServer(server) {
     return get(getApiBase() + "/server/" + server);
 }
 
-export function getConsoleTicket() {
-    return get(getApiBase() + "/account/ticket/server/console");
+export function getConsoleTicket(server) {
+    return post(getApiBase() + "/account/ticket", {"type": "server.console", "data": {"serverId": server}});
 }
 
 export function logoutUser() {

@@ -42,3 +42,7 @@ class WebsocketConnectionManager:
         sync call for coroutine broadcast
         """
         asyncio.run(self.broadcast(msg, except_))
+
+    async def disconnect_all(self):
+        for conn in self.connections:
+            await conn.close()

@@ -1,16 +1,35 @@
 from functools import wraps
 from sanic.response import json, redirect
 from json import dumps as json_dumps, loads as json_loads
-from ..login import Session, User
+from ..login import User
+from bson.objectid import ObjectId
 
 
-def json_res(*args, **kwargs):
+def json_res(di, **kwargs):
     """
     straight wrapper for sanic.response.json
     adds indent to the output json
     :return: the created sanic.response.HTTPResponse
     """
-    return json(*args, dumps=lambda s: json_dumps(s, indent=2), **kwargs)
+    return json(objid_to_str(di), dumps=lambda s: json_dumps(s, indent=2), **kwargs)
+
+
+def objid_to_str(d):
+    if isinstance(d, dict):
+        out = {}
+        for k, v in d.items():
+            if isinstance(v, dict):
+                v = objid_to_str(v)
+            elif isinstance(v, ObjectId):
+                v = str(v)
+            out[k] = v
+        return out
+    elif isinstance(d, list):
+        out = []
+        for l in d:
+            out.append(objid_to_str(l))
+        return out
+    return d
 
 
 def server_endpoint():
@@ -26,10 +45,6 @@ def server_endpoint():
             if "i" not in kwargs.keys():
                 return json_res({"error": "KeyError", "status": 400, "description": "please specify the server id"}, status=404)
             i = kwargs["i"]
-            try:
-                i = int(i)
-            except ValueError:
-                return json_res({"error": "ValueError", "status": 400, "description": "the server id has to be int"}, status=404)
             server = await req.app.server_manager.get_server(i)
             if server is None:
                 return json_res({"error": "Not Found", "status": 404, "description": "no server was found for your id"}, status=404)
@@ -116,25 +131,41 @@ def requires_permission(*perms):
     return decorator
 
 
-def ws_with_ticket(path):
+def console_ws():
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
             if "ticket" not in req.args.keys():
-                print("no ticket")
                 return json_res({"error": "No Ticket Provided", "status": 401, "description": "open a ticket using /account/ticket<endpoint>"}, status=401)
             t = req.args.get("ticket")
-            user = User(req.app.db_connection)
+            user = User(req.app.mongo)
             req.ctx.user = await user.fetch_by_ticket(t)
             if not req.ctx.user:
                 return json_res({"error": "Invalid Ticket", "status": 401,
-                                 "description": "open a ticket using /account/ticket/<endpoint>"}, status=401)
-            e = await req.app.db_connection.fetch_one(f"SELECT * FROM ws_tickets WHERE id=\"{t}\" AND user_id={req.ctx.user.id} AND endpoint=\"{path}\";")
-            if not e:
+                                 "description": "open a ticket using post /account/ticket"}, status=401)
+            rec = await req.app.mongo["wsticket"].find_one({"ticket": t})
+            if not rec:
                 return json_res({"error": "Invalid Ticket", "status": 401,
                                  "description": "open a ticket using /account/ticket/<endpoint>"}, status=401)
-            await req.app.db_connection.execute(f"DELETE FROM ws_tickets WHERE id=\"{t}\" AND user_id={req.ctx.user.id} AND endpoint=\"{path}\";")
+            server = req.ctx.server
+            endpoint = rec["endpoint"]
+            if endpoint["type"] == "server.console" and endpoint["data"]["serverId"] != str(server.id):
+                return json_res({"error": "Invalid Ticket", "status": 401, "description": "the ticket you provided is not opened for this server"})
+            await req.app.mongo["server"].delete_one({"ticket": t})
             response = await f(req, *args, **kwargs)
             return response
+        return decorated_function
+    return decorator
+
+
+def catch_keyerrors():
+    def decorator(f):
+        @wraps(f)
+        async def decorated_function(req, *args, **kwargs):
+            try:
+                response = await f(req, *args, **kwargs)
+                return response
+            except KeyError as e:
+                return json_res({"error": "KeyError", "description": str(e)})
         return decorated_function
     return decorator
