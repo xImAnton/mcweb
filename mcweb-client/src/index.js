@@ -26,37 +26,41 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        let darkmode = (localStorage.getItem("MCWeb_Darkmode") === "true");
+        let darkmode = (localStorage.getItem("MCWeb_Darkmode") === "true"); // set darkmode to setting, when defined in localStorage
 
         this.state = {
-            darkmode: darkmode,
-            username: "",
-            permissions: {},
+            darkmode: darkmode, // whether the app is display in darkmode
+            username: "", // name of logged in user
+            permissions: {}, // permissions of logged in user
             servers: [],
             consoleLines: [],
             currentServer: null,
             serverCreationCancellable: true,
-            missingFetches: 0
+            missingFetches: 0 // how many fetches are missing, when greater 0, displays loading animation
         };
 
         this.serverSocket = null;
     }
 
     setSessionId(sid) {
+        // set session id after login, refetch
         sessionStorage.setItem("MCWeb_Session", sid);
-        this.setState({missingFetches: 2});
         this.refetch();
-        this.forceUpdate();
     }
 
     getSessionId() {
         return sessionStorage.getItem("MCWeb_Session");
     }
 
+    /**
+     * called when a new packet is sent via ws
+     */
     onSocketPacket(data) {
         console.log(data.data);
+        // parse packet
         data = JSON.parse(data.data);
         if (data.packetType === "StateChangePacket") {
+            // update state of current server
             this.setState({servers: this.state.servers.slice().map(x => {
                 if (x.id === this.state.currentServer.id) {
                     Object.assign(x, data.update.server);
@@ -66,11 +70,13 @@ class App extends React.Component {
             })});
         }
         if (data.packetType === "ServerConsoleMessagePacket") {
+            // add message to console
             const consoleMessages = this.state.consoleLines.slice();
             consoleMessages.push(data.data.message);
             this.setState({consoleLines: consoleMessages});
         }
         if (data.packetType === "BulkConsoleMessagePacket") {
+            // add several messages to console
             if (data.data.reset) {
                 this.setState({consoleLines: data.data.lines});
             } else {
@@ -86,12 +92,15 @@ class App extends React.Component {
             console.error("current server not set");
             return;
         }
+        // when socket open, close it
         if (this.serverSocket) {
-            this.ignoreSocketClose = true;
             this.serverSocket.close();
         }
+        // clear console lines --> new server
         this.setState({consoleLines: []});
+        // open ws
         this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + serverId + "/console?ticket=" + ticket);
+        // set handler
         this.serverSocket.onopen = (e) => this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
         this.serverSocket.onmessage = (e) => this.onSocketPacket(e);
         this.serverSocket.onclose = (e) => this.onSocketClose(e);
@@ -105,9 +114,11 @@ class App extends React.Component {
     }
 
     changeServer(id) {
+        // set missing fetches
         this.setState((s) => { return {missingFetches: s.missingFetches + 3} });
         fetchServer(id).then(res => {
             const newservers = [];
+            // update servers state with new fetched server
             for (let i = 0; i < this.state.servers.length; i++) {
                 if (this.state.servers[i].id !== id) {
                     newservers.push(this.state.servers[i]);
@@ -116,25 +127,32 @@ class App extends React.Component {
                     this.setState({currentServer: res.data});
                 }
             }
+            // decrement missing fetches
             this.setState((s) => { return {missingFetches: s.missingFetches - 1, servers: newservers} });
         });
-
+        // open console ws ticket
         getConsoleTicket(id).then(ticket => {
             this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
+            // open ws when ticket retrieved
             this.openWs(id, ticket.data.ticket);
         })
     }
 
     logout() {
+        // close socket when open
         if (this.serverSocket !== null) {
             this.serverSocket.close();
         }
+        // logout in backend
         logoutUser();
+        // clear session
         sessionStorage.removeItem("MCWeb_Session");
+        // rerender
         this.forceUpdate();
     }
 
     refetch() {
+        this.setState({missingFetches: 2});
         if (this.getSessionId()) {
             // refetch user informations
             fetchUser().then(res => {
@@ -143,6 +161,7 @@ class App extends React.Component {
             });
             // refetch servers
             fetchAllServers().then(res => {
+                // create server when none existing
                 if (res.data.length === 0) {
                     this.setState({serverCreationCancellable: false});
                     history.push("/createserver");
@@ -154,13 +173,13 @@ class App extends React.Component {
                 this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             })
         } else {
+            // login when no session id is saved
             this.setState({missingFetches: 0})
             history.push("/login");
         }
     }
 
     componentDidMount() {
-        this.setState({missingFetches: 2});
         this.refetch();
     }
 
@@ -170,6 +189,7 @@ class App extends React.Component {
         return <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
             <Switch history={history} >
                 <Route path="/login">
+                    {/*Display LoginView when path is login*/}
                     <LoginView setSessionId={(i) => this.setSessionId(i)} logout={() => this.logout()} />
                 </Route>
                 <Route path="/">
@@ -177,8 +197,10 @@ class App extends React.Component {
                         <Header />
                             <Switch history={history} >
                                 <Route path="/apierror">
+                                    {/*display backend error*/}
                                     <NoBackend refetch={() => this.refetch()} />
                                 </Route>
+                                {/*redirect to login when no session id present, down here bc. apierror has higher priority*/}
                                 {!sid && <Redirect to="/login" />}
                                 <Route path="/createserver">
                                     <div id="content-wrapper" className="full">
@@ -192,6 +214,7 @@ class App extends React.Component {
                                     </div>
                                 </Route>
                                 <Route path="/">
+                                    {/*display app when to fetches are missing*/}
                                     <>{ this.state.missingFetches <= 0 ? (<>
                                     <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})} setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})} />
                                     <div id="content-wrapper">
@@ -224,6 +247,7 @@ class App extends React.Component {
                                                 <Redirect to="/general" />
                                             </Route>
                                         </Switch>
+                                    {/*display LoadingAnimation when fetches are missing*/}
                                     </div></>) : (<LoadingAnimation loadingText="Loading Server Information" />)}</>
                                 </Route>
                             </Switch>

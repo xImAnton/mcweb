@@ -1,14 +1,17 @@
 import React from "react";
 import CopyField from "./copyfield";
 import { startServer, stopServer } from "../services";
-import { useHistory } from "react-router-dom";
+import history from "../history"
 
 
+/**
+ * plus button for opening CreateServerView
+ */
 function AddServerButton(props) {
-    const history = useHistory();
-
     function clicked(e) {
+        // make server creation cancellable
         props.setCreationCancellable(true);
+        // redirect to server creation
         history.push("/createserver");
     }
 
@@ -18,14 +21,18 @@ function AddServerButton(props) {
 class ServerInfo extends React.Component {
 
     serverChanged(e) {
+        // called when server select field changes, switch and fetch new server
         this.props.changeServer(e.target.value);
     }
 
     toggleCurrentServer() {
+        // start/ stop current server
         const currentServer = this.props.currentServer;
+        // when server offline, clear console and start it
         if (currentServer.onlineStatus === 0) {
             this.props.setConsoleLines([]);
             startServer(this.props.currentServer.id);
+        // when server online or starting, stop it
         } else if (currentServer.onlineStatus === 1 | currentServer.onlineStatus === 2) {
             stopServer(this.props.currentServer.id);
         }
@@ -38,6 +45,7 @@ class ServerInfo extends React.Component {
         let buttonText = "Start";
         let buttonEnabled = true;
         
+        // determine button text, server status field
         if (currentServer) {
             switch (currentServer.onlineStatus) {
                 case 0:

@@ -4,6 +4,9 @@ import history from "../history";
 import LoadingAnimation from "./loading"
 
 
+/**
+ * Create Server and Cancel button of CreateServerView
+ */
 function CreateServerButton(props) {
 
     async function createServer() {
@@ -22,54 +25,65 @@ function CreateServerButton(props) {
         </div>
 }
 
+/**
+ * Component for creating new servers
+ */
 class CreateServerView extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            versions: {},
-            currentServer: "",
-            currentVersion: "",
-            currentName: "",
-            currentRam: 2,
-            alert: "",
-            loading: false,
-            maxRam: 32,
-            versionsLoaded: false
+            versions: {}, // all possible versions for current server
+            currentServer: "", // current software name
+            currentVersion: "", // current software version
+            currentName: "", // name entered in name field
+            currentRam: 2, // current selected ram
+            alert: "", // alert to display on error, not rendered when empty
+            loading: false, // whether the server is creating at the moment
+            maxRam: 32, // the maximal possible ram for the backend, gets set when user tries to set too much ram, because maxram is only sent in error response
+            versionsLoaded: false // whether the versions are fetched and ready to display, displays "Loading Versions" when false
         }
     }
 
     componentDidMount() {
+        // fetch possible software and versions from server
         fetchVersions().then(
             res => {
-                let server = Object.keys(res.data)[0];
-                let serverVersions = res.data[server];
-                let version = serverVersions[serverVersions.length - 1];
+                let server = Object.keys(res.data)[0]; // select first software option
+                let serverVersions = res.data[server]; // get all versions for first server
+                let version = serverVersions[serverVersions.length - 1]; // select latest version of software
                 this.setState({versions: res.data, currentServer: server, currentVersion: version, versionsLoaded: true})
             }
         );
-        document.title = "MCWeb - Create New Server";
     }
 
     async createServer() {
+        // check if server name is specified
         if (!this.state.currentName) {
             this.setState({alert: "Please enter a name for the new server!"})
             return false;
         }
+        // check if ram is set
         if (!this.state.currentRam) {
             this.setState({alert: "Plase specify how much ram the server should have!"})
             return false;
         }
-        var status = 0;
+        var status = 0; // 0 or false when error, server id when server created successfully
+        // display loading animation
         this.setState({loading: true});
+        // send server creation, backend downloads server jar
         await putServer(this.state.currentName, this.state.currentServer, this.state.currentVersion, this.state.currentRam).then(res => {
             status = res.data.add.server.id;
+            // cancel loading animation when server is created and ready to start
             this.setState({loading: false});
+            // pass server creation to app component
             this.props.addServer(res.data.add.server);
         }).catch((e) => {
+            // on api error
             let alert = "";
             status = false;
             let error = e.response.data.error;
+            // translate api error to alert message
             switch (error) {
                 case "Duplicate Name":
                     alert = "There is already a server with that name: " + this.state.currentName;
@@ -88,11 +102,15 @@ class CreateServerView extends React.Component {
                     alert = "There was an server error creating your server"
                     break;
             }
+            // cancel loading animation, display alert
             this.setState({loading: false, alert: alert});
         });
         return status;
     }
 
+    /**
+     * called when the software changed, sets version to latest
+     */
     serverChanged(e) {
         let server = e.target.value;
         let serverVersions = this.state.versions[server];
@@ -101,15 +119,18 @@ class CreateServerView extends React.Component {
     }
 
     render() {
+        // capitalize softwares
         let servers = Object.keys(this.state.versions).map(v => {
             return <option value={v} key={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>
         });
         
         let versions;
+        // display versions for current server when versions loaded
         if (this.state.currentVersion) {
             versions = this.state.versions[this.state.currentServer].map(v => {
                 return <option value={v} key={v}>{v}</option>
             });
+        // otherwise nothing
         } else {
             versions = [];
         }
