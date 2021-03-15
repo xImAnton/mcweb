@@ -16,7 +16,6 @@ UI gets better sometime
 * use regex to validate api input, filter code injections
 
 ## Todo Client
-* add more documentation comments
 * design ui components
 
 ## Coming Features
