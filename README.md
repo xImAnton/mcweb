@@ -5,6 +5,7 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 **Currently in development!**, not safe to use
 
 ## Preview
+UI gets better sometime
 ![Screenshot of Webinterface](/docs/webinterface.png)
 
 ## Todo
