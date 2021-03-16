@@ -1,5 +1,5 @@
 from sanic.blueprints import Blueprint
-from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors, check_regexes
+from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
 from mcweb.views.login import User
 import secrets
 from bson.objectid import ObjectId

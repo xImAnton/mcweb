@@ -2,7 +2,7 @@ from sanic import Sanic
 from .mc.servermanager import ServerManager
 from .views.server import server_blueprint
 from .views.auth import account_blueprint
-from mcweb.views.login import User, Session
+from .views.login import User, Session
 import time
 from mcweb.util import json_res
 import aiohttp

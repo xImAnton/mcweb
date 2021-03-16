@@ -16,8 +16,8 @@ def json_res(di, **kwargs):
 
 def objid_to_str(d):
     """
-    converts all object id object in a json response to str
-    :param d: dict to convert
+    converts all object id objects in a json response to str
+    :param d: element to convert
     :return: converted  dict
     """
     if isinstance(d, dict):
@@ -42,7 +42,7 @@ def server_endpoint():
     marks an api endpoint as a server endpoint
     needs <i> parameter in path
     fetches the server for the id and saves it to request.ctx.server for access in the endpoint
-    raises json error when server couldn't be found
+    raises json error and cancels response when server couldn't be found
     """
     def decorator(f):
         @wraps(f)
@@ -180,11 +180,3 @@ def catch_keyerrors():
                 return json_res({"error": "KeyError", "description": str(e)})
         return decorated_function
     return decorator
-
-
-def check_regexes(data):
-    for field_name, vr in data.items():
-        v, r = vr
-        if not r.match(v):
-            return json_res({"error": "Format Error", "description": f"Field {field_name} has to match regex {r}", "status": 400}, status=400)
-    return None
