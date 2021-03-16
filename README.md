@@ -9,6 +9,7 @@ UI gets better sometime
 ![Screenshot of Webinterface](/docs/webinterface.png)
 
 ## Todo
+* Endpoint/ API documentation
 * implement more server types (forge, vanilla)
 * let get all servers endpoint only return server ids and display names, fetch server on server change
 
