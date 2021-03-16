@@ -4,16 +4,21 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 
 **Currently in development!**, not safe to use
 
+## Preview
+UI gets better sometime
+![Screenshot of Webinterface](/docs/webinterface.png)
+
 ## Todo
+* Endpoint/ API documentation
 * implement more server types (forge, vanilla)
+* let get all servers endpoint only return server ids and display names, fetch server on server change
 
 ## Todo Server
 * add global ws broadcast for e.g. server creation
 * use regex to validate api input, filter code injections
-* dont fetch all paper download urls on start, only the versions and their latest build, fetch download url when actually trying to download server
+* add {supports: {mods: true, plugins: false}} attribute to server for mod/ plugin adding on client
 
 ## Todo Client
-* add more documentation comments
 * design ui components
 
 ## Coming Features
