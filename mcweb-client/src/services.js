@@ -95,7 +95,7 @@ export function fetchUser() {
 }
 
 export function fetchAllServers() {
-    return get(getApiBase() + "/server");
+    return get(getApiBase() + "/server?idonly=1");
 }
 
 export function fetchVersions() {

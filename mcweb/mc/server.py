@@ -136,3 +136,7 @@ class MinecraftServer:
                 "displayName": self.display_name,
                 "software": self.software
                 }
+
+    def light_json(self):
+        return {"id": str(self.id),
+                "displayName": self.display_name}

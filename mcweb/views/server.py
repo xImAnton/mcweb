@@ -25,8 +25,13 @@ async def get_all_servers(req):
     endpoints for getting a list of all servers
     """
     l = []
-    for server in req.app.server_manager.servers:
-        l.append(server.json())
+    if req.args.get("idonly"):
+        for server in req.app.server_manager.servers:
+            print(server.light_json())
+            l.append(server.light_json())
+    else:
+        for server in req.app.server_manager.servers:
+            l.append(server.json())
     return json_res(l)
 
 
