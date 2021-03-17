@@ -77,7 +77,6 @@ class CreateServerView extends React.Component {
             // cancel loading animation when server is created and ready to start
             this.setState({loading: false});
             // pass server creation to app component
-            this.props.addServer(res.data.add.server);
         }).catch((e) => {
             // on api error
             let alert = "";

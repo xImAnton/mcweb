@@ -68,13 +68,13 @@ class App extends React.Component {
                 }
                 return x;
             })});
-        }
+        } else
         if (data.packetType === "ServerConsoleMessagePacket") {
             // add message to console
             const consoleMessages = this.state.consoleLines.slice();
             consoleMessages.push(data.data.message);
             this.setState({consoleLines: consoleMessages});
-        }
+        } else
         if (data.packetType === "BulkConsoleMessagePacket") {
             // add several messages to console
             if (data.data.reset) {
@@ -84,6 +84,9 @@ class App extends React.Component {
                 consoleMessages = consoleMessages.concat(data.data.lines);
                 this.setState({consoleLines: consoleMessages});
             }
+        } else
+        if (data.packetType === "ServerCreationPacket") {
+            this.addNewServer(data.data.server);
         }
     }
 
@@ -136,6 +139,12 @@ class App extends React.Component {
             // open ws when ticket retrieved
             this.openWs(id, ticket.data.ticket);
         })
+    }
+
+    addNewServer(s) {
+        const servers = this.state.servers.slice();
+        servers.push(s);
+        this.setState({servers: servers});
     }
 
     logout() {
@@ -204,11 +213,7 @@ class App extends React.Component {
                                 {!sid && <Redirect to="/login" />}
                                 <Route path="/createserver">
                                     <div id="content-wrapper" className="full">
-                                        <CreateServerView addServer={(s) => {
-                                            const servers = this.state.servers.slice();
-                                            servers.push(s);
-                                            this.setState((s) => {return {servers: servers, missingFetches: s.missingFetches}});
-                                        }} cancellable={this.state.serverCreationCancellable}
+                                        <CreateServerView cancellable={this.state.serverCreationCancellable}
                                         changeServer={(i) => this.changeServer(i)}
                                         />
                                     </div>

@@ -8,6 +8,9 @@ from .versions.manager import VersionManager
 from mcweb.util import json_res
 import subprocess
 from bson.objectid import ObjectId
+import pymongo.errors
+import sys
+from json import dumps as json_dumps
 
 
 class ServerManager:
@@ -23,11 +26,16 @@ class ServerManager:
         """
         fetches all servers and adds them to its server list
         """
+        try:
+            async for server in self.mc.mongo["server"].find({}):
+                s = MinecraftServer(self.mc, server)
+                await s.set_online_status(0)
+                self.servers.append(s)
+        except pymongo.errors.ServerSelectionTimeoutError:
+            print("No connection to mongodb could be established. Check your preferences in the config.json and if your mongo server is running!")
+            self.mc.stop()
+            sys.exit(1)
 
-        async for server in self.mc.mongo["server"].find({}):
-            s = MinecraftServer(self.mc, server)
-            await s.set_online_status(0)
-            self.servers.append(s)
         await self.versions.reload_all()
 
     async def get_ids(self):
@@ -90,6 +98,12 @@ class ServerManager:
         if server == "forge":
             await ServerManager.install_forge_server(dir_, version)
 
+        await self.global_broadcast(json_dumps({
+            "packetType": "ServerCreationPacket",
+            "data": {
+                "server": s.json()
+            }
+        }))
         return json_res({"success": "Server successfully created", "add": {"server": s.json()}})
 
     @staticmethod
@@ -140,10 +154,6 @@ eula=true
     async def global_broadcast(self, msg):
         for server in self.servers:
             await server.connections.broadcast(msg)
-
-    async def disconnect_websockets(self):
-        for server in self.servers:
-            await server.connections.disconnect_all()
 
     @staticmethod
     def format_name(s):

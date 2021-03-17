@@ -53,3 +53,19 @@ Sent for meta information for developers
     }
 }
 ```
+
+## ServerCreationPacket
+
+sent when a server was created on another client
+
+```json
+{
+    "packetType": "ServerCreationPacket",
+    "data": {
+        "server": {
+            "the new": "server object"
+        }
+    }
+}
+```
+

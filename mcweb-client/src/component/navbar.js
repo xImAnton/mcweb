@@ -12,11 +12,6 @@ function NavbarEntry(props) {
 
 
 class Navbar extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
-
     render() {        
         return <ul id="navbar-options">
                     <NavbarEntry name="General" href="general" index={1}/>
