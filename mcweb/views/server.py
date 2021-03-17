@@ -24,14 +24,8 @@ async def get_all_servers(req):
     """
     endpoints for getting a list of all servers
     """
-    l = []
-    if req.args.get("idonly"):
-        for server in req.app.server_manager.servers:
-            l.append(server.light_json())
-    else:
-        for server in req.app.server_manager.servers:
-            l.append(server.json())
-    return json_res(l)
+    o = [s.light_json() if req.args.get("idonly") else s.json() for s in req.app.server_manager.servers]
+    return json_res(o)
 
 
 @server_blueprint.route("/<i>/start")
