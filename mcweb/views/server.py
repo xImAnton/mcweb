@@ -27,7 +27,6 @@ async def get_all_servers(req):
     l = []
     if req.args.get("idonly"):
         for server in req.app.server_manager.servers:
-            print(server.light_json())
             l.append(server.light_json())
     else:
         for server in req.app.server_manager.servers:
