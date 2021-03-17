@@ -7,7 +7,3 @@ MCWeb is a web-remote minecraft server wrapper for controlling your minecraft se
 ## Preview
 UI gets better sometime
 ![Screenshot of Webinterface](/docs/webinterface.png)
-
-## Todo
-* add global ws broadcast for e.g. server creation
-* use regex to validate api input, filter code injections
