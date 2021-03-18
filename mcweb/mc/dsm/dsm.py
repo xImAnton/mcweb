@@ -1,24 +1,18 @@
-from .protocol import PacketBuilder, PacketBuffer, TextComponent
+from .protocol import PacketBuilder, TextComponent
 from json import dumps as json_dumps
-import socketserver
+from .connection import ClientConnection
+from _thread import start_new_thread
+from .encryption import generate_keypair
+import socket
 
 
-class MinecraftClient(socketserver.BaseRequestHandler):
+class Messages:
+    DISCONNECT_STARTING_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()).add_extra(TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("Please wait a Moment").set_color(TextComponent.Color.RED).build()).add_extra(TextComponent.Builder(", this ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("Server ").set_color(TextComponent.Color.GOLD).set_flag(TextComponent.Flag.BOLD).build()).add_extra(TextComponent.Builder("is ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("starting ").set_color(TextComponent.Color.GREEN).build()).add_extra(TextComponent.Builder("now!").set_color(TextComponent.Color.GRAY).build()).build().as_json()
+    DISCONNECT_NO_PERM_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()).add_extra(TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("You are not permitted ").set_color(TextComponent.Color.RED).build()).add_extra(TextComponent.Builder("to ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("start ").set_color(TextComponent.Color.GREEN).build()).add_extra(TextComponent.Builder("this ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("Server!").set_color(TextComponent.Color.GOLD).set_flag(TextComponent.Flag.BOLD).build()).build().as_json()
+    DISCONNECT_ERROR_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()).add_extra(TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("There was an error while checking your username").set_color(TextComponent.Color.RED).build()).add_extra(TextComponent.Builder("!\n\nPlease try again in a few seconds").set_color(TextComponent.Color.GRAY).build()).build().as_json()
 
-    DISCONNECT_STARTING_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(
-        TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()
-    ).add_extra(
-        TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()
-    ).add_extra(
-        TextComponent.Builder("Please wait a Moment").set_color(TextComponent.Color.RED).build()
-    ).add_extra(
-        TextComponent.Builder(", this ").set_color(TextComponent.Color.GRAY).build()
-    ).add_extra(
-        TextComponent.Builder("Server ").set_color(TextComponent.Color.GOLD).set_flag(TextComponent.Flag.BOLD).build()
-    ).add_extra(
-        TextComponent.Builder("is starting now!").set_color(TextComponent.Color.GRAY).build()
-    ).build().as_json()
 
+class DSMClientConnection(ClientConnection):
     QUERY_RESPONSE = {
         "version": {
             "name": "MCWeb DSM Server",
@@ -28,87 +22,83 @@ class MinecraftClient(socketserver.BaseRequestHandler):
             "online": 0,
             "sample": []
         },
-        "description": TextComponent.Builder("MCWeb").set_color(TextComponent.Color.GOLD).set_flag(TextComponent.Flag.BOLD).add_extra(
+        "description": TextComponent.Builder("MCWeb").set_color(TextComponent.Color.GOLD).set_flag(
+            TextComponent.Flag.BOLD).add_extra(
             TextComponent.Builder("-Server is ").set_color(TextComponent.Color.GRAY).set_reset().add_extra(
-                TextComponent.Builder("offline").set_color(TextComponent.Color.RED).set_flag(TextComponent.Flag.BOLD).build()
+                TextComponent.Builder("offline").set_color(TextComponent.Color.RED).set_flag(
+                    TextComponent.Flag.BOLD).build()
             ).add_extra(
                 TextComponent.Builder("! Join to start it!").set_color(TextComponent.Color.GRAY).build()
             ).build()
         ).build().as_json()
     }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, permitted_players, onclose, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.state = 1
-        self.connected = True
+        self.permitted_players = permitted_players
+        self.onclose = onclose
 
-    def handle_ping_packet(self, client_packet):
-        print("Ping!")
-        j = client_packet.read_long()
-        packet = PacketBuilder(0x01)
-        packet.add_long(j)
-        self.request.sendall(packet.build())
-        self.connected = False
+    def handle_query(self, handshake_packet):
+        packet = PacketBuilder(0x00)
+        # use our mcweb response
+        query = DSMClientConnection.QUERY_RESPONSE
+        # set protocol version to protocol of client so it seems like server for every version
+        query["version"]["protocol"] = handshake_packet.protocol_version
+        packet.add_string(json_dumps(query))
+        self.send_packet(packet.build())
 
-    def handle_0_packet(self, client_packet):
-        if self.state == 1:
-            p = client_packet.read_varint()  # Protocol Version
-            if p == 0:
-                return False
-            client_packet.read_string()  # Host
-            client_packet.read_ushort()  # Port
-            next_state = client_packet.read_varint()
-            if next_state == 1:  # Status
-                self.state = 1
-                ping = MinecraftClient.QUERY_RESPONSE
-                ping["version"]["protocol"] = p
-                packet = PacketBuilder(0x00)
-                packet.add_string(json_dumps(ping))
-                packet = packet.build()
-                self.request.sendall(packet)
-            elif next_state == 2:  # Update State to login
-                self.state = 2
-                packet = PacketBuilder(0x00)
-                packet.add_string(json_dumps(MinecraftClient.DISCONNECT_STARTING_MESSAGE))
-                self.request.sendall(packet.build())
-                self.server.on_player_login()
-                self.connected = False
-        # else:
-        #    un = response.read_string()
-        #    packet = PacketBuilder(0x01)  # encryption request
-        #    packet.add_string(" " * 20)
+    def pre_login(self, uuid, name):
+        # check if player is permitted to start server
+        if (name.lower() in self.permitted_players) | (self.permitted_players == []):
+            packet = PacketBuilder(0x00)
+            # if yes, send starting message
+            packet.add_string(json_dumps(Messages.DISCONNECT_STARTING_MESSAGE))
+            self.send_packet(packet.build())
+            # and close connection
+            self.onclose()
+            self.connected = False
+        else:
+            # if no, send error message and close connection
+            packet = PacketBuilder(0x00)
+            packet.add_string(json_dumps(Messages.DISCONNECT_NO_PERM_MESSAGE))
+            self.send_packet(packet.build())
+            self.connected = False
+        # cancel event everytime
+        return False
 
-    def handle(self) -> None:
-        self.state = 1
-        self.connected = True
-        while self.connected:
-            req = self.request.recv(2097151)  # max packet length
-            if not req:
-                continue
-            client_packet = PacketBuffer(req)
-            client_packet.read_varint()  # Length
-            pack_id = client_packet.read_varint()
-            if pack_id == 0x00:  # Login
-                self.handle_0_packet(client_packet)
-            elif pack_id == 0x01:  # Ping
-                self.handle_ping_packet(client_packet)
-
-    def finish(self) -> None:
+    def login_error(self):
+        packet = PacketBuilder(0x00)
+        packet.add_string(json_dumps(Messages.DISCONNECT_ERROR_MESSAGE))
+        self.send_packet(packet.build())
         self.connected = False
 
 
-class DSMPortListener(socketserver.TCPServer):
+class DSMServer:
     def __init__(self, conn):
-        super().__init__(conn, MinecraftClient)
-        self.shall_stop = False
+        self.conn = conn
+        self.serversocket = socket.socket()
+        self.keypair = generate_keypair()
+        self.running = False
+        self.eligible_players = []
 
-    def close(self):
-        self._BaseServer__shutdown_request = True
+    def stop(self):
+        if self.running:
+            self.running = False
+            self.serversocket.close()
+            print("START MC")
 
-    def on_player_login(self):
-        self.close()
+    def start(self):
+        self.serversocket.bind(self.conn)
+        self.serversocket.listen(5)
+        self.running = True
+        while self.running:
+            try:
+                client, addr = self.serversocket.accept()
+            except OSError:
+                self.stop()
+                continue
+            start_new_thread(self.connection_thread, (client, ))
 
-    def run(self):
-        print("DSM SERVER STARTING")
-        self.serve_forever()
-        print("START MINECRAFT SERVER HERE")
+    def connection_thread(self, conn):
+        connection = DSMClientConnection(self.eligible_players, self.stop, conn, self.keypair[0], self.keypair[1])
+        connection.block()

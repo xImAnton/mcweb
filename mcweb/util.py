@@ -87,6 +87,8 @@ def requires_post_params(*json_keys):
     def decorator(f):
         @wraps(f)
         async def decorated_function(req, *args, **kwargs):
+            if req.method != "POST":
+                return json_res({"error": "Method not Allowed", "status": 405, "description": "this is a POST endpoint"})
             for prop in json_keys:
                 if prop not in req.json.keys():
                     return json_res({"error": "KeyError", "status": 400, "description": "you need to specify " + prop}, status=404)

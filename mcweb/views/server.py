@@ -3,6 +3,7 @@ from websockets.exceptions import ConnectionClosed
 from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws
 from json import dumps as json_dumps
 from time import strftime
+import asyncio
 
 
 server_blueprint = Blueprint("server", url_prefix="server")
@@ -121,8 +122,12 @@ async def restart(req, i):
     endpoints for restarting the specified server
     """
     await req.ctx.server.stop()
-    while req.ctx.server.running:
-        pass
+
+    async def server_stopped(s):
+        while s.running:
+            pass
+
+    await asyncio.wait_for(server_stopped(req.ctx.server), 30)
     await req.ctx.server.start()
 
 

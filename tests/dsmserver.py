@@ -1,5 +1,5 @@
-from mcweb.mc.dsm.dsm import DSMPortListener
+from mcweb.mc.dsm.dsm import DSMServer
 
 
-dsm = DSMPortListener(("localhost", 25565))
-dsm.run()
+server = DSMServer(("localhost", 25565))
+server.start()

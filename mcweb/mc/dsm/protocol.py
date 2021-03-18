@@ -1,5 +1,6 @@
 from io import BytesIO
 from struct import pack, unpack
+import uuid
 
 
 class PacketBuilder:
@@ -23,6 +24,14 @@ class PacketBuilder:
             if number == 0:
                 break
         return out
+
+    def pack_uuid(self, u):
+        if isinstance(u, uuid.UUID):
+            return u.bytes
+        return uuid.UUID(u).bytes
+
+    def add_uuid(self, u):
+        self.bytes += self.pack_uuid(u)
 
     def pack_string(self, s):
         data = self.pack_varint(len(s))
@@ -175,3 +184,38 @@ class TextComponent:
         if self.is_flag_set(TextComponent.Flag.OBFUSCATED):
             out["obfuscated"] = True
         return out
+
+
+class Packet(PacketBuffer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.packet_length = self.read_varint()
+        self.packet_id = self.read_varint()
+
+
+class HandshakePacket:
+    def __init__(self, packet):
+        self.protocol_version = packet.read_varint()
+        if self.protocol_version == 0:
+            return
+        self.host = packet.read_string()
+        self.port = packet.read_ushort()
+        self.next_state = packet.read_varint()
+
+
+class EncryptionResponsePacket:
+    def __init__(self, packet):
+        s_l = packet.read_varint()
+        self.secret = packet.read_bytes(s_l)
+        t_l = packet.read_varint()
+        self.token = packet.read_bytes(t_l)
+
+
+class EncryptionRequestPacket(PacketBuilder):
+    def __init__(self, public_key, token):
+        super(EncryptionRequestPacket, self).__init__(0x01)
+        self.add_string("")
+        self.add_varint(len(public_key))
+        self.add_bytes(public_key)  # public key
+        self.add_varint(len(token))
+        self.add_bytes(token)

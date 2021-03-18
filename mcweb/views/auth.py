@@ -3,7 +3,6 @@ from mcweb.util import json_res, requires_post_params, requires_login, catch_key
 from mcweb.views.login import User
 import secrets
 from bson.objectid import ObjectId
-from ..io.regexes import Regexes
 
 
 account_blueprint = Blueprint("account", url_prefix="account")
