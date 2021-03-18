@@ -1,7 +1,6 @@
 from .protocol import PacketBuilder, TextComponent
 from json import dumps as json_dumps
 from .connection import ClientConnection
-from _thread import start_new_thread
 from .encryption import generate_keypair
 import socket
 
@@ -74,12 +73,13 @@ class DSMClientConnection(ClientConnection):
 
 
 class DSMServer:
-    def __init__(self, conn):
+    def __init__(self, conn, loop):
         self.conn = conn
-        self.serversocket = socket.socket()
+        self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.keypair = generate_keypair()
         self.running = False
-        self.eligible_players = []
+        self.eligible_players = ["bedrockcrafterlp"]
+        self.loop = loop
 
     def stop(self):
         if self.running:
@@ -87,18 +87,21 @@ class DSMServer:
             self.serversocket.close()
             print("START MC")
 
-    def start(self):
+    async def start(self):
         self.serversocket.bind(self.conn)
-        self.serversocket.listen(5)
+        self.serversocket.listen(4)
+        self.serversocket.setblocking(False)
         self.running = True
         while self.running:
             try:
-                client, addr = self.serversocket.accept()
+                client, _ = await self.loop.sock_accept(self.serversocket)
             except OSError:
                 self.stop()
                 continue
-            start_new_thread(self.connection_thread, (client, ))
+            self.loop.create_task(self.handle_connection(client))
 
-    def connection_thread(self, conn):
-        connection = DSMClientConnection(self.eligible_players, self.stop, conn, self.keypair[0], self.keypair[1])
-        connection.block()
+    async def handle_connection(self, conn):
+        print("Client Connected")
+        connection = DSMClientConnection(self.eligible_players, self.stop, conn, self.loop, self.keypair[0], self.keypair[1])
+        await connection.block()
+        print("Connection Ended")

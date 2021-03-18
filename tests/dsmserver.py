@@ -1,5 +1,7 @@
 from mcweb.mc.dsm.dsm import DSMServer
+import asyncio
 
 
-server = DSMServer(("localhost", 25565))
-server.start()
+loop = asyncio.get_event_loop()
+server = DSMServer(("localhost", 25565), loop)
+loop.run_until_complete(server.start())

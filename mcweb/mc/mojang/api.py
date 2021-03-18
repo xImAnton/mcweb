@@ -29,7 +29,6 @@ def get_skin_by_name(player_name):
 
 
 def has_player_joined(hash, name):
-	print(f"https://sessionserver.mojang.com/session/minecraft/hasJoined?username={name}&serverId={hash}")
 	resp = rq.get(f"https://sessionserver.mojang.com/session/minecraft/hasJoined?username={name}&serverId={hash}")
 
 	if not resp.ok:

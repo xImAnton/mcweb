@@ -24,7 +24,7 @@ class ClientConnection:
         }
     }
 
-    def __init__(self, socket, public_key, private_key):
+    def __init__(self, socket, loop, public_key, private_key):
         self.secret = b""
         self.token = b""
         self.cipher = None
@@ -36,6 +36,7 @@ class ClientConnection:
         self.encrypted = False
         self.connected = False
         self.state = 1
+        self.loop = loop
 
     def send_packet(self, packet):
         # encrypt packet if connection is encrypted
@@ -43,9 +44,9 @@ class ClientConnection:
             packet = self.cipher.encrypt(fit_to_secret_lenght(packet, self.secret))
         self.socket.sendall(packet)
 
-    def receive_packet(self):
+    async def receive_packet(self):
         # wait for a packet,
-        req = self.socket.recv(2097151)
+        req = await self.loop.sock_recv(self.socket, 2097151)
         if req:
             # decrypt it,
             if self.encrypted:
@@ -84,11 +85,11 @@ class ClientConnection:
     def disconnect(self):
         self.connected = False
 
-    def block(self):
+    async def block(self):
         self.connected = True
         while self.connected:
             # wait for packet
-            packet = self.receive_packet()
+            packet = await self.receive_packet()
             if not packet:
                 continue
             if packet.packet_id == 0x00:
@@ -140,8 +141,6 @@ class ClientConnection:
         self.encrypted = True
         # login hash for verifying session
         login_hash = generate_login_hash(b"", self.secret, self.public_key)
-        # wait for mojang
-        sleep(2)
         # request if the player has joined our server
         resp = has_player_joined(login_hash, self.username)
         # if correct session

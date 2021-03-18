@@ -3,6 +3,7 @@ import hashlib
 from Crypto.Cipher import AES
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
+from bitstring import BitStream
 
 
 def generate_keypair():
@@ -33,10 +34,14 @@ def generate_keypair():
 def generate_login_hash(server_id, secret, public_key):
     # generate login hash like shown in https://wiki.vg/Protocol_Encryption#Client
     h = hashlib.sha1()
-    h.update(server_id)
+    h.update(server_id.decode("iso-8859-1").encode())
     h.update(secret)
     h.update(public_key)
-    return h.hexdigest()
+    return minecraft_hex(h.digest())
+
+
+def minecraft_hex(by):
+    return format(BitStream(by).read("int"), "x")
 
 
 def fit_to_secret_lenght(packet, secret):
