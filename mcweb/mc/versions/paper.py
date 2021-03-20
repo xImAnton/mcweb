@@ -1,5 +1,5 @@
 import aiohttp
-from mcweb.io.config import Config
+from ...io.config import Config
 from .base import VersionProvider
 
 

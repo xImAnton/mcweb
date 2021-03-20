@@ -1,5 +1,4 @@
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
-import asyncio
 
 
 class WebsocketConnectionManager:
@@ -36,12 +35,6 @@ class WebsocketConnectionManager:
                 await ws.send(msg)
             except (ConnectionClosedOK, ConnectionClosedError):
                 await self.disconnected(ws)
-
-    def broadcast_sync(self, msg, except_=None):
-        """
-        sync call for coroutine broadcast
-        """
-        asyncio.run(self.broadcast(msg, except_))
 
     async def disconnect_all(self):
         for conn in self.connections:
