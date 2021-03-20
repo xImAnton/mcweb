@@ -12,6 +12,10 @@
     "forge": {
       "getVersions": "http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml",
       "downloadBuild": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{build}/forge-{build}-installer.jar"
+    },
+    "vanilla": {
+      "getVersions": "https://launchermeta.mojang.com/mc/game/version_manifest.json",
+      "launcherMeta": "https://launchermeta.mojang.com"
     }
   },
   "maxRam": 6,
