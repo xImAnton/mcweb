@@ -102,10 +102,11 @@ export function fetchVersions() {
     return get(getApiBase() + "/server/versions");
 }
 
-export function putServer(name, server, version, ram) {
+export function putServer(name, server, version, ram, port) {
     return put(getApiBase() + "/server/create/" + server + "/" + version, JSON.stringify({
         name: name,
-        ram: ram
+        allocatedRAM: ram,
+        port: port
     }));
 }
 

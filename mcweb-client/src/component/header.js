@@ -6,7 +6,7 @@ class Header extends React.Component {
         return <div id="header-wrapper">
                     <header>
                         <div id="header">
-                            <img src="favicon.ico" id="image-heading" alt="LOGO"/>
+                            <img src="logo_wide_bright.png" id="image-heading" alt="LOGO"/>
                             <div className="text-right">MCWeb Client</div>
                         </div>
                     </header>

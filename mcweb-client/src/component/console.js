@@ -22,9 +22,9 @@ function ConsoleInput(props) {
         inputRef.current.value = "";
     }
 
-    return <div className="console-line send">
-        <input ref={inputRef} type="text" onChange={e => setText(e.target.value)} placeholder="Enter Command" />
-        <button onClick={submitCommand}>Send</button>
+    return <div className="console-input-wrapper">
+        <input style={{display: "inline-block", flexGrow: "1", marginRight: "3px"}} className="mcweb-ui" ref={inputRef} type="text" onChange={e => setText(e.target.value)} placeholder="Enter Command" />
+        <button style={{display: "inline-block", width: "auto"}} className="mcweb-ui" onClick={submitCommand}>Send</button>
     </div>
 }
 
@@ -43,7 +43,7 @@ function ConsoleView(props) {
     return <div id="page-content">
                 <h1 id="page-headline">Console</h1>
                 <div id="console-wrapper">
-                    <textarea id="console-out" readOnly value={props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />
+                    <textarea id="console-out" readOnly value={props.lines.length === 0 ? "Start your Server to see its Output":  props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />
                     <ConsoleInput currentServer={props.currentServer} getSessionId={props.getSessionId} />
                 </div>
             </div>;

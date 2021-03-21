@@ -19,6 +19,7 @@ import CreateServerView from "./component/createserver";
 import history from "./history"
 import NoBackend from "./component/nobackend";
 import LoadingAnimation from "./component/loading";
+import InfoBox from "./component/infobox";
 
 
 class App extends React.Component {
@@ -36,7 +37,9 @@ class App extends React.Component {
             consoleLines: [],
             currentServer: null,
             serverCreationCancellable: true,
-            missingFetches: 0 // how many fetches are missing, when greater 0, displays loading animation
+            missingFetches: 0, // how many fetches are missing, when greater 0, displays loading animation
+            infoBox: "",
+            infoBoxCaption: ""
         };
 
         this.serverSocket = null;
@@ -141,6 +144,15 @@ class App extends React.Component {
         })
     }
 
+    addFirstServer(s) {
+        if (this.state.servers.length === 0) {
+            console.log("addfirst");
+            const servers = this.state.servers.slice();
+            servers.push(s);
+            this.setState({servers: servers});
+        }
+    }
+
     addNewServer(s) {
         const servers = this.state.servers.slice();
         servers.push(s);
@@ -192,6 +204,10 @@ class App extends React.Component {
         this.refetch();
     }
 
+    openInfoBox(head, body) {
+        this.setState({infoBoxCaption: head, infoBox: body});
+    }
+
     render() {
         const sid = this.getSessionId();
 
@@ -214,15 +230,26 @@ class App extends React.Component {
                                 <Route path="/createserver">
                                     <div id="content-wrapper" className="full">
                                         <CreateServerView cancellable={this.state.serverCreationCancellable}
-                                        changeServer={(i) => this.changeServer(i)}
+                                        changeServer={(i) => this.changeServer(i)} addFirstServer={(s) => this.addFirstServer(s)}
                                         />
                                     </div>
                                 </Route>
                                 <Route path="/">
-                                    {/*display app when to fetches are missing*/}
+                                    {/*display app when no fetches are missing*/}
                                     <>{ this.state.missingFetches <= 0 ? (<>
-                                    <Sidebar logout={() => this.logout()} getUserName={() => this.state.username} servers={this.state.servers} currentServer={this.state.currentServer} changeServer={(i) => this.changeServer(i)} sessionId={() => this.getSessionId()} setConsoleLines={(a) => this.setState({consoleLines: a})} setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})} />
+                                    <Sidebar
+                                        logout={() => this.logout()}
+                                        getUserName={() => this.state.username}
+                                        servers={this.state.servers}
+                                        currentServer={this.state.currentServer}
+                                        changeServer={(i) => this.changeServer(i)}
+                                        sessionId={() => this.getSessionId()}
+                                        setConsoleLines={(a) => this.setState({consoleLines: a})}
+                                        setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
+                                        openInfoBox={(h, b) => this.openInfoBox(h, b)}
+                                    />
                                     <div id="content-wrapper">
+                                        { this.state.infoBoxCaption && <InfoBox close={(e) => this.setState({infoBox: "", infoBoxCaption: ""})} text={this.state.infoBox} head={this.state.infoBoxCaption} /> }
                                         <Switch history={history} >
                                             <Route path="/general">
                                                 <GeneralView currentServer={this.state.currentServer} />

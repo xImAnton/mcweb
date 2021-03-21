@@ -1,0 +1,93 @@
+input[type="text"].mcweb-ui {
+    outline: none;
+    border: 1px black solid;
+    padding: 8px 10px;
+    background-color: #171a1f;
+    color: white;
+    border-radius: 8px;
+    display: block;
+    width: 200px;
+}
+
+input[type="text"].mcweb-ui:hover, input[type="text"].mcweb-ui:focus {
+    background-color: #1d2127;
+}
+
+input[type="text"].mcweb-ui:placeholder-shown {
+    color: #41404a;
+    user-select: none;
+}
+
+button.mcweb-ui {
+    outline: none;
+    border: 1px black solid;
+    padding: 8px 10px;
+    background-color: #171a1f;
+    border-radius: 8px;
+    display: block;
+    width: 200px;
+    color: white;
+    user-select: none;
+}
+
+button.mcweb-ui.disabled {
+    color: #41404a;
+}
+
+button.mcweb-ui:not(.disabled):hover {
+    background-color: #1d2127;
+}
+
+button.mcweb-ui:not(.disabled):active {
+    transform: translateY(1px);
+}
+
+.mcweb-ui.select {
+    width: 178px;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background-color: #171a1f;
+    border: 1px black solid;
+    position: relative;
+    user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mcweb-ui.select::after {
+    content: "";
+    width: 0.8em;
+    height: 0.5em;
+    background-color: white;
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    right: 13px;
+    top: 13px;
+    position: absolute;
+    pointer-events: none;
+}
+
+.mcweb-ui.select select {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    outline: none;
+    color: white;
+    width: 153px;
+}
+
+.mcweb-ui.select select::-ms-expand {
+    display: none;
+}
+
+.mcweb-ui.select select option {
+    color: black;
+}
+
+.mcweb-ui {
+    margin-bottom: 4px;
+}

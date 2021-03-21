@@ -1,7 +1,8 @@
 import React from "react";
 import { fetchVersions, putServer } from "../services";
 import history from "../history";
-import LoadingAnimation from "./loading"
+import LoadingAnimation from "./loading";
+import { Select } from "./ui";
 
 
 /**
@@ -18,9 +19,9 @@ function CreateServerButton(props) {
     }
 
     return <div className="server-create-btns">
-            <button onClick={createServer}>Create Server</button>
+            <button className="mcweb-ui" onClick={createServer}>Create Server</button>
             { props.cancellable &&
-                <button onClick={() => history.push("/general")}>Cancel</button>
+                <button className="mcweb-ui" onClick={() => history.push("/general")}>Cancel</button>
             }
         </div>
 }
@@ -41,7 +42,8 @@ class CreateServerView extends React.Component {
             alert: "", // alert to display on error, not rendered when empty
             loading: false, // whether the server is creating at the moment
             maxRam: 32, // the maximal possible ram for the backend, gets set when user tries to set too much ram, because maxram is only sent in error response
-            versionsLoaded: false // whether the versions are fetched and ready to display, displays "Loading Versions" when false
+            versionsLoaded: false, // whether the versions are fetched and ready to display, displays "Loading Versions" when false
+            currentPort: 25565
         }
     }
 
@@ -65,15 +67,20 @@ class CreateServerView extends React.Component {
         }
         // check if ram is set
         if (!this.state.currentRam) {
-            this.setState({alert: "Plase specify how much ram the server should have!"})
+            this.setState({alert: "Please specify how much ram the server should have!"})
+            return false;
+        }
+        if (!this.state.currentPort) {
+            this.setState({alert: "Please specify the server port!"})
             return false;
         }
         var status = 0; // 0 or false when error, server id when server created successfully
         // display loading animation
         this.setState({loading: true});
         // send server creation, backend downloads server jar
-        await putServer(this.state.currentName, this.state.currentServer, this.state.currentVersion, this.state.currentRam).then(res => {
+        await putServer(this.state.currentName, this.state.currentServer, this.state.currentVersion, this.state.currentRam, this.state.currentPort).then(res => {
             status = res.data.add.server.id;
+            this.props.addFirstServer(res.data.add.server);
             // cancel loading animation when server is created and ready to start
             this.setState({loading: false});
             // pass server creation to app component
@@ -81,6 +88,7 @@ class CreateServerView extends React.Component {
             // on api error
             let alert = "";
             status = false;
+            console.log(e.response);
             let error = e.response.data.error;
             // translate api error to alert message
             switch (error) {
@@ -96,6 +104,9 @@ class CreateServerView extends React.Component {
                 case "Too Much RAM":
                     alert = "The maximal possible ram is " + e.response.data.maxRam;
                     this.setState({maxRam: e.response.data.maxRam})
+                    break;
+                case "Invalid Port":
+                    alert = "The Port Number is invalid!"
                     break;
                 default:
                     alert = "There was an server error creating your server"
@@ -139,19 +150,59 @@ class CreateServerView extends React.Component {
                 <div className="page-full">
                     <h1 id="page-headline">Create a new Server</h1>
                     { this.state.alert && <div className={"alert-box red"}>{this.state.alert}</div> }
-                    Name: <input type="text" onChange={e => {this.setState({currentName: e.target.value})}} defaultValue={this.state.currentName} />
-                    <br />
-                    Server: <select value={this.state.currentServer} onChange={e => this.serverChanged(e)}>
-                        {servers}
-                    </select>
-                    <br />
-                    Version: <select value={this.state.currentVersion} onChange={e => this.setState({currentVersion: e.target.value})}>
-                        {versions}
-                    </select>
-                    <br />
-                    Ram: <input type="number" min={1} className={"gb-selection"} defaultValue={this.state.currentRam} max={this.state.maxRam} onChange={e => this.setState({currentRam: parseInt(e.target.value)})} />
-                    <br />
-                    <CreateServerButton createServer={() => this.createServer()} cancellable={this.props.cancellable} changeServer={this.props.changeServer}/>
+                    <table className="formtable">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Name:
+                                </td>
+                                <td>
+                                    <input className="mcweb-ui" type="text" onChange={e => {this.setState({currentName: e.target.value})}} defaultValue={this.state.currentName} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Software:
+                                </td>
+                                <td>
+                                    <Select value={this.state.currentServer} onChange={e => this.serverChanged(e)}>
+                                        {servers}
+                                    </Select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Version:
+                                </td>
+                                <td>
+                                    <Select value={this.state.currentVersion} onChange={e => this.setState({currentVersion: e.target.value})}>
+                                        {versions}
+                                    </Select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    RAM:
+                                </td>
+                                <td>
+                                    <input className="mcweb-ui gb-selection" type="number" min={1} defaultValue={this.state.currentRam} max={this.state.maxRam} onChange={e => this.setState({currentRam: parseInt(e.target.value)})} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Port:
+                                </td>
+                                <td>
+                                <input className="mcweb-ui" type="number" min={25000} defaultValue={this.state.currentPort} max={30000} onChange={e => this.setState({currentPort: parseInt(e.target.value)})} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan={2}>
+                                <CreateServerButton createServer={() => this.createServer()} cancellable={this.props.cancellable} changeServer={this.props.changeServer} />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             ) : (<LoadingAnimation loadingText="Creating Server" />)}
 
