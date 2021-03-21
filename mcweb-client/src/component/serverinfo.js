@@ -1,5 +1,5 @@
 import React from "react";
-import CopyField from "./copyfield";
+import { CopyField, Select } from "./ui";
 import { startServer, stopServer } from "../services";
 import history from "../history"
 
@@ -15,7 +15,30 @@ function AddServerButton(props) {
         history.push("/createserver");
     }
 
-    return <button id="btn-add-server" onClick={clicked}>+</button>
+    return <button id="btn-add-server" className="mcweb-ui" onClick={clicked}>+</button>
+}
+
+function ServerStatus(props) {
+    let serverStatus;
+    switch (props.status) {
+        case 0:
+            serverStatus = "offline";
+            break;
+        case 1:
+            serverStatus = "starting";
+            break;
+        case 2:
+            serverStatus = "online";
+            break;
+        case 3:
+            serverStatus = "stopping";
+            break;
+        default:
+            serverStatus = "unknown";
+            break;
+    }
+
+    return <div id="online-status" className={serverStatus}></div>;
 }
 
 class ServerInfo extends React.Component {
@@ -31,7 +54,11 @@ class ServerInfo extends React.Component {
         // when server offline, clear console and start it
         if (currentServer.onlineStatus === 0) {
             this.props.setConsoleLines([]);
-            startServer(this.props.currentServer.id);
+            startServer(this.props.currentServer.id).catch((e) => {
+                if (e.response.data.error === "Port Unavailable") {
+                    this.props.openInfoBox("Port Unavailable", "There is already a server running on that port!")
+                }
+            });
         // when server online or starting, stop it
         } else if (currentServer.onlineStatus === 1 | currentServer.onlineStatus === 2) {
             stopServer(this.props.currentServer.id);
@@ -39,48 +66,75 @@ class ServerInfo extends React.Component {
     }
 
     render() {
-        let serverStatus = "";
         const currentServer = this.props.currentServer;
         let ip = "127.0.0.1";
         let buttonText = "Start";
         let buttonEnabled = true;
+        let port = 25565;
         
-        // determine button text, server status field
+        // determine button text
         if (currentServer) {
             switch (currentServer.onlineStatus) {
                 case 0:
-                    serverStatus = "offline";
                     break;
                 case 1:
-                    serverStatus = "starting";
                     buttonText = "Stop";
                     break;
                 case 2:
-                    serverStatus = "online";
                     buttonText = "Stop";
                     break;
                 case 3:
-                    serverStatus = "stopping";
                     buttonText = "Stop";
                     buttonEnabled = false;
                     break;
                 default:
-                    serverStatus = "unknown";
                     buttonText = "Start"
                     buttonEnabled = false;
                     break;
             };
             ip = currentServer.ip;
+            port = currentServer.port;
         }
 
-        return <div id="server-information">Server: 
-                <select value={this.props.currentServer ? this.props.currentServer.id : 0} onChange={(e) => this.serverChanged(e)}>
-                    {this.props.servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
-                </select>
-                    <CopyField text={ip} />
-                    Status: <div id="online-status" className={serverStatus}></div>
-                    <button id="control-server" onClick={() => this.toggleCurrentServer()} disabled={!buttonEnabled} >{buttonText}</button>
-                    <AddServerButton setCreationCancellable={this.props.setCreationCancellable} />
+        return  <div id="server-information">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    Server:
+                                </td>
+                                <td>
+                                    <Select value={this.props.currentServer ? this.props.currentServer.id : 0} onChange={(e) => this.serverChanged(e)}>
+                                        {this.props.servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
+                                    </Select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    IP:
+                                </td>
+                                <td>
+                                    <CopyField text={ip + ":" + port} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    Status:
+                                </td>
+                                <td>
+                                    <ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan={2}>
+                                    <div className="start-add-wrapper mcweb-ui" style={{"padding": "0"}}>
+                                        <button className="mcweb-ui" id="control-server" onClick={() => this.toggleCurrentServer()} disabled={!buttonEnabled} >{buttonText}</button>
+                                        <AddServerButton setCreationCancellable={this.props.setCreationCancellable} />
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>;
     }
 }

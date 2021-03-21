@@ -3,7 +3,7 @@ body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     transition: background-color 500ms;
-    --side-width: 256px;
+    --side-width: 310px;
 }
 
 body.darkmode {
