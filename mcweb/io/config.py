@@ -10,14 +10,14 @@ class Config:
         "DB_PATH": ("dbPath", "data.db"),
         "RESET_DB": ("resetDB", False),
         "SESSION_EXPIRATION": ("sessionExpiration", 7200),
-        "DOWNLOADS": ("downloads", {}),
+        "VERSIONS": ("versions", {}),
         "MAX_RAM": ("maxRam", 2),
         "MONGO":  ("mongoDB", {})
     }
 
     DB_PATH = "data.db"
     RESET_DB = False
-    DOWNLOADS = {}
+    VERSIONS = {}
     SESSION_EXPIRATION = 7200
     MAX_RAM = 2
     MONGO = {}

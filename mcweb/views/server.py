@@ -4,6 +4,8 @@ from mcweb.util import server_endpoint, requires_server_online, json_res, requir
 from json import dumps as json_dumps
 from time import strftime
 import asyncio
+from ..io.regexes import Regexes
+from ..io.config import Config
 
 
 server_blueprint = Blueprint("server", url_prefix="server")
@@ -37,6 +39,8 @@ async def start_server(req, i):
     """
     endpoints for starting the specified server
     """
+    if await req.app.server_manager.server_running_on(port=req.ctx.server.port):
+        return json_res({"error": "Port Unavailable", "description": "there is already a server running on that port", "status": 423}, status=423)
     await req.ctx.server.start()
     return json_res({"success": "server started", "update": {"server": {"online_status": 1}}})
 
@@ -131,13 +135,43 @@ async def restart(req, i):
     await req.ctx.server.start()
 
 
+@server_blueprint.patch("/<i>")
+@requires_login()
+@server_endpoint()
+async def update_server(req, i):
+    for k, v in req.json.items():
+        if k == "displayName":
+            if not Regexes.SERVER_DISPLAY_NAME.match(v):
+                return json_res({"error": "Illegal Server Name", "description": f"the server name doesn't match the regex for server names", "status": 400, "regex": Regexes.SERVER_DISPLAY_NAME.pattern}, status=400)
+            req.ctx.server.display_name = v
+        elif k == "port":
+            if not isinstance(v, int):
+                return json_res({"error": "TypeError", "description": "port has to be int", "status": 400}, status=400)
+            if v < 25000 | v > 30000:
+                return json_res(
+                    {"error": "Invalid Port", "description": f"Port range is between 25000 and 30000", "status": 400}, status=400)
+            req.ctx.server.port = v
+        elif k == "allocatedRAM":
+            if not isinstance(v, int):
+                return json_res({"error": "TypeError", "description": "allocatedRAM has to be int", "status": 400}, status=400)
+            if v > Config.MAX_RAM:
+                return json_res({"error": "Too Much RAM", "description": "maximal ram is " + str(Config.MAX_RAM), "status": 400, "maxRam": Config.MAX_RAM}, status=400)
+            req.ctx.server.ram = v
+        else:
+            return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {v}", "status": 400}, status=400)
+    await req.ctx.server.update()
+    return json_res({"success": "Updated Server", "update": {"server": req.ctx.server.json()}})
+
+
 @server_blueprint.put("/create/<server>/<version>")
 @requires_login()
-@requires_post_params("name")
+@requires_post_params("name", "port")
 async def create(req, server, version):
-    ram = 2 if "ram" not in req.json.keys() else req.json["ram"]
+    ram = 2 if "allocatedRAM" not in req.json.keys() else req.json["allocatedRAM"]
     name = req.json["name"]
-    return await req.app.server_manager.create_server(name, server, version, ram)
+    port = req.json["port"]
+    version_provider = await req.app.server_manager.versions.provider_by_name(server)
+    return await req.app.server_manager.create_server(name, version_provider, version, ram, port)
 
 
 @server_blueprint.get("/versions")

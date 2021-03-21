@@ -5,22 +5,25 @@ from .vanilla import SnapshotVersionProvider, VanillaVersionProvider
 
 class VersionManager:
     def __init__(self):
-        self.provider = {
-            "paper": PaperVersionProvider(),
-            "forge": ForgeVersionProvider(),
-            "snapshot": SnapshotVersionProvider(),
-            "vanilla": VanillaVersionProvider()
-        }
+        self.provider = [
+            PaperVersionProvider(),
+            ForgeVersionProvider(),
+            SnapshotVersionProvider(),
+            VanillaVersionProvider()
+        ]
 
     async def reload_all(self):
-        for p in self.provider.values():
+        for p in self.provider:
             await p.reload()
 
     async def get_json(self):
         out = {}
-        for k, v in self.provider.items():
-            out[k] = await v.get_versions()
+        for v in self.provider:
+            out[v.NAME] = await v.get_versions()
         return out
 
-    async def get_provider(self):
-        return self.provider
+    async def provider_by_name(self, s):
+        for p in self.provider:
+            if p.NAME == s:
+                return p
+        return None

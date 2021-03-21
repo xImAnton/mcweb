@@ -36,7 +36,7 @@ class MCWeb(Sanic):
         """
         listener to be called after server start
         """
-        self.mongo = MongoClient(self).db
+        self.mongo = MongoClient(self, loop).db
         await self.server_manager.init()
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.ipify.org/") as resp:
