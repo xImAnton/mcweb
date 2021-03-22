@@ -1,0 +1,150 @@
+body {
+    background-color: #1b2330;
+}
+
+.limiter {
+    width: 800px;
+    height: 870px;
+    position: relative;
+    overflow: hidden;
+}
+
+.curse-selector {
+    inset: 0;
+    border: 1px solid black;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    background-color: #0d1625;
+    position: absolute;
+    height: 99.8%;
+}
+
+.curse-head {
+    padding: 5px 6px;
+    font-weight: 700;
+    font-size: 20px;
+    -webkit-box-shadow: 0px 7px 25px -11px #000000;
+    -moz-box-shadow: 0px 7px 25px -11px #000000;
+    box-shadow: 0px 7px 25px -11px #000000;
+    z-index: 1;
+}
+
+.curse-head .search {
+    display: flex;
+}
+
+.curse-selector h1 {
+    margin: 0;
+}
+
+.curse-footer {
+    padding: 5px 6px;
+    -webkit-box-shadow: 0px -7px 25px -11px #000000;
+    -moz-box-shadow: 0px -7px 25px -11px #000000;
+    box-shadow: 0px -7px 25px -11px #000000;
+    z-index: 1;
+}
+
+.addon-list {
+    flex-grow: 1;
+    background-color: #1b2330;
+    position: relative;
+}
+
+.addon-list .inner {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: auto;
+}
+
+.addon-list .inner.unscrollable {
+    overflow: hidden;
+}
+
+.addon {
+    padding: 5px 6px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    cursor: pointer;
+}
+
+.addon img {
+    width: 64px;
+    height: auto;
+    display: inline-block;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.addon h3 {
+    display: inline-block;
+    margin-top: 0;
+    margin-bottom: 3px;
+}
+
+.addon .text {
+    display: inline-block;
+    padding: 5px 6px;
+}
+
+.addon span {
+    display: block;
+}
+
+.addon:hover {
+    background-color: #232d3d;
+}
+
+.image-wrap {
+    height: 64px;
+    background-color: white;
+    display: flex;
+}
+
+.addon-popup-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    backdrop-filter: blur(5px) brightness(40%);
+}
+
+.addon-popup {
+    z-index: 3;
+    background-color: #0d1625;
+    padding: 8px;
+    max-width: 40%;
+}
+
+.addon-popup span {
+    margin-bottom: 20px;
+    display: block;
+    word-wrap: break-word;
+}
+
+.addon-popup a, .addon-popup a:active, .addon-popup a:visited {
+    color: white;
+}
+
+.curse-paginator {
+    display: flex;
+    justify-content: space-between;
+}
+
+.curse-paginator button {
+    padding: 0 8px;
+    width: auto;
+}

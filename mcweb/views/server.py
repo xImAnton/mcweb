@@ -1,6 +1,6 @@
 from sanic.blueprints import Blueprint
 from websockets.exceptions import ConnectionClosed
-from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws
+from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws, catch_keyerrors
 from json import dumps as json_dumps
 from time import strftime
 import asyncio
@@ -161,6 +161,21 @@ async def update_server(req, i):
             return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {v}", "status": 400}, status=400)
     await req.ctx.server.update()
     return json_res({"success": "Updated Server", "update": {"server": req.ctx.server.json()}})
+
+
+@server_blueprint.put("/<i>/addons")
+@requires_login()
+@server_endpoint()
+@requires_post_params("addonId", "addonType", "addonVersion")
+@catch_keyerrors()
+async def add_addon(req, i):
+    if not await req.ctx.server.supports(req.json["addonType"]):
+        return json_res({"error": "Invalid Addon Type", "description": "this server doesn't support " + req.json["addonType"], "status": 400}, status=400)
+    addon = await req.ctx.server.add_addon(req.json["addonId"], req.json["addonType"], req.json["addonVersion"])
+    if addon:
+        return json_res({"success": "Addon added", "data": {"addon": addon}})
+    else:
+        return json_res({"error": "Error while creating Addon", "description": "maybe the addon id is wrong, the file couldn't be downloaded or this server doesn't support addons yet", "status": 400}, status=400)
 
 
 @server_blueprint.put("/create/<server>/<version>")

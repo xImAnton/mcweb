@@ -12,7 +12,9 @@ class Config:
         "SESSION_EXPIRATION": ("sessionExpiration", 7200),
         "VERSIONS": ("versions", {}),
         "MAX_RAM": ("maxRam", 2),
-        "MONGO":  ("mongoDB", {})
+        "MONGO":  ("mongoDB", {}),
+        "SERVER_DIR": ("serverDir", "./servers"),
+        "ADDONS": ("addons", {})
     }
 
     DB_PATH = "data.db"
@@ -21,6 +23,8 @@ class Config:
     SESSION_EXPIRATION = 7200
     MAX_RAM = 2
     MONGO = {}
+    SERVER_DIR = "./servers"
+    ADDONS = {}
 
     @staticmethod
     def load() -> None:

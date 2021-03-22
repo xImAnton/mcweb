@@ -11,4 +11,13 @@ module.exports = function(app) {
             ws: true
         })
     );
+    app.use("/curseforge",
+        createProxyMiddleware({
+            target: "https://addons-ecs.forgesvc.net/api/v2/",
+            changeOrigin: true,
+            pathRewrite: {
+                "^/curseforge": "/"
+            }
+        })
+    );
 };

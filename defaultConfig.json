@@ -1,5 +1,4 @@
 {
-  "dbPath": "./database.db",
   "resetDB": false,
   "sessionExpiration": 7200,
   "downloads": {
@@ -7,15 +6,33 @@
       "getVersions": "https://papermc.io/api/v2/projects/paper/",
       "getBuilds": "https://papermc.io/api/v2/projects/paper/versions/{version}",
       "getBuildDownload": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}",
-      "downloadBuild": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}/downloads/{download}"
+      "downloadBuild": "https://papermc.io/api/v2/projects/paper/versions/{version}/builds/{build}/downloads/{download}",
+      "supports": {
+        "mods": false,
+        "plugins": true
+      }
     },
     "forge": {
       "getVersions": "http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml",
-      "downloadBuild": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{build}/forge-{build}-installer.jar"
+      "downloadBuild": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{build}/forge-{build}-installer.jar",
+      "supports": {
+        "mods": true,
+        "plugins": false
+      }
     },
     "vanilla": {
       "getVersions": "https://launchermeta.mojang.com/mc/game/version_manifest.json",
-      "launcherMeta": "https://launchermeta.mojang.com"
+      "launcherMeta": "https://launchermeta.mojang.com",
+      "supports": {
+        "mods": false,
+        "plugins": false
+      }
+    }
+  },
+  "addons": {
+    "mods": {
+      "getDownloadUrl": "https://addons-ecs.forgesvc.net/api/v2/addon/{addon_id}/file/{file_id}/download-url",
+      "getModInfo": "https://addons-ecs.forgesvc.net/api/v2/addon/{addon_id}"
     }
   },
   "maxRam": 6,
@@ -25,5 +42,6 @@
     "username": "",
     "password": "",
     "database": "mcweb"
-  }
+  },
+  "serverDir": "./servers"
 }

@@ -3,6 +3,9 @@ from sanic.response import json, redirect
 from json import dumps as json_dumps, loads as json_loads
 from mcweb.views.login import User
 from bson.objectid import ObjectId
+from urllib.parse import urlparse
+from os.path import split as split_path
+import aiohttp, aiofiles
 
 
 def json_res(di, **kwargs):
@@ -12,6 +15,28 @@ def json_res(di, **kwargs):
     :return: the created sanic.response.HTTPResponse
     """
     return json(objid_to_str(di), dumps=lambda s: json_dumps(s, indent=2), **kwargs)
+
+
+def get_path(url):
+    u = urlparse(url)
+    return split_path(u.path)
+
+
+async def download_and_save(url, path):
+    """
+    downloads a file and saves it to the given path
+    :param url: the url to download
+    :param path: the path of the output file
+    :return: True, if the server was created successfully
+    """
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                f = await aiofiles.open(path, mode='wb')
+                await f.write(await resp.read())
+                await f.close()
+                return True
+    raise FileNotFoundError("file couldn't be saved")
 
 
 def objid_to_str(d):

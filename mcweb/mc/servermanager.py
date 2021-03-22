@@ -1,11 +1,10 @@
 from typing import Optional
 from .server import MinecraftServer
-import aiohttp
 import aiofiles
 from mcweb.io.config import Config
 import os
 from .versions.manager import VersionManager
-from mcweb.util import json_res
+from ..util import json_res, download_and_save
 from bson.objectid import ObjectId
 import pymongo.errors
 import sys
@@ -102,19 +101,19 @@ class ServerManager:
             name += "-"
 
         # generate path name and dir
-        dir_ = os.path.join(os.path.join(os.getcwd(), "servers"), name)
+        dir_ = os.path.join(os.path.join(os.getcwd(), Config.SERVER_DIR), name)
         while os.path.isdir(dir_):
             dir_ += "-server"
         os.mkdir(dir_)
 
         # Download Server jar
         out_file = version_provider.DOWNLOAD_FILE_NAME
-        await ServerManager.download_and_save(await version_provider.get_download(version), os.path.join(dir_, out_file))
+        await download_and_save(await version_provider.get_download(version), os.path.join(dir_, out_file))
         # save agreed eula
         await ServerManager.save_eula(dir_)
 
         # insert into db
-        doc = {"_id": ObjectId(), "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port}
+        doc = {"_id": ObjectId(), "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port, "addons": []}
         await self.mc.mongo["server"].insert_one(doc)
 
         # add server record to db and register to server manager
@@ -139,23 +138,6 @@ class ServerManager:
         :param name: the name to check
         """
         return await self.mc.mongo["server"].find_one({"name": name}) is None
-
-    @staticmethod
-    async def download_and_save(url, path):
-        """
-        downloads a file and saves it to the given path
-        :param url: the url to download
-        :param path: the path of the output file
-        :return: True, if the server was created successfully
-        """
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    f = await aiofiles.open(path, mode='wb')
-                    await f.write(await resp.read())
-                    await f.close()
-                    return True
-        raise FileNotFoundError("file couldn't be saved")
 
     @staticmethod
     async def save_eula(path):

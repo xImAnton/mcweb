@@ -1,9 +1,10 @@
 import aiohttp
-from mcweb.io.config import Config
+from ...io.config import Config
 import xml.etree.ElementTree as xml
 from .base import VersionProvider
 import os
 import subprocess
+from ...util import get_path, download_and_save
 
 
 class ForgeVersionProvider(VersionProvider):
@@ -45,3 +46,22 @@ class ForgeVersionProvider(VersionProvider):
                 pass
         if not renamed:
             raise FileNotFoundError("couldn't find server file")
+
+    async def add_addon(self, addon_id, addon_type, addon_version, server_dir):
+        if addon_type != "mods":
+            return {}
+        url = Config.ADDONS["mods"]["getDownloadUrl"].format(addon_id=addon_id, file_id=addon_version)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as r:
+                url = await r.text()
+            async with session.get(Config.ADDONS["mods"]["getModInfo"].format(addon_id=addon_id)) as r:
+                info = await r.json()
+        if not url:
+            return {}
+        file_name = get_path(url)[-1]
+        mods_dir = os.path.join(server_dir, "mods")
+        if not os.path.isdir(mods_dir):
+            os.mkdir(mods_dir)
+        file_path = os.path.join(mods_dir, file_name)
+        await download_and_save(url, file_path)
+        return {"filePath": file_path, "name": info["name"], "description": info["summary"]}

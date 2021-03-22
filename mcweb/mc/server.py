@@ -4,6 +4,7 @@ from ..io.wsmanager import WebsocketConnectionManager
 from json import dumps as json_dumps
 from time import strftime
 from ..io.regexes import Regexes
+from ..io.config import Config
 
 
 class MinecraftServer:
@@ -22,6 +23,7 @@ class MinecraftServer:
         self.status = record["onlineStatus"]
         self.software = record["software"]
         self.port = record["port"]
+        self.addons = record["addons"]
         cmd = f"java -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
         self.communication = ServerCommunication(self.mc.loop, cmd, self.on_output, self.on_output, self.on_stop, cwd=self.run_dir)
         self.output = []
@@ -39,6 +41,7 @@ class MinecraftServer:
         self.status = record["onlineStatus"]
         self.software = record["software"]
         self.port = record["port"]
+        self.addons = record["addons"]
 
     async def update(self):
         await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": self.update_doc()})
@@ -141,8 +144,22 @@ class MinecraftServer:
             "ip": self.mc.public_ip,
             "displayName": self.display_name,
             "software": self.software,
-            "port": self.port
+            "port": self.port,
+            "supports": Config.VERSIONS[self.software["server"]]["supports"],
+            "addons": self.addons
         }
+
+    async def get_version_provider(self):
+        return await self.mc.server_manager.versions.provider_by_name(self.software["server"])
+
+    async def add_addon(self, addon_id, addon_type, addon_version):
+        res = await (await self.get_version_provider()).add_addon(addon_id, addon_type, addon_version, self.run_dir)
+        if res:
+            await self.mc.mongo["server"].update_one({"_id": self.id}, {"$addToSet": {"addons": res}})
+        return res
+
+    async def supports(self, addon_type):
+        return Config.VERSIONS[self.software["server"]]["supports"][addon_type]
 
     def update_doc(self):
         return {

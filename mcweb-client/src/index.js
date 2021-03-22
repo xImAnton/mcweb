@@ -20,7 +20,7 @@ import history from "./history"
 import NoBackend from "./component/nobackend";
 import LoadingAnimation from "./component/loading";
 import InfoBox from "./component/infobox";
-import AddonSelector from "./curse/curse";
+import ModView from "./component/mods";
 
 
 class App extends React.Component {
@@ -251,35 +251,42 @@ class App extends React.Component {
                                     />
                                     <div id="content-wrapper">
                                         { this.state.infoBoxCaption && <InfoBox close={(e) => this.setState({infoBox: "", infoBoxCaption: ""})} text={this.state.infoBox} head={this.state.infoBoxCaption} /> }
-                                        <Switch history={history} >
-                                            <Route path="/general">
-                                                <GeneralView currentServer={this.state.currentServer} />
-                                            </Route>
-                                            <Route path="/player">
-                                                <PlayerView currentServer={this.state.currentServer} />
-                                            </Route>
-                                            <Route path="/console">
-                                                <ConsoleView lines={this.state.consoleLines} currentServer={this.state.currentServer} getSessionId={() => this.getSessionId()} />
-                                            </Route>
-                                            <Route path="/backups">
-                                                <BackupsView currentServer={this.state.currentServer} />
-                                            </Route>
-                                            <Route path="/settings">
-                                                <SettingsView currentServer={this.state.currentServer} changeServer={(id) => this.changeServer(id)} />
-                                            </Route>
-                                            <Route path="/worlds">
-                                                <WorldsView currentServer={this.state.currentServer} />
-                                            </Route>
-                                            <Route path="/dsm">
-                                                <DSMView currentServer={this.state.currentServer} />
-                                            </Route>
-                                            <Route path="/user">
-                                                <UserView currentServer={this.state.currentServer} />
-                                            </Route>
-                                            <Route path="/">
-                                                <Redirect to="/general" />
-                                            </Route>
-                                        </Switch>
+                                        {this.state.currentServer && 
+                                            <Switch history={history} >
+                                                <Route path="/general">
+                                                    <GeneralView currentServer={this.state.currentServer} />
+                                                </Route>
+                                                <Route path="/player">
+                                                    <PlayerView currentServer={this.state.currentServer} />
+                                                </Route>
+                                                <Route path="/console">
+                                                    <ConsoleView lines={this.state.consoleLines} currentServer={this.state.currentServer} getSessionId={() => this.getSessionId()} />
+                                                </Route>
+                                                <Route path="/backups">
+                                                    <BackupsView currentServer={this.state.currentServer} />
+                                                </Route>
+                                                <Route path="/settings">
+                                                    <SettingsView currentServer={this.state.currentServer} changeServer={(id) => this.changeServer(id)} />
+                                                </Route>
+                                                { this.state.currentServer.supports.mods &&
+                                                    <Route path="/mods">
+                                                        <ModView currentServer={this.state.currentServer} />
+                                                    </Route>
+                                                }
+                                                <Route path="/worlds">
+                                                    <WorldsView currentServer={this.state.currentServer} />
+                                                </Route>
+                                                <Route path="/dsm">
+                                                    <DSMView currentServer={this.state.currentServer} />
+                                                </Route>
+                                                <Route path="/user">
+                                                    <UserView currentServer={this.state.currentServer} />
+                                                </Route>
+                                                <Route path="/">
+                                                    <Redirect to="/general" />
+                                                </Route>
+                                            </Switch>
+                                        }
                                     {/*display LoadingAnimation when fetches are missing*/}
                                     </div></>) : (<LoadingAnimation loadingText="Loading Server Information" />)}</>
                                 </Route>

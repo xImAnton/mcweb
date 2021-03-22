@@ -136,3 +136,12 @@ export function getLogin() {
 export function patchServer(server, data) {
     return patch(getApiBase() + "/server/" + server, data);
 }
+
+export function addAddon(server, addonId, addonType, addonVersion) {
+    return put(getApiBase() + "/server/" + server + "/addons", {
+            addonId: addonId,
+            addonType: addonType,
+            addonVersion: addonVersion,
+        }
+    );
+}

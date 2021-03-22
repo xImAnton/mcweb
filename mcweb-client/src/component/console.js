@@ -40,7 +40,7 @@ function ConsoleView(props) {
         textRef.current.scrollTop = textRef.current.scrollHeight;
     })
 
-    return <div id="page-content">
+    return  <div id="page-content">
                 <h1 id="page-headline">Console</h1>
                 <div id="console-wrapper">
                     <textarea id="console-out" readOnly value={props.lines.length === 0 ? "Start your Server to see its Output":  props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />

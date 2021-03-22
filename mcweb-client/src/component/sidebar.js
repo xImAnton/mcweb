@@ -17,7 +17,7 @@ class Sidebar extends React.Component {
                                 setCreationCancellable={this.props.setCreationCancellable}
                                 openInfoBox={this.props.openInfoBox}
                             />
-                            <Navbar logout={this.props.logout} getUserName={this.props.getUserName}/>
+                            <Navbar logout={this.props.logout} getUserName={this.props.getUserName} currentServer={this.props.currentServer} />
                         </div>
                     </aside>
                 </div>;
