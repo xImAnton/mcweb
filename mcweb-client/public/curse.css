@@ -10,14 +10,12 @@ body {
 }
 
 .curse-selector {
-    inset: 0;
-    border: 1px solid black;
     display: flex;
     flex-direction: column;
     color: white;
     background-color: #0d1625;
     position: absolute;
-    height: 99.8%;
+    inset: 0;
 }
 
 .curse-head {

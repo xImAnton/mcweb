@@ -308,11 +308,3 @@ ReactDOM.render(
         <App />
     </Router>,
 document.getElementById("root"));
-
-// 12: Texture Packs, 4471: Modpacks, 6: Mods, 17: Worlds
-
-/*
-ReactDOM.render(
-    <AddonSelector sectionId={6} />,
-document.getElementById("root"));
-*/
