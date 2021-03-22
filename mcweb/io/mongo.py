@@ -7,4 +7,4 @@ class MongoClient(motor.motor_asyncio.AsyncIOMotorClient):
         uri = f"mongodb://{Config.MONGO['username']}:{Config.MONGO['password']}@{Config.MONGO['host']}:{Config.MONGO['port']}"
         super(MongoClient, self).__init__(uri, io_loop=loop)
         self.mc = mc
-        self.db = self["mcweb"]
+        self.db = self[Config.MONGO["database"]]
