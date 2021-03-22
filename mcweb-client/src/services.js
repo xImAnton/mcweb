@@ -10,6 +10,14 @@ async function get(url) {
     }));
 }
 
+async function patch(url, data) {
+    return catchApiErrors(axios.patch(url, data, {
+        headers: {
+            "Authorization": "Token " + getSessionId()
+        }
+    }));
+}
+
 async function post(url, data) {
     return catchApiErrors(axios.post(url, data, {
         headers: {
@@ -33,6 +41,7 @@ function catchApiErrors(promise) {
 function catchTimeoutError(promise) {
     return promise.catch((e => {
         console.error("Error while fetching url " + e.response.url);
+        console.error(e.response);
         if (e.response.status === 504) { // Gateway Timeout
             if (!(history.location.pathname === "/apierror")) {
                 history.push("/apierror");
@@ -122,4 +131,8 @@ export function getServer(servers, id) {
 
 export function getLogin() {
     return get(getApiBase() + "/account/login");
+}
+
+export function patchServer(server, data) {
+    return patch(getApiBase() + "/server/" + server, data);
 }

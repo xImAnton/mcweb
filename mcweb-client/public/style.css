@@ -485,6 +485,7 @@ span.logout {
     text-align: center;
     border-radius: 12px;
     color: black;
+    z-index: 2;
 }
 
 .infobox h1 {

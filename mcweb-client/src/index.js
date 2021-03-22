@@ -20,6 +20,7 @@ import history from "./history"
 import NoBackend from "./component/nobackend";
 import LoadingAnimation from "./component/loading";
 import InfoBox from "./component/infobox";
+import AddonSelector from "./curse/curse";
 
 
 class App extends React.Component {
@@ -264,7 +265,7 @@ class App extends React.Component {
                                                 <BackupsView currentServer={this.state.currentServer} />
                                             </Route>
                                             <Route path="/settings">
-                                                <SettingsView currentServer={this.state.currentServer} />
+                                                <SettingsView currentServer={this.state.currentServer} changeServer={(id) => this.changeServer(id)} />
                                             </Route>
                                             <Route path="/worlds">
                                                 <WorldsView currentServer={this.state.currentServer} />
@@ -300,3 +301,11 @@ ReactDOM.render(
         <App />
     </Router>,
 document.getElementById("root"));
+
+// 12: Texture Packs, 4471: Modpacks, 6: Mods, 17: Worlds
+
+/*
+ReactDOM.render(
+    <AddonSelector sectionId={6} />,
+document.getElementById("root"));
+*/
