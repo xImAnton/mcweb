@@ -112,7 +112,8 @@ class App extends React.Component {
     }
 
     onSocketClose(e) {
-        if (e.code === 1000) { // Closed by server
+        console.log(e);
+        if (e.code === 1000 | e.code === 1006) { // Closed by server
             console.error("Server closed websocket")
             history.push("/apierror");
         }

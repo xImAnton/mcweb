@@ -1,3 +1,4 @@
+import { render } from "@testing-library/react";
 import axios from "axios";
 import history from "./history";
 
@@ -110,11 +111,12 @@ export function fetchVersions() {
     return get(getApiBase() + "/server/versions");
 }
 
-export function putServer(name, server, version, ram, port) {
+export function putServer(name, server, version, ram, port, javaVersion) {
     return put(getApiBase() + "/server/create/" + server + "/" + version, JSON.stringify({
         name: name,
         allocatedRAM: ram,
-        port: port
+        port: port,
+        javaVersion: javaVersion
     }));
 }
 
@@ -134,6 +136,10 @@ export function getLogin() {
 
 export function patchServer(server, data) {
     return patch(getApiBase() + "/server/" + server, data);
+}
+
+export function fetchJavaVersions() {
+    return get(getApiBase() + "/server/javaversions");
 }
 
 export function addAddon(server, addonId, addonType, addonVersion) {

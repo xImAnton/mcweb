@@ -33,6 +33,7 @@ class ServerCommunication:
         AsyncStreamWatcher(self.loop, self.process.stdout, self.process, self.on_stderr, None).start()
 
     async def process_end(self):
+        print("stopped")
         self.running = False
         await self.on_close()
 

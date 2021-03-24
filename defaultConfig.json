@@ -1,5 +1,4 @@
 {
-  "resetDB": false,
   "sessionExpiration": 7200,
   "downloads": {
     "paper": {
@@ -43,5 +42,14 @@
     "password": "",
     "database": "mcweb"
   },
-  "serverDir": "./servers"
+  "serverDir": "./servers",
+  "javaSettings": {
+    "installations": {
+      "default": {
+        "displayName": "Default Java Version",
+        "path": "java",
+        "additionalArguments": ""
+      }
+    }
+  }
 }

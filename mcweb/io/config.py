@@ -8,23 +8,23 @@ class Config:
 
     ATTR_KEYS = {
         "DB_PATH": ("dbPath", "data.db"),
-        "RESET_DB": ("resetDB", False),
         "SESSION_EXPIRATION": ("sessionExpiration", 7200),
         "VERSIONS": ("versions", {}),
         "MAX_RAM": ("maxRam", 2),
         "MONGO":  ("mongoDB", {}),
         "SERVER_DIR": ("serverDir", "./servers"),
-        "ADDONS": ("addons", {})
+        "ADDONS": ("addons", {}),
+        "JAVA": ("javaSettings", {})
     }
 
     DB_PATH = "data.db"
-    RESET_DB = False
     VERSIONS = {}
     SESSION_EXPIRATION = 7200
     MAX_RAM = 2
     MONGO = {}
     SERVER_DIR = "./servers"
     ADDONS = {}
+    JAVA = {}
 
     @staticmethod
     def load() -> None:

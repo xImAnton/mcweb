@@ -24,9 +24,13 @@ class MinecraftServer:
         self.software = record["software"]
         self.port = record["port"]
         self.addons = record["addons"]
-        cmd = f"java -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
-        self.communication = ServerCommunication(self.mc.loop, cmd, self.on_output, self.on_output, self.on_stop, cwd=self.run_dir)
+        self.java_version = record["javaVersion"]
+        self.communication = None
         self.output = []
+
+    async def generate_command(self):
+        java_cmd = Config.JAVA["installations"][self.java_version]["path"] + Config.JAVA["installations"][self.java_version]["additionalArguments"]
+        return f"{java_cmd} -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
 
     async def refetch(self) -> None:
         """
@@ -42,6 +46,7 @@ class MinecraftServer:
         self.software = record["software"]
         self.port = record["port"]
         self.addons = record["addons"]
+        self.java_version = record["javaVersion"]
 
     async def update(self):
         await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": self.update_doc()})
@@ -63,6 +68,8 @@ class MinecraftServer:
         """
         whether the server process is running or not.
         """
+        if not self.communication:
+            return False
         return self.communication.running
 
     async def start(self) -> None:
@@ -70,6 +77,7 @@ class MinecraftServer:
         starts the server and updates it status
         check if server is not running before calling
         """
+        self.communication = ServerCommunication(self.mc.loop, await self.generate_command(), self.on_output, self.on_output, self.on_stop, cwd=self.run_dir)
         self.output = []
         await self.set_online_status(1)
         await self.communication.begin()
@@ -92,6 +100,7 @@ class MinecraftServer:
         called on server process end
         sets the server status to offline
         """
+        self.communication.running = False
         await self.set_online_status(0)
 
     async def on_output(self, line) -> None:
@@ -146,7 +155,9 @@ class MinecraftServer:
             "software": self.software,
             "port": self.port,
             "supports": Config.VERSIONS[self.software["server"]]["supports"],
-            "addons": self.addons
+            "addons": self.addons,
+            "javaVersion": self.java_version,
+            "full": True
         }
 
     async def get_version_provider(self):
@@ -165,11 +176,13 @@ class MinecraftServer:
         return {
             "allocatedRAM": self.ram,
             "displayName": self.display_name,
-            "port": self.port
+            "port": self.port,
+            "javaVersion": self.java_version
         }
 
     def light_json(self):
         return {
             "id": str(self.id),
-            "displayName": self.display_name
+            "displayName": self.display_name,
+            "full": False
         }

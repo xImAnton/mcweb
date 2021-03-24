@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchVersions, putServer } from "../services";
+import { fetchVersions, putServer, fetchJavaVersions } from "../services";
 import history from "../history";
 import LoadingAnimation from "./loading";
 import { Select, FormTable, FormLine, LastFormLine, Alert } from "./ui";
@@ -41,20 +41,24 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
     const [maxRam, setMaxRam] = useState(32); // the maximal possible ram for the backend, gets set when user tries to set too much ram, because maxram is only sent in error response
     const [versionsLoaded, setVersionsLoaded] = useState(false); // whether the versions are fetched and ready to display, displays "Loading Versions" when false
     const [currentPort, setCurrentPort] = useState(25565); // current entered ram
+    const [javaVersions, setJavaVersions] = useState({});
+    const [currentJavaVersion, setCurrentJavaVersion] = useState("");
 
     useEffect(() => {
         // fetch possible software and versions from server
-        fetchVersions().then(
-            res => {
-                let server = Object.keys(res.data)[0]; // select first software option
-                let serverVersions = res.data[server]; // get all versions for first server
-                let version = serverVersions[serverVersions.length - 1]; // select latest version of software
-                setVersions(res.data);
-                setCurrentSoftware(server);
-                setCurrentVersion(version);
-                setVersionsLoaded(true);
-            }
-        );
+        fetchVersions().then(res => {
+            let server = Object.keys(res.data)[0]; // select first software option
+            let serverVersions = res.data[server]; // get all versions for first server
+            let version = serverVersions[serverVersions.length - 1]; // select latest version of software
+            setVersions(res.data);
+            setCurrentSoftware(server);
+            setCurrentVersion(version);
+            setVersionsLoaded(true);
+        });
+        fetchJavaVersions().then(res => {
+            setJavaVersions(res.data);
+            setCurrentJavaVersion(Object.keys(res.data)[0]);
+        });
     }, []);
 
     async function createServer() {
@@ -76,7 +80,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
         // display loading animation
         setCreating(true);
         // send server creation, backend downloads server jar
-        await putServer(currentName, currentSoftware, currentVersion, currentRam, currentPort).then(res => {
+        await putServer(currentName, currentSoftware, currentVersion, currentRam, currentPort, currentJavaVersion).then(res => {
             status = res.data.add.server.id;
             addFirstServer(res.data.add.server);
             // cancel loading animation when server is created and ready to start
@@ -171,6 +175,13 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
                     } />
                     <FormLine label="Port" input={
                         <input className="mcweb-ui" type="number" min={25000} defaultValue={currentPort} max={30000} onChange={e => setCurrentPort(parseInt(e.target.value))} />
+                    } />
+                    <FormLine label="Java Version" input={
+                        <Select value={currentJavaVersion} onChange={e => setCurrentJavaVersion(e.target.value)}>
+                            {Object.keys(javaVersions).map((k, i) => {
+                                return <option value={k} key={k}>{javaVersions[k]}</option>
+                            })}
+                        </Select>
                     } />
                     <LastFormLine>
                         <CreateServerButton createServer={createServer} cancellable={cancellable} changeServer={changeServer} />

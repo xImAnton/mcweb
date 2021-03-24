@@ -63,7 +63,7 @@ class ServerManager:
                 return server
         return None
 
-    async def create_server(self, name, version_provider, version, ram, port):
+    async def create_server(self, name, version_provider, version, ram, port, java_version):
         """
         creates a new server
         :param name: the new servers name
@@ -71,6 +71,7 @@ class ServerManager:
         :param version: the version that is passed to the version provider
         :param ram: the ram the server should have, can be changed later
         :param port: the port the server should run on in the future
+        :param java_version: the java version that runs the server
         :return: sanic json response
         """
         # check if version existing
@@ -91,6 +92,9 @@ class ServerManager:
 
         if not Regexes.SERVER_DISPLAY_NAME.match(name):
             return json_res({"error": "Illegal Server Name", "description": f"the server name doesn't match the regex for server names", "status": 400, "regex": Regexes.SERVER_DISPLAY_NAME.pattern}, status=400)
+
+        if java_version not in Config.JAVA["installations"].keys():
+            return json_res({"error": "Invalid Java Version", "description": "there is no such java version: " + java_version, "status": 400}, status=400)
 
         # Lowercase, no special char server name
         display_name = name
@@ -113,7 +117,7 @@ class ServerManager:
         await ServerManager.save_eula(dir_)
 
         # insert into db
-        doc = {"_id": ObjectId(), "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port, "addons": []}
+        doc = {"_id": ObjectId(), "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port, "addons": [], "javaVersion": java_version}
         await self.mc.mongo["server"].insert_one(doc)
 
         # add server record to db and register to server manager

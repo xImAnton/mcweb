@@ -157,6 +157,10 @@ async def update_server(req, i):
             if v > Config.MAX_RAM:
                 return json_res({"error": "Too Much RAM", "description": "maximal ram is " + str(Config.MAX_RAM), "status": 400, "maxRam": Config.MAX_RAM}, status=400)
             req.ctx.server.ram = v
+        elif k == "javaVersion":
+            if v not in Config.JAVA["installations"].keys():
+                return json_res({"error": "Invalid Java Version", "description": "there is no such java version: " + v, "status": 400}, status=400)
+            req.ctx.server.java_version = v
         else:
             return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {v}", "status": 400}, status=400)
     await req.ctx.server.update()
@@ -183,13 +187,23 @@ async def add_addon(req, i):
 @requires_post_params("name", "port")
 async def create(req, server, version):
     ram = 2 if "allocatedRAM" not in req.json.keys() else req.json["allocatedRAM"]
+    java_version = "default" if "javaVersion" not in req.json.keys() else req.json["javaVersion"]
     name = req.json["name"]
     port = req.json["port"]
     version_provider = await req.app.server_manager.versions.provider_by_name(server)
-    return await req.app.server_manager.create_server(name, version_provider, version, ram, port)
+    return await req.app.server_manager.create_server(name, version_provider, version, ram, port, java_version)
 
 
 @server_blueprint.get("/versions")
 @requires_login()
 async def get_all_versions(req):
     return json_res(await req.app.server_manager.versions.get_json())
+
+
+@server_blueprint.get("/javaversions")
+@requires_login()
+async def get_java_versions(req):
+    out = {}
+    for k, v in Config.JAVA["installations"].items():
+        out[k] = v["displayName"]
+    return json_res(out)
