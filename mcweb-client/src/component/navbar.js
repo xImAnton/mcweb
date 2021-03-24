@@ -1,4 +1,3 @@
-import React from "react";
 import history from "../history"
 
 
@@ -12,6 +11,7 @@ function NavbarEntry(props) {
 
 
 function Navbar(props) {
+    if (!props.currentServer.full) return <></>;
     return  <ul id="navbar-options">
                 <NavbarEntry name="General" href="general" index={1}/>
                 <NavbarEntry name="Player" href="player" index={2}/>
@@ -22,7 +22,7 @@ function Navbar(props) {
                 <NavbarEntry name="World Management" href="worlds" index={7}/>
                 <NavbarEntry name="Dynamic Server Management" href="dsm" index={8}/>
                 <NavbarEntry name="User Management" href="user" index={9}/>
-                <li key={9}>Logged in as {props.getUserName()} (<span onClick={props.logout} className="logout">Logout</span>)</li>
+                <li key={9}>Logged in as {props.username} (<span onClick={props.logout} className="logout">Logout</span>)</li>
             </ul>;
 }
 

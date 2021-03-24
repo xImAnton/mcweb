@@ -20,10 +20,17 @@ function ConsoleInput(props) {
         await sendCommand(props.currentServer.id, text)
         // clear input field
         inputRef.current.value = "";
+        setText("");
     }
 
     return <div className="console-input-wrapper">
-        <input style={{display: "inline-block", flexGrow: "1", marginRight: "3px"}} className="mcweb-ui" ref={inputRef} type="text" onChange={e => setText(e.target.value)} placeholder="Enter Command" />
+        <input style={{display: "inline-block", flexGrow: "1", marginRight: "3px"}} 
+            className="mcweb-ui" ref={inputRef}
+            type="text"
+            onChange={e => setText(e.target.value)}
+            placeholder="Enter Command"
+            onKeyPress={(e) => {if (e.key === "Enter") submitCommand()}}
+        />
         <button style={{display: "inline-block", width: "auto"}} className="mcweb-ui" onClick={submitCommand}>Send</button>
     </div>
 }

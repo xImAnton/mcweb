@@ -64,12 +64,10 @@ function AddonsList({page, sectionId, searchText, currentServer}) {
             listDiv.current.scrollTop = 0;
             setLoaded(true);
         });
-    }, [page, searchText]);
+    }, [page, searchText, sectionId]);
 
     const data = addons.map(e => {
-        return <AddonsListEntry data={e} key={e.id} onClick={
-            (id) => addons.map(e => { if (e.id === id) setSelected(e) })
-        } />
+        return <AddonsListEntry data={e} key={e.id} onClick={() => setSelected(e) } />
     })
 
     return  <div className={"addon-list"}>
@@ -103,7 +101,10 @@ function SearchBar({search}) {
 
     let searchText = "";
 
+    const searchBar = useRef(null);
+
     return  <div className="search">
+                <button className="mcweb-ui" style={{width: "32px", display: "inline-block", marginRight: "3px"}} onClick={() => {search(""); searchBar.current.value = ""}}>×</button>
                 <input
                     onChange={(e) => {searchText = e.currentTarget.value}}
                     placeholder="Search Mods"
@@ -111,15 +112,16 @@ function SearchBar({search}) {
                     type="text"
                     style={{display: "inline-block", flexGrow: "1", marginRight: "3px"}}
                     onKeyDown={(e) => { if (e.key === "Enter") search(searchText); }}
+                    ref={searchBar}
                 />
-                <button className="mcweb-ui" style={{width: "auto", display: "inline-block"}} onClick={() => search(searchText)}>🔍</button>
+                <button className="mcweb-ui" style={{width: "32px", display: "inline-block"}} onClick={() => search(searchText)}>🔍</button>
             </div>
 }
 
 
 function AddonSelectHeader({search}) {
     return  <div className="curse-head">
-                <h1>Select Mod</h1>
+                <h1>Mods</h1>
                 <SearchBar search={search} />
             </div>;
 }

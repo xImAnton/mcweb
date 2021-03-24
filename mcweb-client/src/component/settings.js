@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { patchServer } from "../services";
+import { FormTable, FormLine } from "./ui";
 
 
 function SettingsView({currentServer, changeServer}) {
@@ -28,25 +29,14 @@ function SettingsView({currentServer, changeServer}) {
 
     return  <div id="page-content">
                 <h1 id="page-headline">Settings</h1>
-                <table className={"formtable"}>
-                    <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td><input type="text" className="mcweb-ui" defaultValue={name} onChange={(e) => setName(e.currentTarget.value)}/></td>
-                        </tr>
-                        <tr>
-                            <td>Port</td>
-                            <td><input className="mcweb-ui" type="number" min={25000} defaultValue={port} max={30000} onChange={(e) => setPort(parseInt(e.currentTarget.value))}></input></td>
-                        </tr>
-                        <tr>
-                            <td>RAM</td>
-                            <td><input className="mcweb-ui" type="number" min={1} defaultValue={ram} max={32} onChange={(e) => setRam(parseInt(e.currentTarget.value))}></input></td>
-                        </tr>
-                        <tr>
-                            <td colSpan={2}><button className="mcweb-ui" onClick={submit}>Save Changes</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <FormTable mergeLast={true}>
+                    <FormLine label="Name" input={<input type="text" className="mcweb-ui" defaultValue={name} onChange={(e) => setName(e.currentTarget.value)}/>} />
+                    <FormLine label="Port" input={<input className="mcweb-ui" type="number" min={25000} defaultValue={port} max={30000} onChange={(e) => setPort(parseInt(e.currentTarget.value))} />} />
+                    <FormLine label="RAM" input={<input className="mcweb-ui" type="number" min={1} defaultValue={ram} max={32} onChange={(e) => setRam(parseInt(e.currentTarget.value))} />} />
+                    <tr>
+                        <td colSpan={2}><button className="mcweb-ui" onClick={submit}>Save Changes</button></td>
+                    </tr>
+                </FormTable>
             </div>;
 }
 

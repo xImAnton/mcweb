@@ -1,20 +1,15 @@
-import React from "react";
-
-
-class Footer extends React.Component {
-    render() {
-        return <div id="footer-wrapper">
-                    <footer>
-                        <div id="footer">
-                            <label className="switch">
-                                <input type="checkbox" onChange={this.props.toggleDarkMode} id="darkmode-switch" defaultChecked={this.props.darkmode} />
-                                <span className="slider"></span>
-                            </label>
-                            enable Darkmode
-                        </div>
-                    </footer>
-                </div>;
-    }
+function Footer({toggleDarkMode, darkmode}) {
+    return  <div id="footer-wrapper">
+                <footer>
+                    <div id="footer">
+                        <label className="switch">
+                            <input type="checkbox" onChange={toggleDarkMode} id="darkmode-switch" defaultChecked={darkmode} />
+                            <span className="slider"></span>
+                        </label>
+                        enable Darkmode
+                    </div>
+                </footer>
+            </div>;
 }
 
 export default Footer;

@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
 import Header from "./component/header";
 import Sidebar from "./component/sidebar";
 import GeneralView from "./component/general";
 import Footer from "./component/footer";
-import LoginView from "./component/login"
+import LoginView from "./component/login";
 import { Route, Switch, Redirect, Router } from "react-router-dom";
 import PlayerView from "./component/player";
 import ConsoleView from "./component/console";
@@ -16,7 +15,7 @@ import DSMView from "./component/dsm";
 import UserView from "./component/user";
 import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser } from "./services";
 import CreateServerView from "./component/createserver";
-import history from "./history"
+import history from "./history";
 import NoBackend from "./component/nobackend";
 import LoadingAnimation from "./component/loading";
 import InfoBox from "./component/infobox";
@@ -32,15 +31,14 @@ class App extends React.Component {
 
         this.state = {
             darkmode: darkmode, // whether the app is display in darkmode
-            username: "", // name of logged in user
-            permissions: {}, // permissions of logged in user
+            user: null,
             servers: [],
             consoleLines: [],
             currentServer: null,
             serverCreationCancellable: true,
             missingFetches: 0, // how many fetches are missing, when greater 0, displays loading animation
             infoBox: "",
-            infoBoxCaption: ""
+            infoBoxCaption: "",
         };
 
         this.serverSocket = null;
@@ -178,7 +176,7 @@ class App extends React.Component {
         if (this.getSessionId()) {
             // refetch user informations
             fetchUser().then(res => {
-                this.setState({username: res.data.username, permissions: res.data.permissions})
+                this.setState({user: res.data});
                 this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             });
             // refetch servers
@@ -237,10 +235,10 @@ class App extends React.Component {
                                 </Route>
                                 <Route path="/">
                                     {/*display app when no fetches are missing*/}
-                                    <>{ this.state.missingFetches <= 0 ? (<>
+                                    <>{ this.state.missingFetches <= 0 && this.state.user ? (<>
                                     <Sidebar
                                         logout={() => this.logout()}
-                                        getUserName={() => this.state.username}
+                                        username={this.state.user.username}
                                         servers={this.state.servers}
                                         currentServer={this.state.currentServer}
                                         changeServer={(i) => this.changeServer(i)}

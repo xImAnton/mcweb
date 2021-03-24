@@ -40,7 +40,7 @@ function catchApiErrors(promise) {
 
 function catchTimeoutError(promise) {
     return promise.catch((e => {
-        console.error("Error while fetching url " + e.response.url);
+        console.error("Error while fetching url " + e.config.url);
         console.error(e.response);
         if (e.response.status === 504) { // Gateway Timeout
             if (!(history.location.pathname === "/apierror")) {
@@ -62,9 +62,8 @@ function catchUnauthorized(promise) {
     }));
 }
 
-function getSessionId() {
-    let sid = sessionStorage.getItem("MCWeb_Session");
-    return sid;
+export function getSessionId() {
+    return sessionStorage.getItem("MCWeb_Session");
 }
 
 export function getApiBase() {
@@ -144,4 +143,9 @@ export function addAddon(server, addonId, addonType, addonVersion) {
             addonVersion: addonVersion,
         }
     );
+}
+
+export function setSessionId(sid) {
+    // set session id after login, refetch
+    sessionStorage.setItem("MCWeb_Session", sid);
 }

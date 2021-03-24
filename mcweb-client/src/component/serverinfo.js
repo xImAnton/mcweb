@@ -1,7 +1,7 @@
-import React from "react";
 import { CopyField, Select } from "./ui";
-import { startServer, stopServer } from "../services";
-import history from "../history"
+import { startServer, stopServer, getServer } from "../services";
+import history from "../history";
+import { FormTable, FormLine } from "./ui";
 
 
 /**
@@ -41,102 +41,72 @@ function ServerStatus(props) {
     return <div id="online-status" className={serverStatus}></div>;
 }
 
-class ServerInfo extends React.Component {
+function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers}) {
 
-    serverChanged(e) {
-        // called when server select field changes, switch and fetch new server
-        this.props.changeServer(e.target.value);
-    }
-
-    toggleCurrentServer() {
+    function toggleCurrentServer() {
         // start/ stop current server
-        const currentServer = this.props.currentServer;
         // when server offline, clear console and start it
         if (currentServer.onlineStatus === 0) {
-            this.props.setConsoleLines([]);
-            startServer(this.props.currentServer.id).catch((e) => {
+            setConsoleLines([]);
+            startServer(currentServer.id).catch((e) => {
                 if (e.response.data.error === "Port Unavailable") {
-                    this.props.openInfoBox("Port Unavailable", "There is already a server running on that port!")
+                    openInfoBox("Port Unavailable", "There is already a server running on that port!")
                 }
             });
         // when server online or starting, stop it
         } else if (currentServer.onlineStatus === 1 | currentServer.onlineStatus === 2) {
-            stopServer(this.props.currentServer.id);
+            stopServer(currentServer.id);
         }
     }
 
-    render() {
-        const currentServer = this.props.currentServer;
-        let ip = "127.0.0.1";
-        let buttonText = "Start";
-        let buttonEnabled = true;
-        let port = 25565;
-        
-        // determine button text
-        if (currentServer) {
-            switch (currentServer.onlineStatus) {
-                case 0:
-                    break;
-                case 1:
-                    buttonText = "Stop";
-                    break;
-                case 2:
-                    buttonText = "Stop";
-                    break;
-                case 3:
-                    buttonText = "Stop";
-                    buttonEnabled = false;
-                    break;
-                default:
-                    buttonText = "Start"
-                    buttonEnabled = false;
-                    break;
-            };
-            ip = currentServer.ip;
-            port = currentServer.port;
-        }
-
-        return  <div id="server-information">
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    Server:
-                                </td>
-                                <td>
-                                    <Select value={this.props.currentServer ? this.props.currentServer.id : 0} onChange={(e) => this.serverChanged(e)}>
-                                        {this.props.servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
-                                    </Select>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    IP:
-                                </td>
-                                <td>
-                                    <CopyField text={ip + ":" + port} />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    Status:
-                                </td>
-                                <td>
-                                    <ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colSpan={2}>
-                                    <div className="start-add-wrapper mcweb-ui" style={{"padding": "0"}}>
-                                        <button className="mcweb-ui" id="control-server" onClick={() => this.toggleCurrentServer()} disabled={!buttonEnabled} >{buttonText}</button>
-                                        <AddServerButton setCreationCancellable={this.props.setCreationCancellable} />
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>;
+    let ip = "127.0.0.1";
+    let buttonText = "Start";
+    let buttonEnabled = true;
+    let port = 25565;
+    
+    // determine button text
+    if (currentServer) {
+        switch (currentServer.onlineStatus) {
+            case 0:
+                break;
+            case 1:
+                buttonText = "Stop";
+                break;
+            case 2:
+                buttonText = "Stop";
+                break;
+            case 3:
+                buttonText = "Stop";
+                buttonEnabled = false;
+                break;
+            default:
+                buttonText = "Start"
+                buttonEnabled = false;
+                break;
+        };
+        ip = currentServer.ip;
+        port = currentServer.port;
     }
+
+    return  <div id="server-information">
+                <FormTable mergeLast={false}>
+                    <FormLine label="Server" input={
+                        <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)}>
+                            {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
+                        </Select>
+                    } />
+                    <FormLine label="IP" input={<CopyField text={ip + ":" + port} />} />
+                    <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
+                    <tr>
+                        <td colSpan={2}>
+                            <div className="start-add-wrapper mcweb-ui" style={{"padding": "0"}}>
+                                <button className="mcweb-ui" id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled} >{buttonText}</button>
+                                <AddServerButton setCreationCancellable={setCreationCancellable} />
+                            </div>
+                        </td>
+                    </tr>
+                </FormTable>
+            </div>;
 }
 
 export default ServerInfo;
