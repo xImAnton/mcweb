@@ -1,5 +1,5 @@
 import { CopyField, Select } from "./ui";
-import { startServer, stopServer, getServer } from "../services";
+import { startServer, stopServer } from "../services";
 import history from "../history";
 import { FormTable, FormLine } from "./ui";
 

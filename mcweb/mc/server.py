@@ -5,6 +5,7 @@ from json import dumps as json_dumps
 from time import strftime
 from ..io.regexes import Regexes
 from ..io.config import Config
+import os
 
 
 class MinecraftServer:
@@ -27,16 +28,18 @@ class MinecraftServer:
         self.java_version = record["javaVersion"]
         self.communication = None
         self.output = []
+        self.files_to_remove = []
 
     async def generate_command(self):
-        java_cmd = Config.JAVA["installations"][self.java_version]["path"] + Config.JAVA["installations"][self.java_version]["additionalArguments"]
-        return f"{java_cmd} -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
+        return f"{Config.JAVA['installations'][self.java_version]['path'] + Config.JAVA['installations'][self.java_version]['additionalArguments']} -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
 
     async def refetch(self) -> None:
         """
         refetches the current server from the database
         """
         record = await self.mc.mongo["server"].find_one({"_id": self.id})
+        if not record:
+            return await self.mc.server_manager.remove_server(self.id)
         self.name = record["name"]
         self.display_name = record["displayName"]
         self.ram = record["allocatedRAM"]
@@ -102,6 +105,9 @@ class MinecraftServer:
         """
         self.communication.running = False
         await self.set_online_status(0)
+        for f in self.files_to_remove:
+            os.remove(f)
+        self.files_to_remove = []
 
     async def on_output(self, line) -> None:
         """
@@ -163,10 +169,31 @@ class MinecraftServer:
         return await self.mc.server_manager.versions.provider_by_name(self.software["server"])
 
     async def add_addon(self, addon_id, addon_type, addon_version):
+        await self.remove_addon(addon_id)
         res = await (await self.get_version_provider()).add_addon(addon_id, addon_type, addon_version, self.run_dir)
         if res:
             await self.mc.mongo["server"].update_one({"_id": self.id}, {"$addToSet": {"addons": res}})
         return res
+
+    async def remove_addon(self, addon_id):
+        addon = await self.get_installed_addon(addon_id)
+        if addon is None:
+            return
+        if self.running:
+            self.files_to_remove.append(addon["filePath"])
+        else:
+            os.remove(addon["filePath"])
+        new_addon_list = []
+        for ad in self.addons:
+            if ad["id"] != addon_id:
+                new_addon_list.append(ad)
+        self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": {"addons": new_addon_list}})
+
+    async def get_installed_addon(self, addon_id):
+        for ad in self.addons:
+            if ad["id"] == addon_id:
+                return ad
+        return None
 
     async def supports(self, addon_type):
         return Config.VERSIONS[self.software["server"]]["supports"][addon_type]

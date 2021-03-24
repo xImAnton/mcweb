@@ -9,7 +9,7 @@ function getAddons(sectionId, page, search) {
 }
 
 function getFiles(projectId) {
-    
+    return axios.get(getApiBase() + "/addon/" + projectId + "/files");
 }
 
-export { getAddons };
+export { getAddons, getFiles };

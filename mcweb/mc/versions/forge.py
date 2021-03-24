@@ -64,4 +64,4 @@ class ForgeVersionProvider(VersionProvider):
             os.mkdir(mods_dir)
         file_path = os.path.join(mods_dir, file_name)
         await download_and_save(url, file_path)
-        return {"filePath": file_path, "name": info["name"], "description": info["summary"]}
+        return {"filePath": file_path, "name": info["name"], "description": info["summary"], "id": addon_id, "fileId": addon_version}

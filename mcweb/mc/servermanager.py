@@ -63,6 +63,13 @@ class ServerManager:
                 return server
         return None
 
+    async def remove_server(self, id_):
+        o = []
+        for s in self.servers:
+            if s.id != id_:
+                o.append(s)
+        self.servers = o
+
     async def create_server(self, name, version_provider, version, ram, port, java_version):
         """
         creates a new server
