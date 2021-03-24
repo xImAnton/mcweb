@@ -110,10 +110,9 @@ class MinecraftServer:
         :param line: the line that is printed
         """
         self.output.append(line)
-        if Regexes.DONE.match(line.strip()):
-            await self.set_online_status(2)
-        if Regexes.ADVANCED_TERMINAL_FEATURES.match(line.strip()):
-            return
+        if self.status == 1:
+            if Regexes.DONE.match(line.strip()):
+                await self.set_online_status(2)
         await self.connections.broadcast(json_dumps({
             "packetType": "ServerConsoleMessagePacket",
             "data": {
