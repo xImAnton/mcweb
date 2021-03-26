@@ -65,6 +65,7 @@ class MinecraftServer:
         """
         await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": {"onlineStatus": status}})
         await self.connections.broadcast(json_dumps({"packetType": "StateChangePacket", "update": {"server": {"onlineStatus": status}}}))
+        self.status = status
 
     @property
     def running(self) -> bool:
