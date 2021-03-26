@@ -59,9 +59,12 @@ class ForgeVersionProvider(VersionProvider):
         if not url:
             return {}
         file_name = get_path(url)[-1]
+        image_url = None
+        if len(info["attachments"]) > 0:
+            image_url = info["attachments"]["thumbnailUrl"]
         mods_dir = os.path.join(server_dir, "mods")
         if not os.path.isdir(mods_dir):
             os.mkdir(mods_dir)
         file_path = os.path.join(mods_dir, file_name)
         await download_and_save(url, file_path)
-        return {"filePath": file_path, "name": info["name"], "description": info["summary"], "id": addon_id, "fileId": addon_version}
+        return {"filePath": file_path, "name": info["name"], "description": info["summary"], "id": addon_id, "fileId": addon_version, "imageUrl": image_url}

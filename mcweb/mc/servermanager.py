@@ -124,15 +124,18 @@ class ServerManager:
         await ServerManager.save_eula(dir_)
 
         # insert into db
-        doc = {"_id": ObjectId(), "name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port, "addons": [], "javaVersion": java_version}
-        await self.mc.mongo["server"].insert_one(doc)
-
+        doc = {"name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port, "addons": [], "javaVersion": java_version}
+        insert_result = await self.mc.mongo["server"].insert_one(doc)
+        doc["_id"] = insert_result.inserted_id
         # add server record to db and register to server manager
         s = MinecraftServer(self.mc, doc)
         await s.set_online_status(0)
         self.servers.append(s)
-
-        await version_provider.post_download(dir_, version)
+        try:
+            await version_provider.post_download(dir_, version)
+        except Exception as e:
+            await self.mc.mongo["server"].delete_one({"_id": insert_result.inserted_id})
+            return json_res({"error": "Error during Server Creation", "description": " ".join(e.args), "status": 500}, status=500)
 
         await self.global_broadcast(json_dumps({
             "packetType": "ServerCreationPacket",
