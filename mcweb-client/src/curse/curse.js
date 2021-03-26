@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { getAddons, getFiles } from "./curseapi";
+import { getFiles } from "./curseapi";
 import LoadingAnimation from "../component/loading";
 import { addAddon } from "../services";
 
@@ -15,7 +15,7 @@ function AddonsListEntry({data, onClick}) {
         thumbnailUrl = thumbnail.thumbnailUrl;
     }
 
-    return  <div className="addon" onClick={() => onClick(data.id)}>
+    return  <div className="addon" onClick={() => onClick(data)}>
                 <div className="image-wrap">
                     <img src={thumbnailUrl} alt="" />
                 </div>
@@ -37,6 +37,7 @@ function AddonInstallationFileSelection({currentServer, addonId, installAddon, a
         getFiles(addonId).then(res => {
             setLoading(false);
             const fileObjs = [];
+            // eslint-disable-next-line
             res.data.map((e) => {
                 if (e.fileName.endsWith(".jar"))
                 fileObjs.push({
@@ -47,7 +48,7 @@ function AddonInstallationFileSelection({currentServer, addonId, installAddon, a
             });
             setFiles(fileObjs);
         })
-    }, []);
+    }, [addonId]);
 
     let fileElements = files.map((e) => <AddonInstallationFileEntry
             gameVersion={e.gameVersion}
@@ -101,47 +102,36 @@ function AddonInstallationDialog({data, close, currentServer, installAddon}) {
 }
 
 
-function AddonsList({page, sectionId, searchText, currentServer}) {
+function AddonsList({currentServer, addons, setLoadingText, setLoaded}) {
 
-    const [addons, setAddons] = useState([]);
     const [selected, setSelected] = useState(null);
-    const [loaded, setLoaded] = useState(true);
-    const [loadingText, setLoadingText] = useState("Loading Mods");
 
     const listDiv = useRef(null);
 
     useEffect(() => {
-        setLoadingText("Loading Mods");
-        setLoaded(false);
-        getAddons(sectionId, page, searchText).then((res) => {
-            setAddons(res.data);
-            if (listDiv.current)
+        if (listDiv.current) {
             listDiv.current.scrollTop = 0;
-            setLoaded(true);
-        });
-    }, [page, searchText, sectionId]);
+        }
+    }, [addons])
 
     function installAddon(addonId, fileId, addonName) {
         setLoadingText("Installing " + addonName);
         setLoaded(false);
         addAddon(currentServer.id, addonId, "mods", fileId).then((res) => {
             setLoaded(true);
-            setSelected(null);
         }
         );
     }
 
     const data = addons.map(e => {
         return <AddonsListEntry data={e} key={e.id} onClick={() => setSelected(e) } />
-    })
+    });
 
     return  <div className={"addon-list"}>
-                { loaded ? <>
-                    <div ref={listDiv} className={"inner" + (selected ? " unscrollable" : "")}>
-                        {data}
-                    </div>
-                    { selected && <AddonInstallationDialog data={selected} close={() => setSelected(null)} currentServer={currentServer} installAddon={installAddon} /> }
-                </> : <LoadingAnimation loadingText={loadingText} /> }
+                <div ref={listDiv} className={"inner" + (selected ? " unscrollable" : "")}>
+                    {data}
+                </div>
+                { selected && <AddonInstallationDialog data={selected} close={() => setSelected(null)} currentServer={currentServer} installAddon={installAddon} /> }
             </div>
 }
 
@@ -186,22 +176,24 @@ function SearchBar({search}) {
 
 function AddonSelectHeader({search}) {
     return  <div className="curse-head">
-                <h1>Mods</h1>
                 <SearchBar search={search} />
             </div>;
 }
 
 
-function AddonSelector({sectionId, currentServer}) {
-
-    const [searchText, setSearch] = useState("");
-    const [page, setPage] = useState(0);
+function AddonSelector({currentServer, page, setPage, setSearch, addons, setLoadingText, setLoaded}) {
     
     return  <div className="curse-selector">
-                <AddonSelectHeader search={(s) => setSearch(s)} />
-                <AddonsList page={page} sectionId={sectionId} searchText={searchText} currentServer={currentServer} />
+                <AddonSelectHeader search={setSearch} />
+                <AddonsList
+                    currentServer={currentServer}
+                    addons={addons}
+                    setLoaded={setLoaded}
+                    setLoadingText={setLoadingText}
+                />
                 <AddonSelectFooter page={page} setPage={setPage} />
             </div>;
 }
 
-export default AddonSelector;
+export { AddonSelector, AddonsListEntry };
+ 

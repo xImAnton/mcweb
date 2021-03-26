@@ -1,3 +1,5 @@
+import React, { useState } from "react";
+
 /**
  * Displays a value and gives the oppotunity to copy it
  */
@@ -47,4 +49,50 @@ function Alert({text, color}) {
 }
 
 
-export { CopyField, Select, FormLine, FormTable, LastFormLine, Alert };
+function Tab({name, children}) {
+
+}
+
+
+function TabSelector({name, changeTab, selected}) {
+    return <div className={"tabarea-tab" + (selected ? " selected" : "")} onClick={() => changeTab(name)}>{name}</div>
+}
+
+
+function TabArea({tab, children}) {
+
+    let [currentTab, setCurrentTab] = useState("");
+    if (tab) {
+        [currentTab, setCurrentTab] = tab;
+    }
+
+    const tabNames = [];
+    let tabContent;
+    let firstSet = false;
+    React.Children.map(children, child => {
+        if (React.isValidElement(child) && child.type === Tab) {
+            tabNames.push(child.props.name);
+            if (currentTab === "" && !firstSet) {
+                setCurrentTab(child.props.name);
+                firstSet = true;
+            }
+            if (currentTab === child.props.name) {
+                tabContent = child.props.children;
+            }
+        }
+    })
+
+    return <div className="tab-wrapper">
+        <div className="tabarea-tabs">
+            {tabNames.map(n => <TabSelector name={n} changeTab={setCurrentTab} key={n} selected={n === currentTab} />)}
+        </div>
+        <div className="tab-content-wrapper">
+            <div className="tab-content">
+                {tabContent}
+            </div>
+        </div>
+    </div>
+}
+
+
+export { CopyField, Select, FormLine, FormTable, LastFormLine, Alert, TabArea, Tab };

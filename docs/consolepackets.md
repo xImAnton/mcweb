@@ -69,3 +69,16 @@ sent when a server was created on another client
 }
 ```
 
+## AddonAddPacket
+
+sent when an addon gets added to this server
+
+```json
+{
+    "packetType": "AddonUpdatePacket",
+    "type": "add",
+    "data": {
+        "addon_": "data"
+    }
+}
+```

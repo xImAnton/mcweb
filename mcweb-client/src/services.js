@@ -10,6 +10,14 @@ async function get(url) {
     }));
 }
 
+async function delete_(url) {
+    return catchApiErrors(axios.delete(url, {
+        headers: {
+            "Authorization": "Token " + getSessionId()
+        }
+    }));
+}
+
 async function patch(url, data) {
     return catchApiErrors(axios.patch(url, data, {
         headers: {
@@ -148,6 +156,10 @@ export function addAddon(server, addonId, addonType, addonVersion) {
             addonVersion: addonVersion,
         }
     );
+}
+
+export function removeAddon(server, addonId) {
+    return delete_(getApiBase() + "/server/" + server + "/addons/" + addonId);
 }
 
 export function setSessionId(sid) {

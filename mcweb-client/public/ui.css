@@ -162,3 +162,54 @@ button.mcweb-ui:not([disabled]):active {
 .formtable tr:last-child td * {
     width: 100%;
 }
+
+.tabarea-tabs {
+    display: flex;
+}
+
+.tabarea-tab {
+    padding: 12px 10px;
+    flex-grow: 1;
+    text-align: center;
+    user-select: none;
+    color: var(--font);
+    border-radius: 12px 12px 0 0;
+}
+
+.tabarea-tab:not(:last-child) {
+    margin-right: 8px;
+}
+
+.tabarea-tab:hover, .tabarea-tab.selected {
+    background-color: var(--main-bg-color);
+}
+
+.tabarea-tab.selected {
+    /*box-shadow: 4px 0px 7px 0px black;*/
+    border: 1px solid var(--font);
+    border-bottom: none;
+}
+
+.tabarea-tab:not(.selected) {
+    cursor: pointer;
+}
+
+.tab-wrapper {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    top: 72px;
+    left: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-content-wrapper {
+    flex-grow: 1;
+}
+
+.tab-content {
+    top: 0;
+    height: 100%;
+}

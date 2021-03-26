@@ -173,13 +173,18 @@ class MinecraftServer:
         await self.remove_addon(addon_id)
         res = await (await self.get_version_provider()).add_addon(addon_id, addon_type, addon_version, self.run_dir)
         if res:
+            await self.connections.broadcast(json_dumps({
+                "packetType": "AddonUpdatePacket",
+                "type": "add",
+                "data": res
+            }))
             await self.mc.mongo["server"].update_one({"_id": self.id}, {"$addToSet": {"addons": res}})
         return res
 
     async def remove_addon(self, addon_id):
         addon = await self.get_installed_addon(addon_id)
         if addon is None:
-            return
+            return False
         if self.running:
             self.files_to_remove.append(addon["filePath"])
         else:
@@ -188,7 +193,13 @@ class MinecraftServer:
         for ad in self.addons:
             if ad["id"] != addon_id:
                 new_addon_list.append(ad)
+        await self.connections.broadcast(json_dumps({
+            "packetType": "AddonUpdatePacket",
+            "type": "remove",
+            "data": addon
+        }))
         self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": {"addons": new_addon_list}})
+        return True
 
     async def get_installed_addon(self, addon_id):
         for ad in self.addons:

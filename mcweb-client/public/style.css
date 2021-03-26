@@ -511,3 +511,11 @@ span.logout {
     display: flex;
     margin-top: 3px;
 }
+
+.installed-addons-wrapper {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    background-color: #0d1625;
+    height: 100%;
+}

@@ -61,7 +61,7 @@ class ForgeVersionProvider(VersionProvider):
         file_name = get_path(url)[-1]
         image_url = None
         if len(info["attachments"]) > 0:
-            image_url = info["attachments"]["thumbnailUrl"]
+            image_url = info["attachments"][0]["thumbnailUrl"]
         mods_dir = os.path.join(server_dir, "mods")
         if not os.path.isdir(mods_dir):
             os.mkdir(mods_dir)

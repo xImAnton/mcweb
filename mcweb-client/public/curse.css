@@ -3,8 +3,7 @@
     flex-direction: column;
     color: white;
     background-color: #0d1625;
-    position: absolute;
-    inset: 0;
+    height: 100%;
 }
 
 .curse-head {

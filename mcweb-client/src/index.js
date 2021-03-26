@@ -89,6 +89,31 @@ class App extends React.Component {
         } else
         if (data.packetType === "ServerCreationPacket") {
             this.addNewServer(data.data.server);
+        } else
+        if (data.packetType === "AddonUpdatePacket") {
+            if (data.type === "add") {
+                this.setState({servers: this.state.servers.slice().map(x => {
+                    if (x.id === this.state.currentServer.id) {
+                        x.addons.push(data.data);
+                    }
+                    return x;
+                })});
+            } else
+            if (data.type === "remove") {
+                this.setState({servers: this.state.servers.slice().map(x => {
+                    if (x.id === this.state.currentServer.id) {
+                        let newaddons = [];
+                        // eslint-disable-next-line
+                        x.addons.map(a => {
+                            if (!(a.id === data.data.id && a.fileId === data.data.fileId)) {
+                                newaddons.push(a)
+                            }
+                        });
+                        x.addons = newaddons;
+                    }
+                    return x;
+                })});
+            }
         }
     }
 

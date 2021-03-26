@@ -182,6 +182,16 @@ async def add_addon(req, i):
         return json_res({"error": "Error while creating Addon", "description": "maybe the addon id is wrong, the file couldn't be downloaded or this server doesn't support addons yet", "status": 400}, status=400)
 
 
+@server_blueprint.delete("/<i>/addons/<addon_id:int>")
+@requires_login()
+@server_endpoint()
+async def remove_addon(req, i, addon_id):
+    if await req.ctx.server.remove_addon(addon_id):
+        return json_res({"success": "Addon Removed"})
+    else:
+        return json_res({"error": "Addon Not Found", "description": "addon couldn't be found on the server", "status": 400}, status=400)
+
+
 @server_blueprint.put("/create/<server>/<version>")
 @requires_login()
 @requires_post_params("name", "port")
