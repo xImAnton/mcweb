@@ -290,7 +290,7 @@ class App extends React.Component {
                                                     <BackupsView currentServer={this.state.currentServer} />
                                                 </Route>
                                                 <Route path="/settings">
-                                                    <SettingsView currentServer={this.state.currentServer} changeServer={(id) => this.changeServer(id)} />
+                                                    <SettingsView currentServer={this.state.currentServer} />
                                                 </Route>
                                                 { this.state.currentServer.supports.mods &&
                                                     <Route path="/mods">

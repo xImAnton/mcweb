@@ -4,22 +4,23 @@ import LoadingAnimation from "./loading";
 import { FormTable, FormLine, Select } from "./ui";
 
 
-function SettingsView({currentServer, changeServer}) {
+function SettingsView({currentServer}) {
 
     const [currentName, setName] = useState("");
     const [currentPort, setPort] = useState(25565);
     const [currentRam, setRam] = useState(2);
     const [javaVersions, setJavaVersions] = useState({});
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
+    const [loadingText, setLoadingText] = useState("");
 
     useEffect(() => {
+        setLoadingText("Loading Java Versions")
         fetchJavaVersions().then(res => {
             setJavaVersions(res.data);
-        });
+        }).finally(() => setLoadingText(""));
     }, []);
 
     useEffect(() => {
-        console.log("upd");
         setName(currentServer.displayName);
         setPort(currentServer.port);
         setRam(currentServer.allocatedRAM);
@@ -27,18 +28,18 @@ function SettingsView({currentServer, changeServer}) {
     }, [currentServer]);
 
     function submit() {
+        setLoadingText("Updating Settings");
         let out = {
             displayName: currentName,
             port: currentPort,
             allocatedRAM: currentRam,
             javaVersion: currentJavaVersion
         }
-        patchServer(currentServer.id, out).then((r) => {
-        })
+        patchServer(currentServer.id, out).finally(() => setLoadingText(""));
     }
 
     return  <div id="page-content">
-                { Object.keys(javaVersions).length !== 0 ? 
+                { !loadingText ? 
                     <>
                         <h1 id="page-headline">Settings</h1>
                         <FormTable mergeLast={true}>
@@ -57,7 +58,7 @@ function SettingsView({currentServer, changeServer}) {
                             </tr>
                         </FormTable>
                     </> :
-                    <LoadingAnimation />
+                    <LoadingAnimation loadingText={loadingText} />
                 }
             </div>;
 }
