@@ -52,6 +52,7 @@ class MinecraftServer:
         self.java_version = record["javaVersion"]
 
     async def update(self):
+        await self.connections.broadcast(json_dumps({"packetType": "StateChangePacket", "update": {"server": self.update_doc()}}))
         await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": self.update_doc()})
 
     async def set_online_status(self, status) -> None:

@@ -39,8 +39,8 @@ class App extends React.Component {
             missingFetches: 0, // how many fetches are missing, when greater 0, displays loading animation
             infoBox: "",
             infoBoxCaption: "",
+            error: "The Server is not Responding"
         };
-
         this.serverSocket = null;
     }
 

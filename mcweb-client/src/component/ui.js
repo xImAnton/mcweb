@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 
 /**
  * Displays a value and gives the oppotunity to copy it
@@ -61,21 +61,26 @@ function TabSelector({name, changeTab, selected}) {
 
 function TabArea({tab, children}) {
 
-    let [currentTab, setCurrentTab] = useState("");
-    if (tab) {
-        [currentTab, setCurrentTab] = tab;
-    }
+    const [currentTab, setCurrentTab] = tab;
 
     const tabNames = [];
+
+    useEffect(() => {
+        let set = false;
+        React.Children.map(children, child => {
+            if (React.isValidElement(child) && child.type === Tab) {
+                if (currentTab === "" && !set) {
+                    setCurrentTab(child.props.name);
+                    set = true;
+                }
+            }
+        })
+    }, []);
+    
     let tabContent;
-    let firstSet = false;
     React.Children.map(children, child => {
         if (React.isValidElement(child) && child.type === Tab) {
             tabNames.push(child.props.name);
-            if (currentTab === "" && !firstSet) {
-                setCurrentTab(child.props.name);
-                firstSet = true;
-            }
             if (currentTab === child.props.name) {
                 tabContent = child.props.children;
             }

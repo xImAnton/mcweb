@@ -58,6 +58,7 @@ function LoginView({setSessionId}) {
 
     return <>{ !(loading || loggingIn) ? (<div id="login-wrapper">
         <div id="login-field">
+            <img src={process.env.PUBLIC_URL + "logo_wide_bright.png"} alt="MCWeb Logo" />
             <h1>Login</h1>
             <Alert text={alert} />
             <div id="input-form">
