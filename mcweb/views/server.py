@@ -208,12 +208,3 @@ async def create(req, server, version):
 @requires_login()
 async def get_all_versions(req):
     return json_res(await req.app.server_manager.versions.get_json())
-
-
-@server_blueprint.get("/javaversions")
-@requires_login()
-async def get_java_versions(req):
-    out = {}
-    for k, v in Config.JAVA["installations"].items():
-        out[k] = v["displayName"]
-    return json_res(out)

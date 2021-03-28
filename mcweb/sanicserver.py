@@ -2,6 +2,7 @@ from sanic import Sanic
 from .mc.servermanager import ServerManager
 from .views.server import server_blueprint
 from .views.auth import account_blueprint
+from .views.misc import misc_blueprint
 from .views.login import User, Session
 import time
 from mcweb.util import json_res
@@ -16,7 +17,6 @@ class MCWeb(Sanic):
     """
     def __init__(self):
         super().__init__(__name__)
-        # self.db_connection = DatabaseConnector(Config.DB_PATH)
         self.server_manager = ServerManager(self)
         self.register_routes()
         self.public_ip = ""
@@ -28,9 +28,9 @@ class MCWeb(Sanic):
         """
         self.blueprint(server_blueprint)
         self.blueprint(account_blueprint)
+        self.blueprint(misc_blueprint)
         self.register_listener(self.after_server_start, "after_server_start")
         self.register_middleware(self.set_session_middleware, "request")
-        # self.static("", "./tests/testclient.html")
 
     async def after_server_start(self, app, loop) -> None:
         """

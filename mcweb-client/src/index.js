@@ -13,7 +13,7 @@ import SettingsView from "./component/settings";
 import WorldsView from "./component/worlds";
 import DSMView from "./component/dsm";
 import UserView from "./component/user";
-import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser } from "./services";
+import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser, fetchConfig } from "./services";
 import CreateServerView from "./component/createserver";
 import history from "./history";
 import NoBackend from "./component/nobackend";
@@ -39,7 +39,8 @@ class App extends React.Component {
             missingFetches: 0, // how many fetches are missing, when greater 0, displays loading animation
             infoBox: "",
             infoBoxCaption: "",
-            error: "The Server is not Responding"
+            error: "The Server is not Responding",
+            config: {}
         };
         this.serverSocket = null;
     }
@@ -198,7 +199,7 @@ class App extends React.Component {
     }
 
     refetch() {
-        this.setState({missingFetches: 2});
+        this.setState({missingFetches: 3});
         if (this.getSessionId()) {
             // refetch user informations
             fetchUser().then(res => {
@@ -217,7 +218,12 @@ class App extends React.Component {
                 this.changeServer(this.state.servers[0].id);
             }).finally(() => {
                 this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
-            })
+            });
+            fetchConfig().then((res) => {
+                this.setState({config: res.data});
+            }).finally(() => {
+                this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
+            });
         } else {
             // login when no session id is saved
             this.setState({missingFetches: 0})
@@ -255,7 +261,10 @@ class App extends React.Component {
                                 <Route path="/createserver">
                                     <div id="content-wrapper" className="full">
                                         <CreateServerView cancellable={this.state.serverCreationCancellable}
-                                        changeServer={(i) => this.changeServer(i)} addFirstServer={(s) => this.addFirstServer(s)}
+                                        changeServer={(i) => this.changeServer(i)}
+                                        addFirstServer={(s) => this.addFirstServer(s)}
+                                        maxRam={this.state.config.maxRam}
+                                        javaVersions={this.state.config.javaVersions}
                                         />
                                     </div>
                                 </Route>
@@ -290,7 +299,7 @@ class App extends React.Component {
                                                     <BackupsView currentServer={this.state.currentServer} />
                                                 </Route>
                                                 <Route path="/settings">
-                                                    <SettingsView currentServer={this.state.currentServer} />
+                                                    <SettingsView currentServer={this.state.currentServer} javaVersions={this.state.config.javaVersions} maxRam={this.state.config.maxRam} />
                                                 </Route>
                                                 { this.state.currentServer.supports.mods &&
                                                     <Route path="/mods">

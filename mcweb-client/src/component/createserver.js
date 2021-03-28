@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchVersions, putServer, fetchJavaVersions } from "../services";
+import { fetchVersions, putServer, useRestrictedState } from "../services";
 import history from "../history";
 import LoadingAnimation from "./loading";
 import { Select, FormTable, FormLine, LastFormLine, Alert } from "./ui";
@@ -29,19 +29,16 @@ function CreateServerButton(props) {
 /**
  * Component for creating new servers
  */
-function CreateServerView({addFirstServer, cancellable, changeServer}) {
-
+function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, javaVersions}) {
+    const [alert, setAlert] = useState(""); // alert to display on error, not rendered when empty
     const [versions, setVersions] = useState({}); // all possible versions for current server
     const [currentSoftware, setCurrentSoftware] = useState(""); // current software name
     const [currentVersion, setCurrentVersion] = useState(""); // current software version
-    const [currentName, setCurrentName] = useState(""); // name entered in name field
-    const [currentRam, setCurrentRam] = useState(2); // current selected ram
-    const [alert, setAlert] = useState(""); // alert to display on error, not rendered when empty
+    const [currentName, setCurrentName] = useRestrictedState("", (n) => n.match(/^[a-zA-Z0-9_\-\. ]{0,48}$/), () => {}); // name entered in name field
+    const [currentRam, setCurrentRam] = useRestrictedState(2, (r) => r <= maxRam && r > 0, () => {});
     const [creating, setCreating] = useState(false); // whether the server is creating at the moment
-    const [maxRam, setMaxRam] = useState(32); // the maximal possible ram for the backend, gets set when user tries to set too much ram, because maxram is only sent in error response
     const [versionsLoaded, setVersionsLoaded] = useState(false); // whether the versions are fetched and ready to display, displays "Loading Versions" when false
-    const [currentPort, setCurrentPort] = useState(25565); // current entered ram
-    const [javaVersions, setJavaVersions] = useState({});
+    const [currentPort, setCurrentPort] = useRestrictedState(25565, (p) => p <= 30000 && p >= 25000, () => {}); // current entered ram
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
 
     useEffect(() => {
@@ -54,10 +51,6 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
             setCurrentSoftware(server);
             setCurrentVersion(version);
             setVersionsLoaded(true);
-        });
-        fetchJavaVersions().then(res => {
-            setJavaVersions(res.data);
-            setCurrentJavaVersion(Object.keys(res.data)[0]);
         });
     }, []);
 
@@ -104,8 +97,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
                     alert = "The " + currentSoftware + " version is not supported: " + currentVersion;
                     break;
                 case "Too Much RAM":
-                    alert = "The maximal possible ram is " + e.response.data.maxRam;
-                    setMaxRam(e.response.data.maxRam);
+                    alert = "The maximal possible ram is " + maxRam;
                     break;
                 case "Invalid Port":
                     alert = "The Port Number is invalid!";
@@ -158,7 +150,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
                 <Alert text={alert} />
                 <FormTable mergeLast={true}>
                     <FormLine label="Name" input={
-                        <input className="mcweb-ui" type="text" onChange={e => setCurrentName(e.target.value)} defaultValue={currentName}
+                        <input className="mcweb-ui" type="text" onChange={e => setCurrentName(e.target.value)} value={currentName}
                     />} />
                     <FormLine label="Software" input={
                         <Select value={currentSoftware} onChange={serverChanged}>
@@ -171,10 +163,10 @@ function CreateServerView({addFirstServer, cancellable, changeServer}) {
                     </Select>
                     } />
                     <FormLine label="RAM" input={
-                        <input className="mcweb-ui gb-selection" type="number" min={1} defaultValue={currentRam} max={maxRam} onChange={e => setCurrentRam(parseInt(e.target.value))} />
+                        <input className="mcweb-ui gb-selection" type="number" min={1} value={currentRam} max={maxRam} onChange={e => setCurrentRam(parseInt(e.target.value))} />
                     } />
                     <FormLine label="Port" input={
-                        <input className="mcweb-ui" type="number" min={25000} defaultValue={currentPort} max={30000} onChange={e => setCurrentPort(parseInt(e.target.value))} />
+                        <input className="mcweb-ui" type="number" min={25000} value={currentPort} max={30000} onChange={e => setCurrentPort(parseInt(e.target.value))} />
                     } />
                     <FormLine label="Java Version" input={
                         <Select value={currentJavaVersion} onChange={e => setCurrentJavaVersion(e.target.value)}>

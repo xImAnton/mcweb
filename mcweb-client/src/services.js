@@ -1,5 +1,6 @@
 import axios from "axios";
 import history from "./history";
+import { useEffect, useState, useRef } from "react";
 
 
 async function get(url) {
@@ -145,10 +146,6 @@ export function patchServer(server, data) {
     return patch(getApiBase() + "/server/" + server, data);
 }
 
-export function fetchJavaVersions() {
-    return get(getApiBase() + "/server/javaversions");
-}
-
 export function addAddon(server, addonId, addonType, addonVersion) {
     return put(getApiBase() + "/server/" + server + "/addons", {
             addonId: addonId,
@@ -162,7 +159,33 @@ export function removeAddon(server, addonId) {
     return delete_(getApiBase() + "/server/" + server + "/addons/" + addonId);
 }
 
+export function fetchConfig() {
+    return get(getApiBase() + "/config");
+}
+
 export function setSessionId(sid) {
     // set session id after login, refetch
     sessionStorage.setItem("MCWeb_Session", sid);
+}
+
+export function usePrevious(state, def=undefined) {
+    const ref = useRef(def);
+    useEffect(() => {
+        ref.current = state;
+    });
+    return ref.current;
+}
+
+export function useRestrictedState(defaultVal, check, errorCallback) {
+    const [state, setState] = useState(defaultVal);
+    const prevState = usePrevious(state, defaultVal);
+
+    useEffect(() => {
+        if (!check(state)) {
+            errorCallback(state);
+            setState(prevState);
+        }
+    }, [state]);
+
+    return [state, setState];
 }

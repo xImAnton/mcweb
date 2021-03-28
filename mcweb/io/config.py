@@ -39,3 +39,13 @@ class Config:
                 setattr(Config, attr, data[key[0]])
             except KeyError:
                 setattr(Config, attr, key[1])
+
+    @staticmethod
+    def public_json():
+        java_versions = {}
+        for k, v in Config.JAVA["installations"].items():
+            java_versions[k] = v["displayName"]
+        return {
+            "javaVersions": java_versions,
+            "maxRam": Config.MAX_RAM
+        }
