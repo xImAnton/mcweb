@@ -1,6 +1,6 @@
 {
   "sessionExpiration": 7200,
-  "downloads": {
+  "versions": {
     "paper": {
       "getVersions": "https://papermc.io/api/v2/projects/paper/",
       "getBuilds": "https://papermc.io/api/v2/projects/paper/versions/{version}",
