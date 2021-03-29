@@ -41,3 +41,4 @@ sudo docker build --tag mcweb-client mcweb-client
 sudo docker build --tag mcweb-mongo mcweb-mongo
 
 echo -e "Everything is set up! Run \"docker-compose up\" to start MCWeb."
+exit
