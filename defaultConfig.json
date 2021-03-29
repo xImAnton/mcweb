@@ -38,7 +38,7 @@
   "mongoDB": {
     "host": "mcweb-mongodb",
     "port": 27017,
-    "username": "",
+    "username": "admin",
     "password": "",
     "database": "mcweb"
   },
