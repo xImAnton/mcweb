@@ -7,7 +7,7 @@ class ServerCommunication:
     """
     A class for abstracting away sending commands to and receiving output from the server
     """
-    def __init__(self, loop, command, on_output, on_stderr, on_close, cwd="."):
+    def __init__(self, loop, command, on_output, on_stderr, on_close, cwd=".", shell=False):
         """
         :param command: the command to start the server with
         :param cwd: the working directory for the server
@@ -22,12 +22,13 @@ class ServerCommunication:
         self.on_close = on_close
         self.running = False
         self.on_stderr = on_stderr
+        self.shell = shell
 
     async def begin(self) -> None:
         """
         starts the server
         """
-        self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, cwd=self.cwd, stderr=subprocess.PIPE)
+        self.process = subprocess.Popen(self.command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, cwd=self.cwd, stderr=subprocess.PIPE, shell=self.shell)
         self.running = True
         AsyncStreamWatcher(self.loop, self.process.stdout, self.process, self.on_output, self.on_close).start()
         AsyncStreamWatcher(self.loop, self.process.stdout, self.process, self.on_stderr, None).start()

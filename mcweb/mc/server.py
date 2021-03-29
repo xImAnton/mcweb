@@ -82,7 +82,8 @@ class MinecraftServer:
         starts the server and updates it status
         check if server is not running before calling
         """
-        self.communication = ServerCommunication(self.mc.loop, await self.generate_command(), self.on_output, self.on_output, self.on_stop, cwd=self.run_dir)
+        # shell has to be True when running with docker
+        self.communication = ServerCommunication(self.mc.loop, await self.generate_command(), self.on_output, self.on_output, self.on_stop, cwd=self.run_dir, shell=Config.get_docker_secret("mongo_user") is not None)
         self.output = []
         await self.set_online_status(1)
         try:
