@@ -15,8 +15,6 @@ fi
 
 MCWEB_PW_HASH=$(python3 -c "import hashlib; print(hashlib.sha256('$MCWEB_ROOT_PW_FIRST'.encode()).hexdigest())")
 
-git clone "https://github.com/xImAnton/mcweb.git"
-
 echo -e "db.user.insertOne({\nname: '$MCWEB_ROOT_UN',\nemail: 'test@example.com',\npassword: '$MCWEB_PW_HASH',\npermissions: []\n});" >> ./mcweb-mongo/seed.js
 
 MCWEB_MONGO_PW=$(python3 -c "import os, base64; print(base64.b64encode(os.urandom(16)).decode())")
