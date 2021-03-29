@@ -22,12 +22,7 @@ MCWEB_MONGO_PW=$(python3 -c "import os, base64; print(base64.b64encode(os.urando
 mv defaultConfig.json config.json
 
 # insert mongo password in config
-echo -e "import json
-with open(\"config.json\") as f:
-    data = json.loads(f.read())
-data[\"mongoDB\"][\"password\"] = $MCWEB_MONGO_PW
-with open(\"config.json\", \"w\") as f:
-    f.write(json.dumps(data))" | python3 -
+echo -e "import json\nwith open(\"config.json\") as f:\n    data = json.loads(f.read())\ndata[\"mongoDB\"][\"password\"] = \"$MCWEB_MONGO_PW\"\nwith open(\"config.json\", \"w\") as f:\n    f.write(json.dumps(data))" | python3 -
 
 
 mkdir "secrets"
