@@ -15,6 +15,7 @@ fi
 
 MCWEB_PW_HASH=$(python3 -c "import hashlib; print(hashlib.sha256('$MCWEB_ROOT_PW_FIRST'.encode()).hexdigest())")
 
+> ./mcweb-mongo/seed.js
 echo -e "db.user.insertOne({\nname: '$MCWEB_ROOT_UN',\nemail: 'test@example.com',\npassword: '$MCWEB_PW_HASH',\npermissions: []\n});" >> ./mcweb-mongo/seed.js
 
 MCWEB_MONGO_PW=$(python3 -c "import os, base64; print(base64.b64encode(os.urandom(16)).decode())")
@@ -33,7 +34,7 @@ echo -e -n "admin" >> secrets/mongo_root_user.txt
 touch secrets/mongo_root_password.txt
 echo -e -n "$MCWEB_MONGO_PW" >> secrets/mongo_root_password.txt
 
-sudo chroot -R 777 ./secrets
+sudo chmod -R 777 ./secrets
 
 sudo docker build --tag mcweb-backend .
 sudo docker build --tag mcweb-client mcweb-client
