@@ -30,7 +30,7 @@ class MinecraftServer:
         self.output = []
         self.files_to_remove = []
 
-    async def generate_command(self):
+    async def generate_command(self) -> str:
         return f"{Config.JAVA['installations'][self.java_version]['path'] + Config.JAVA['installations'][self.java_version]['additionalArguments']} -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
 
     async def refetch(self) -> None:
@@ -85,7 +85,17 @@ class MinecraftServer:
         self.communication = ServerCommunication(self.mc.loop, await self.generate_command(), self.on_output, self.on_output, self.on_stop, cwd=self.run_dir)
         self.output = []
         await self.set_online_status(1)
-        await self.communication.begin()
+        try:
+            await self.communication.begin()
+        except FileNotFoundError as e:
+            await self.connections.broadcast(json_dumps({
+                "packetType": "ServerConsoleMessagePacket",
+                "data": {
+                    "message": "FileNotFoundError: " + str(e),
+                    "serverId": str(self.id)
+                }
+            }))
+            await self.set_online_status(0)
 
     async def stop(self, force=False) -> None:
         """

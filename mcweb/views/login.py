@@ -1,4 +1,3 @@
-from __future__ import annotations
 import hashlib
 import secrets
 import time
@@ -17,7 +16,7 @@ class User:
         self.password = ""
         self.perms = ""
 
-    async def fetch_by_name(self, name) -> Optional[User]:
+    async def fetch_by_name(self, name):
         """
         fetches this user from the database by its name
         :param name: the username to search for
@@ -33,7 +32,7 @@ class User:
         else:
             return None
 
-    async def fetch_by_id(self, i) -> Optional[User]:
+    async def fetch_by_id(self, i):
         """
         fetches this user from the database by its user id
         :param i: the user id to search for
@@ -67,7 +66,7 @@ class User:
         await self.db["session"].insert_one({"sid": sess_id, "userId": self.id, "expiration": expires})
         return sess_id
 
-    async def fetch_by_sid(self, sid) -> Optional[User]:
+    async def fetch_by_sid(self, sid):
         """
         fetches this user by a session id assigned to this user
         :param sid: the session if to search for
@@ -98,7 +97,7 @@ class Session:
         self.user_id = 0
         self.expiration = 0
 
-    async def fetch_by_sid(self, sid) -> Optional[Session]:
+    async def fetch_by_sid(self, sid):
         """
         fetches this session by a session id
         :param sid: the session id to search for

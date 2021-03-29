@@ -18,7 +18,7 @@ class SnapshotVersionProvider(VersionProvider):
                 self.versions[v["id"]] = v["url"]
 
     async def get_versions(self):
-        return list(reversed(self.versions.keys()))
+        return list(reversed(list(self.versions.keys())))
 
     async def get_download(self, version):
         async with aiohttp.ClientSession() as session:

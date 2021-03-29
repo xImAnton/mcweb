@@ -49,3 +49,11 @@ class Config:
             "javaVersions": java_versions,
             "maxRam": Config.MAX_RAM
         }
+
+    @staticmethod
+    def get_docker_secret(key):
+        try:
+            with open(f"/run/secrets/{key}") as f:
+                return f.read()
+        except FileNotFoundError:
+            return None

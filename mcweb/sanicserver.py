@@ -69,4 +69,4 @@ class MCWeb(Sanic):
         """
         if not os.path.isdir(os.path.join(os.getcwd(), "servers")):
             os.mkdir(os.path.join(os.getcwd(), "servers"))
-        self.run(host="localhost", port=1337)
+        self.run(host=os.getenv("BACKEND_HOST") or "localhost", port=os.getenv("BACKEND_PORT") or 5001)

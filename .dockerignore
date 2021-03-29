@@ -1,0 +1,10 @@
+docs
+images
+mcweb-client
+servers
+tests
+venv
+LICENSE
+README.md
+defaultConfig.json
+secrets
