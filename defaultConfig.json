@@ -36,7 +36,7 @@
   },
   "maxRam": 6,
   "mongoDB": {
-    "host": "localhost",
+    "host": "mcweb-mongodb",
     "port": 27017,
     "username": "",
     "password": "",
