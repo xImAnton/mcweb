@@ -34,7 +34,7 @@ class ForgeVersionProvider(VersionProvider):
 
     async def post_download(self, directory, version):
         null = open(os.devnull, "w")
-        subprocess.call("java -jar installer.jar --installServer", stdout=null, stderr=null, cwd=directory)
+        subprocess.call("java -jar installer.jar --installServer", stdout=null, stderr=null, cwd=directory, shell=Config.get_docker_secret("mongo_user") is not None)
         files_to_try = [f"forge-{version}-universal.jar", f"forge-{version}.jar"]
         renamed = False
         for file in files_to_try:
