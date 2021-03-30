@@ -36,6 +36,9 @@ echo -e -n "$MCWEB_MONGO_PW" >> secrets/mongo_root_password.txt
 
 sudo chmod -R 777 ./secrets
 
+sudo docker volume rm mcweb-data
+sudo docker volume rm mcweb-servers
+
 sudo docker build --tag mcweb-backend .
 sudo docker build --tag mcweb-client mcweb-client
 sudo docker build --tag mcweb-mongo mcweb-mongo
