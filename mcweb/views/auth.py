@@ -73,8 +73,10 @@ async def open_ticket(req):
         data["serverId"] = ObjectId(data["serverId"])
     rec = await req.app.mongo["wsticket"].find_one({"userId": user.id, "endpoint": {"type": type_, "data": data}})
     if rec:
+        del rec["_id"]
         return json_res(rec)
     ticket = secrets.token_urlsafe(24)
     doc = {"ticket": ticket, "userId": user.id, "endpoint": {"type": type_, "data": data}}
     await req.app.mongo["wsticket"].insert_one(doc)
+    del doc["_id"]
     return json_res(doc)
