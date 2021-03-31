@@ -10,6 +10,9 @@ This is meant for private use, don't use in production. Be careful with port for
 
 **Currently in development!**, not safe to use
 
+## Repository Structure
+WIP
+
 ## Requirements
 
 * docker ([Linux](https://docs.docker.com/engine/install/ubuntu/), [Windows](https://docs.docker.com/docker-for-windows/install/))
@@ -25,7 +28,7 @@ Clone this repository using `git clone "https://github.com/xImAnton/mcweb.git"`.
 
 `cd` into the downloaded repository and run `sudo bash install.sh`.
 
-Once the installation script is done, just run `docker-compose` to start the application.
+Once the installation script is done, just use `docker-compose` to start the application.
 
 When you're getting errors, because your python executable couldn't be found, run `PYTHON_CMD=<your_python_command> ` before executing the installation script.
 
