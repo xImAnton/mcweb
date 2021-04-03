@@ -11,9 +11,6 @@ This is meant for private use, don't use in production. Be careful with port for
 
 **Currently in development!**, not safe to use
 
-## Repository Structure
-WIP
-
 ## Requirements
 
 * docker ([Linux](https://docs.docker.com/engine/install/ubuntu/), [Windows](https://docs.docker.com/docker-for-windows/install/))
@@ -70,3 +67,17 @@ You can control your Minecraft Server from everywhere. Just enter a [Minecraft C
 When you chose a Forge Server, you can install and remove every Minecraft Mod with one click.
 
 ![Mod Selection](/docs/modselection.png)
+
+## Repository Structure
+Directory/ File  | Description
+---|---
+.idea | PyCharm Config Files
+docs | Documentation Markdown and Images
+mcweb | Backend Python Module, used by run.py
+mcweb-client | Frontend Code, Node Package
+mcweb-mongo | MongoDB Dockerfile and initial Values
+Dockerfile | Dockerfile for building the backend container
+defaultConfig.json | the default config values, needs to be renamed to config.json
+docker-compose.yml | docker-compose used to run the application
+install.sh | installation shell script
+run.py | Python file that starts the backend
