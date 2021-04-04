@@ -1,9 +1,9 @@
 from sanic import Sanic
 from .mc.servermanager import ServerManager
-from .views.server import server_blueprint
-from .views.auth import account_blueprint
-from .views.misc import misc_blueprint
-from .views.login import User, Session
+from .endpoints.server import server_blueprint
+from .endpoints.auth import account_blueprint
+from .endpoints.misc import misc_blueprint
+from mcweb.login import User, Session
 import time
 from mcweb.util import json_res
 import aiohttp

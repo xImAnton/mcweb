@@ -55,7 +55,7 @@ echo -e -n "admin" >> secrets/mongo_root_user.txt
 touch secrets/mongo_root_password.txt
 echo -e -n "$MCWEB_MONGO_PW" >> secrets/mongo_root_password.txt
 
-# change access to secrets for access in container
+# change access to secrets so that the container can access it without any permissions
 sudo chmod -R 777 ./secrets
 
 # clear previous mcweb data

@@ -11,7 +11,7 @@ from ..io.config import Config
 server_blueprint = Blueprint("server", url_prefix="server")
 
 
-@server_blueprint.route("/<i:string>")
+@server_blueprint.get("/<i:string>")
 @requires_login()
 @server_endpoint()
 async def get_server(req, i):
@@ -21,7 +21,7 @@ async def get_server(req, i):
     return json_res(req.ctx.server.json())
 
 
-@server_blueprint.route("/")
+@server_blueprint.get("/")
 @requires_login()
 async def get_all_servers(req):
     """
@@ -31,7 +31,7 @@ async def get_all_servers(req):
     return json_res(o)
 
 
-@server_blueprint.route("/<i>/start")
+@server_blueprint.get("/<i>/start")
 @requires_login()
 @server_endpoint()
 @requires_server_online(False)
@@ -87,7 +87,7 @@ async def console_websocket(req, ws, i):
         await req.ctx.server.connections.disconnected(ws)
 
 
-@server_blueprint.route("/<i>/command", methods=frozenset({"POST"}))
+@server_blueprint.post("/<i>/command")
 @requires_login()
 @server_endpoint()
 @requires_server_online()
@@ -102,7 +102,7 @@ async def execute_console_command(req, i):
     return json_res({"success": "command sent", "update": {}})
 
 
-@server_blueprint.route("/<i>/stop")
+@server_blueprint.get("/<i>/stop")
 @requires_login()
 @server_endpoint()
 @requires_server_online()
@@ -117,7 +117,7 @@ async def stop_server(req, i):
     return json_res({"success": "server stopped", "update": {"server": {"online_status": 3}}})
 
 
-@server_blueprint.route("<i>/restart")
+@server_blueprint.get("<i>/restart")
 @requires_login()
 @server_endpoint()
 @requires_server_online()

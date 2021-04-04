@@ -8,7 +8,7 @@ import aiohttp
 from bson.objectid import ObjectId
 from sanic.response import json, redirect
 
-from .views.login import User
+from mcweb.login import User
 
 
 def json_res(di, **kwargs):
