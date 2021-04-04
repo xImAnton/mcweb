@@ -77,7 +77,7 @@ sudo chmod -R 777 ./secrets
 echo "Do you want to remove previous MCWeb Data? [y/n]"
 read -r CLEAR_VOLUMES
 
-if [ "$CLEAR_VOLUMES" == "y"]
+if [ "$CLEAR_VOLUMES" == "y" ]
 then
   # clear previous mcweb data
   echo "Removing old Docker Volumes"
