@@ -56,10 +56,10 @@ class User:
         """
         return hashlib.sha256(pw.encode()).hexdigest() == self.password
 
-    async def login(self) -> Tuple[str, str, int]:
+    async def login(self) -> str:
         """
         creates a new session for the user
-        :return: Tuple of the new session id, the new session key and session expiration timestamp
+        :return: the new session id
         """
         sess_id = secrets.token_urlsafe(32)
         expires = int(time.time() + Config.SESSION_EXPIRATION)
@@ -80,6 +80,7 @@ class User:
         ticket = await self.db["wsticket"].find_one({"ticket": ticket})
         if not ticket:
             return None
+        # TODO: return user object and not record
         user = await self.db["user"].find_one({"_id": ticket["userId"]})
         return user
 
