@@ -34,6 +34,7 @@ services:
     secrets:
       - mongo_password
       - mongo_user
+      - config
 volumes:
   mcweb-data:
     name: mcweb-data
@@ -48,3 +49,5 @@ secrets:
     file: "./secrets/mongo_root_user.txt"
   mongo_password:
     file: "./secrets/mongo_root_password.txt"
+  config:
+    file: "./config.json"

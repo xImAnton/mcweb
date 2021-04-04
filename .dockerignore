@@ -10,3 +10,5 @@ defaultConfig.json
 secrets
 install.sh
 .idea
+config.json
+rerun_docker.bat

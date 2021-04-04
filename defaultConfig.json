@@ -46,8 +46,18 @@
   "javaSettings": {
     "installations": {
       "default": {
-        "displayName": "Default Java Version",
-        "path": "java",
+        "displayName": "Java 8",
+        "path": "/usr/lib/jvm/java-1.8.0-openjdk/bin/java",
+        "additionalArguments": ""
+      },
+      "java11": {
+        "displayName": "Java 11",
+        "path": "",
+        "additionalArguments": ""
+      },
+      "java16": {
+        "displayName": "Java 16",
+        "path": "",
         "additionalArguments": ""
       }
     }

@@ -1,12 +1,12 @@
 FROM centos:7
 
 RUN yum update -y
-RUN yum install -y \
-       java-1.8.0-openjdk \
-       java-1.8.0-openjdk-devel
+RUN yum install -y wget
 
-ENV JAVA_HOME="/usr/lib/jvm/jre-openjdk"
+# install java 1.8
+RUN yum install -y java-1.8.0-openjdk
 
+# install python
 RUN yum install python3 -y \
 && pip3 install --upgrade pip setuptools wheel \
 && if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi \

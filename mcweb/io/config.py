@@ -31,8 +31,12 @@ class Config:
         """
         loads the config file and stores it's values as class attributes
         """
-        with open("config.json", "r", encoding="utf-8") as f:
-            data = json.loads(f.read())
+        config_secret = Config.get_docker_secret("config")
+        if config_secret:
+            data = json.loads(config_secret)
+        else:
+            with open("config.json", "r", encoding="utf-8") as f:
+                data = json.loads(f.read())
 
         for attr, key in Config.ATTR_KEYS.items():
             try:
@@ -53,7 +57,7 @@ class Config:
     @staticmethod
     def get_docker_secret(key):
         try:
-            with open(f"/run/secrets/{key}") as f:
+            with open(f"/run/secrets/{key}", encoding="utf-8") as f:
                 return f.read()
         except FileNotFoundError:
             return None
