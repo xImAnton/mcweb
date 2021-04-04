@@ -58,9 +58,15 @@ echo -e -n "$MCWEB_MONGO_PW" >> secrets/mongo_root_password.txt
 # change access to secrets so that the container can access it without any permissions
 sudo chmod -R 777 ./secrets
 
-# clear previous mcweb data
-sudo docker volume rm mcweb-data
-sudo docker volume rm mcweb-servers
+echo "Do you want to remove previous MCWeb Data? [y/n]"
+read -r CLEAR_VOLUMES
+
+if [ "$CLEAR_VOLUMES" == "y"]
+then
+  # clear previous mcweb data
+  sudo docker volume rm mcweb-data
+  sudo docker volume rm mcweb-servers
+fi
 
 # build container
 echo "Building Backend"
@@ -71,4 +77,11 @@ echo "Building Database"
 sudo docker build --tag mcweb-mongo mcweb-mongo
 
 echo -e "Everything is set up! Run \"sudo docker-compose up\" to start MCWeb."
+
+$MCWEB_ROOT_PW_FIRST=""
+$MCWEB_ROOT_PW_SEC=""
+$MCWEB_ROOT_UN=""
+$MCWEB_PW_HASH=""
+$MCWEB_MONGO_PW=""
+
 exit
