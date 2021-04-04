@@ -3,7 +3,7 @@ then
   PYTHON_CMD=python3
 fi
 
-$PYTHON_CMD -m pip install argon2
+$PYTHON_CMD -m pip install argon2-cffi
 
 # Prompt for username
 echo "Whats your root username?"
