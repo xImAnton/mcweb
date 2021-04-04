@@ -1,8 +1,9 @@
-import hashlib
 import secrets
 import time
-from typing import Optional, Tuple
+from typing import Optional
 from mcweb.io.config import Config
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
 
 class User:
@@ -15,6 +16,7 @@ class User:
         self.name = ""
         self.password = ""
         self.perms = ""
+        self.salt = b""
 
     async def fetch_by_name(self, name):
         """
@@ -28,6 +30,7 @@ class User:
             self.name = user["name"]
             self.password = user["password"]
             self.perms = user["permissions"]
+            self.salt = user["salt"].encode()
             return self
         else:
             return None
@@ -44,17 +47,32 @@ class User:
             self.name = user["name"]
             self.password = user["password"]
             self.perms = user["permissions"]
+            self.salt = user["salt"].encode()
             return self
         else:
             return None
 
-    async def check_password(self, pw) -> bool:
+    @staticmethod
+    def hash_password(hasher: PasswordHasher, pwd: str, salt: bytes, pepper: bytes):
+        return hasher.hash(salt + pwd.encode() + pepper)
+
+    async def check_password(self, hasher: PasswordHasher, pwd: str, pepper: bytes) -> bool:
         """
-        compares the specified password with the password in the database
-        :param pw: the password to check
-        :return: True if password was correct, False if not
+        compares a password to the password of the user
+        :param hasher: PasswordHasher of MCWeb instance
+        :param pwd: the entered password
+        :param pepper: pepper  of the MCWeb instance
+        :return: whether the password is correct
         """
-        return hashlib.sha256(pw.encode()).hexdigest() == self.password
+        spp = self.salt + pwd.encode() + pepper
+        try:
+            if hasher.verify(self.password, spp):
+                if hasher.check_needs_rehash(self.password):
+                    hsh = hasher.hash(spp)
+                    await self.db["user"].update_one({"_id": self.id}, {"$set": {"password": hsh}})
+                return True
+        except VerifyMismatchError:
+            return False
 
     async def login(self) -> str:
         """

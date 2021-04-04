@@ -14,7 +14,8 @@ class Config:
         "MONGO":  ("mongoDB", {}),
         "SERVER_DIR": ("serverDir", "./servers"),
         "ADDONS": ("addons", {}),
-        "JAVA": ("javaSettings", {})
+        "JAVA": ("javaSettings", {}),
+        "PEPPER": ("pepper", "20 rndm pepper bytes")
     }
 
     DB_PATH = "data.db"
@@ -25,6 +26,7 @@ class Config:
     SERVER_DIR = "./servers"
     ADDONS = {}
     JAVA = {}
+    PEPPER = ""
 
     @staticmethod
     def load() -> None:
