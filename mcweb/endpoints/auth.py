@@ -1,6 +1,6 @@
 from sanic.blueprints import Blueprint
 from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
-from mcweb.login import User
+from mcweb.auth import User
 import secrets
 from bson.objectid import ObjectId
 
@@ -18,7 +18,7 @@ async def login_post(req):
     user = User(req.app.mongo)
     user = await user.fetch_by_name(req.json["username"])
     if user:
-        if await user.check_password(req.json["password"]):
+        if await user.check_password(req.app.password_hasher, str(req.json["password"]), req.app.pepper):
             sess_id = await user.login()
             resp = json_res({"success": "logged in successfully", "data": {"sessionId": sess_id}})
             return resp

@@ -1,6 +1,7 @@
 db.user.insertOne({
     name: "root",
     email: "test@example.com",
-    password: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-    permissions: []
+    password: "$argon2id$v=19$m=102400,t=2,p=8$ItTrFEviauIQP+x1WrX8Fw$TgsCsmjfF1EGGIG5LDhYKw",
+    permissions: [],
+    salt: "20 random salt bytes"
 });

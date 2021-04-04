@@ -3,12 +3,14 @@ from .mc.servermanager import ServerManager
 from .endpoints.server import server_blueprint
 from .endpoints.auth import account_blueprint
 from .endpoints.misc import misc_blueprint
-from mcweb.login import User, Session
+from mcweb.auth import User, Session
 import time
 from mcweb.util import json_res
 import aiohttp
 import os
 from .io.mongo import MongoClient
+from argon2 import PasswordHasher
+from .io.config import Config
 
 
 class MCWeb(Sanic):
@@ -21,6 +23,8 @@ class MCWeb(Sanic):
         self.register_routes()
         self.public_ip = ""
         self.mongo = None
+        self.password_hasher = PasswordHasher()
+        self.pepper = (Config.get_docker_secret("pepper") or Config.PEPPER).encode()
 
     def register_routes(self) -> None:
         """

@@ -28,6 +28,7 @@ represents a user that is able to login to the webinterface
     "name": "xImAnton_",                    -- name of the user  (unique) "^[a-z0-9_-A-Z]{6,15}$"
     "email": "ximanton@example.com",        -- email for login and first password creation --> users cannot sign up by theirselfes (unique) "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/"
     "password": "...",                      -- password hash
+    "salt": "...",                          -- random salt, 20 bytes
     "permissions": {
     	"global": [
     		"global.server.create",        -- create a server

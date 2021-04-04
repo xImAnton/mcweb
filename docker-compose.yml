@@ -35,6 +35,7 @@ services:
       - mongo_password
       - mongo_user
       - config
+      - pepper
 volumes:
   mcweb-data:
     name: mcweb-data
@@ -51,3 +52,5 @@ secrets:
     file: "./secrets/mongo_root_password.txt"
   config:
     file: "./config.json"
+  pepper:
+    file: "./secrets/pepper.txt"
