@@ -42,6 +42,11 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
 
     useEffect(() => {
+        if (javaVersions)
+        setCurrentJavaVersion(Object.keys(javaVersions)[0]);
+    }, [javaVersions])
+
+    useEffect(() => {
         // fetch possible software and versions from server
         fetchVersions().then(res => {
             let server = Object.keys(res.data)[0]; // select first software option
