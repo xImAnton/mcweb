@@ -45,7 +45,7 @@ class ServerCommunication:
         """
         if not self.running:
             return
-        self.process.stdin.write(cmd.encode("ascii") + b'\n')
+        self.process.stdin.write(str(cmd).encode("utf-8") + b'\n')
         self.process.stdin.flush()
 
 
