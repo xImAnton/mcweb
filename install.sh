@@ -39,10 +39,10 @@ MCWEB_ROOT_SALT=$($PYTHON_CMD -c "import os, base64; print(base64.b64encode(os.u
 
 # Generate Password hash using python
 echo "Hashing Password using Argon2"
-MCWEB_PW_HASH=$($PYTHON_CMD -c "from mcweb.auth import User; from argon2 import PasswordHasher; print(User.hash_password(PasswordHasher(), '$MCWEB_ROOT_PW_FIRST', b'$MCWEB_ROOT_SALT', b'$MCWEB_PEPPER'))")
+MCWEB_PW_HASH=$($PYTHON_CMD -c "from argon2 import PasswordHasher; print(PasswordHasher().hash(b'$MCWEB_ROOT_SALT' + '$MCWEB_ROOT_PW_FIRST'.encode() + b'$MCWEB_PEPPER'))")
 
 # Clear seed.js
-> ./mcweb-mongo/seed.js
+> mcweb-mongo/seed.js
 # write root user to seed.js
 echo "Writing Database Initialisation Script"
 echo -e "db.user.insertOne({\nname: '$MCWEB_ROOT_UN',\nemail: 'test@example.com',\npassword: '$MCWEB_PW_HASH',\npermissions: [],\nsalt: '$MCWEB_ROOT_SALT'});" >> ./mcweb-mongo/seed.js
@@ -62,13 +62,13 @@ echo -e "import json\nwith open(\"config.json\") as f:\n    data = json.loads(f.
 echo "Creating docker-compose Secrets"
 mkdir "secrets"
 
-touch secrets/mongo_root_user.txt
+> secrets/mongo_root_user.txt
 echo -e -n "admin" >> secrets/mongo_root_user.txt
 
-touch secrets/mongo_root_password.txt
+> secrets/mongo_root_password.txt
 echo -e -n "$MCWEB_MONGO_PW" >> secrets/mongo_root_password.txt
 
-touch secrets/pepper.txt
+> secrets/pepper.txt
 echo -e -n "$MCWEB_PEPPER" >> secrets/pepper.txt
 
 # change access to secrets so that the container can access it without any permissions
@@ -80,6 +80,7 @@ read -r CLEAR_VOLUMES
 if [ "$CLEAR_VOLUMES" == "y"]
 then
   # clear previous mcweb data
+  echo "Removing old Docker Volumes"
   sudo docker volume rm mcweb-data
   sudo docker volume rm mcweb-servers
 fi
@@ -94,12 +95,12 @@ sudo docker build --tag mcweb-mongo mcweb-mongo
 
 echo -e "Everything is set up! Run \"sudo docker-compose up\" to start MCWeb."
 
-$MCWEB_ROOT_PW_FIRST=""
-$MCWEB_ROOT_PW_SEC=""
-$MCWEB_ROOT_UN=""
-$MCWEB_PW_HASH=""
-$MCWEB_MONGO_PW=""
-$MCWEB_PEPPER=""
-$MCWEB_ROOT_SALT=""
+MCWEB_ROOT_PW_FIRST=""
+MCWEB_ROOT_PW_SEC=""
+MCWEB_ROOT_UN=""
+MCWEB_PW_HASH=""
+MCWEB_MONGO_PW=""
+MCWEB_PEPPER=""
+MCWEB_ROOT_SALT=""
 
 exit
