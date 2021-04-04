@@ -21,6 +21,9 @@ if [ "$MCWEB_ROOT_PW_FIRST" != "$MCWEB_ROOT_PW_SEC" ]
 then
   # Exit if not matching
   echo "The two passwords don't match!"
+  $MCWEB_ROOT_PW_FIRST=""
+  $MCWEB_ROOT_PW_SEC=""
+  $MCWEB_ROOT_UN=""
   exit
 fi
 
