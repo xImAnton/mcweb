@@ -72,7 +72,6 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     }, []);
 
     function fetchCurrentMinors() {
-        console.log("majorchanged");
         if (!(currentSoftware && currentMajor)) return;
         if (!versions[currentSoftware][currentMajor].fetched) {
             setVersionsLoaded(false);
@@ -184,9 +183,6 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     
     let currentMinorVersions = [];
     // display versions for current server when versions loaded
-    console.log(versions);
-    console.log(currentSoftware);
-    console.log(currentMajor);
     if (currentMajor && currentMinor && versions[currentSoftware][currentMajor]) {
         currentMinorVersions = versions[currentSoftware][currentMajor].data.map(minor => {
             return <option value={minor} key={minor}>{capitalize(minor)}</option>;
