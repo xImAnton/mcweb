@@ -31,7 +31,7 @@ async def get_all_servers(req):
     return json_res(o)
 
 
-@server_blueprint.get("/<i>/start")
+@server_blueprint.get("/<i:string>/start")
 @requires_login()
 @server_endpoint()
 @requires_server_online(False)
@@ -45,7 +45,7 @@ async def start_server(req, i):
     return json_res({"success": "server started", "update": {"server": {"online_status": 1}}})
 
 
-@server_blueprint.websocket("/<i>/console")
+@server_blueprint.websocket("/<i:string>/console")
 @server_endpoint()
 @console_ws()
 async def console_websocket(req, ws, i):
@@ -87,7 +87,7 @@ async def console_websocket(req, ws, i):
         await req.ctx.server.connections.disconnected(ws)
 
 
-@server_blueprint.post("/<i>/command")
+@server_blueprint.post("/<i:string>/command")
 @requires_login()
 @server_endpoint()
 @requires_server_online()
@@ -102,7 +102,7 @@ async def execute_console_command(req, i):
     return json_res({"success": "command sent", "update": {}})
 
 
-@server_blueprint.get("/<i>/stop")
+@server_blueprint.get("/<i:string>/stop")
 @requires_login()
 @server_endpoint()
 @requires_server_online()
@@ -117,7 +117,7 @@ async def stop_server(req, i):
     return json_res({"success": "server stopped", "update": {"server": {"online_status": 3}}})
 
 
-@server_blueprint.get("<i>/restart")
+@server_blueprint.get("<i:string>/restart")
 @requires_login()
 @server_endpoint()
 @requires_server_online()
@@ -135,7 +135,7 @@ async def restart(req, i):
     await req.ctx.server.start()
 
 
-@server_blueprint.patch("/<i>")
+@server_blueprint.patch("/<i:string>")
 @requires_login()
 @server_endpoint()
 async def update_server(req, i):
@@ -167,7 +167,7 @@ async def update_server(req, i):
     return json_res({"success": "Updated Server", "update": {"server": req.ctx.server.json()}})
 
 
-@server_blueprint.put("/<i>/addons")
+@server_blueprint.put("/<i:string>/addons")
 @requires_login()
 @server_endpoint()
 @requires_post_params("addonId", "addonType", "addonVersion")
@@ -182,7 +182,7 @@ async def add_addon(req, i):
         return json_res({"error": "Error while creating Addon", "description": "maybe the addon id is wrong, the file couldn't be downloaded or this server doesn't support addons yet", "status": 400}, status=400)
 
 
-@server_blueprint.delete("/<i>/addons/<addon_id:int>")
+@server_blueprint.delete("/<i:string>/addons/<addon_id:int>")
 @requires_login()
 @server_endpoint()
 async def remove_addon(req, i, addon_id):
