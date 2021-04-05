@@ -12,7 +12,7 @@
       }
     },
     "forge": {
-      "getVersions": "http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.xml",
+      "getVersions": "http://files.minecraftforge.net/maven/net/minecraftforge/forge/maven-metadata.json",
       "downloadBuild": "https://files.minecraftforge.net/maven/net/minecraftforge/forge/{build}/forge-{build}-installer.jar",
       "supports": {
         "mods": true,
@@ -22,6 +22,12 @@
     "vanilla": {
       "getVersions": "https://launchermeta.mojang.com/mc/game/version_manifest.json",
       "launcherMeta": "https://launchermeta.mojang.com",
+      "supports": {
+        "mods": false,
+        "plugins": false
+      }
+    },
+    "snapshot": {
       "supports": {
         "mods": false,
         "plugins": false
@@ -49,16 +55,6 @@
       "default": {
         "displayName": "Java 8",
         "path": "/usr/lib/jvm/java-1.8.0-openjdk/bin/java",
-        "additionalArguments": ""
-      },
-      "java11": {
-        "displayName": "Java 11",
-        "path": "",
-        "additionalArguments": ""
-      },
-      "java16": {
-        "displayName": "Java 16",
-        "path": "",
         "additionalArguments": ""
       }
     }

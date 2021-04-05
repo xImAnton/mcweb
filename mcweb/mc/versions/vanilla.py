@@ -17,19 +17,27 @@ class SnapshotVersionProvider(VersionProvider):
             if v["type"] == "snapshot":
                 self.versions[v["id"]] = v["url"]
 
-    async def get_versions(self):
+    async def get_major_versions(self):
+        return ["minecraft"]
+
+    async def get_minor_versions(self, major):
+        if major != "minecraft":
+            return []
         return list(reversed(list(self.versions.keys())))
 
-    async def get_download(self, version):
+    async def get_download(self, major, minor):
         async with aiohttp.ClientSession() as session:
-            async with session.get(self.versions[version]) as r:
+            async with session.get(self.versions[minor]) as r:
                 resp = await r.json()
 
         url = resp["downloads"]["server"]["url"]
         return url
 
-    async def has_version(self, version):
-        return version in self.versions.keys()
+    async def has_version(self, major, minor):
+        return major == "minecraft" and minor in self.versions.keys()
+
+    async def get_minecraft_version(self, major, minor):
+        return minor
 
 
 class VanillaVersionProvider(SnapshotVersionProvider):
