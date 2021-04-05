@@ -192,19 +192,28 @@ async def remove_addon(req, i, addon_id):
         return json_res({"error": "Addon Not Found", "description": "addon couldn't be found on the server", "status": 400}, status=400)
 
 
-@server_blueprint.put("/create/<server>/<version>")
+@server_blueprint.put("/create/<server:string>/<major_version:string>/<minor_version:string>")
 @requires_login()
 @requires_post_params("name", "port")
-async def create(req, server, version):
+async def create(req, server, major_version, minor_version):
     ram = 2 if "allocatedRAM" not in req.json.keys() else req.json["allocatedRAM"]
     java_version = "default" if "javaVersion" not in req.json.keys() else req.json["javaVersion"]
     name = req.json["name"]
     port = req.json["port"]
     version_provider = await req.app.server_manager.versions.provider_by_name(server)
-    return await req.app.server_manager.create_server(name, version_provider, version, ram, port, java_version)
+    return await req.app.server_manager.create_server(name, version_provider, major_version, minor_version, ram, port, java_version)
 
 
 @server_blueprint.get("/versions")
 @requires_login()
 async def get_all_versions(req):
-    return json_res(await req.app.server_manager.versions.get_json())
+    return json_res(await req.app.server_manager.versions.get_all_major_versions_json())
+
+
+@server_blueprint.get("/versions/<software:string>/<major_version:string>")
+@requires_login()
+async def get_minor_versions(req, software, major_version):
+    prov = await req.app.server_manager.versions.provider_by_name(software)
+    if not prov:
+        return json_res({"error": "Invalid Software", "description": "there is no server software with that name: " + str(software), "status": 400}, status=400)
+    return json_res(await prov.get_minor_versions(major_version))

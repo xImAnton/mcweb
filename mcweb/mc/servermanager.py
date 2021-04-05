@@ -5,7 +5,6 @@ from mcweb.io.config import Config
 import os
 from .versions.manager import VersionManager
 from ..util import json_res, download_and_save
-from bson.objectid import ObjectId
 import pymongo.errors
 import sys
 from json import dumps as json_dumps
@@ -70,12 +69,13 @@ class ServerManager:
                 o.append(s)
         self.servers = o
 
-    async def create_server(self, name, version_provider, version, ram, port, java_version):
+    async def create_server(self, name, version_provider, major_version, minor_version, ram, port, java_version):
         """
         creates a new server
         :param name: the new servers name
         :param version_provider: the version provider that is used to get the version download link
-        :param version: the version that is passed to the version provider
+        :param major_version: major version of server to install
+        :param minor_version: minor version of server to install
         :param ram: the ram the server should have, can be changed later
         :param port: the port the server should run on in the future
         :param java_version: the java version that runs the server
@@ -84,8 +84,8 @@ class ServerManager:
         # check if version existing
         if not isinstance(version_provider, VersionProvider):
             return json_res({"error": "Invalid Server", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
-        if not await version_provider.has_version(version):
-            return json_res({"error": "Invalid Version", "description": "use /server/versions to view all valid servers and versions", "status": 404}, status=404)
+        if not await version_provider.has_version(major_version, minor_version):
+            return json_res({"error": "Invalid Version", "description": "use /server/versions to view all valid servers and their versions", "status": 404}, status=404)
 
         # Check ram
         if ram > Config.MAX_RAM:
@@ -119,12 +119,12 @@ class ServerManager:
 
         # Download Server jar
         out_file = version_provider.DOWNLOAD_FILE_NAME
-        await download_and_save(await version_provider.get_download(version), os.path.join(dir_, out_file))
+        await download_and_save(await version_provider.get_download(major_version, minor_version), os.path.join(dir_, out_file))
         # save agreed eula
         await ServerManager.save_eula(dir_)
 
         # insert into db
-        doc = {"name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "version": version}, "displayName": display_name, "port": port, "addons": [], "javaVersion": java_version}
+        doc = {"name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "majorVersion": major_version, "minorVersion": minor_version, "minecraftVersion": await version_provider.get_minecraft_version(major_version, minor_version)}, "displayName": display_name, "port": port, "addons": [], "javaVersion": java_version}
         insert_result = await self.mc.mongo["server"].insert_one(doc)
         doc["_id"] = insert_result.inserted_id
         # add server record to db and register to server manager
@@ -132,7 +132,7 @@ class ServerManager:
         await s.set_online_status(0)
         self.servers.append(s)
         try:
-            await version_provider.post_download(dir_, version)
+            await version_provider.post_download(dir_, major_version, minor_version)
         except Exception as e:
             await self.mc.mongo["server"].delete_one({"_id": insert_result.inserted_id})
             return json_res({"error": "Error during Server Creation", "description": " ".join(e.args), "status": 500}, status=500)

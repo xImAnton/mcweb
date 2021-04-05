@@ -7,27 +7,35 @@ class PaperVersionProvider(VersionProvider):
     NAME = "paper"
 
     def __init__(self):
-        self.versions = []
+        self.versions = {}
 
-    async def has_version(self, version):
-        return version in self.versions
+    async def has_version(self, major, minor):
+        return major in self.versions.keys() and minor in self.versions[major]
 
     async def reload(self):
         async with aiohttp.ClientSession() as session:
             async with session.get(Config.VERSIONS["paper"]["getVersions"]) as r:
                 resp = await r.json()
-            self.versions = resp["versions"]
+            for version in resp["versions"]:
+                async with session.get(Config.VERSIONS["paper"]["getBuilds"].format(version=version)) as r:
+                    builds = await r.json()
+                self.versions[version] = [str(build) for build in builds["builds"]]
 
-    async def get_download(self, version):
+    async def get_download(self, major, minor):
         async with aiohttp.ClientSession() as session:
-            async with session.get(Config.VERSIONS["paper"]["getBuilds"].format(version=version)) as r:
-                resp = await r.json()
-            last_build = resp["builds"][-1]
             async with session.get(
-                    Config.VERSIONS["paper"]["getBuildDownload"].format(version=version, build=last_build)) as r:
+                    Config.VERSIONS["paper"]["getBuildDownload"].format(version=major, build=minor)) as r:
                 resp = await r.json()
             download = resp["downloads"]["application"]["name"]
-            return Config.VERSIONS["paper"]["downloadBuild"].format(version=version, build=last_build, download=download)
+            return Config.VERSIONS["paper"]["downloadBuild"].format(version=major, build=minor, download=download)
 
-    async def get_versions(self):
-        return self.versions
+    async def get_major_versions(self):
+        return list(self.versions.keys())
+
+    async def get_minor_versions(self, major):
+        if major not in self.versions.keys():
+            return []
+        return self.versions[major]
+
+    async def get_minecraft_version(self, major, minor):
+        return major

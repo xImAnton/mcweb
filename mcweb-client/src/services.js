@@ -115,12 +115,16 @@ export function fetchAllServers() {
     return get(getApiBase() + "/server?idonly=1");
 }
 
-export function fetchVersions() {
+export function fetchSoftwaresAndTheirMajors() {
     return get(getApiBase() + "/server/versions");
 }
 
-export function putServer(name, server, version, ram, port, javaVersion) {
-    return put(getApiBase() + "/server/create/" + server + "/" + version, JSON.stringify({
+export function fetchMinorVersions(software, majorVersion) {
+    return get(getApiBase() + "/server/versions/" + software + "/" + majorVersion);
+}
+
+export function putServer(name, server, major, minor, ram, port, javaVersion) {
+    return put(getApiBase() + "/server/create/" + server + "/" + major + "/" + minor, JSON.stringify({
         name: name,
         allocatedRAM: ram,
         port: port,
@@ -188,4 +192,8 @@ export function useRestrictedState(defaultVal, check, errorCallback) {
     }, [state]);
 
     return [state, setState];
+}
+
+export function capitalize(string) {
+    return string.split(" ").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
 }

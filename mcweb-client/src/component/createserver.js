@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchVersions, putServer, useRestrictedState } from "../services";
+import { fetchSoftwaresAndTheirMajors, fetchMinorVersions, putServer, useRestrictedState, capitalize } from "../services";
 import history from "../history";
 import LoadingAnimation from "./loading";
 import { Select, FormTable, FormLine, LastFormLine, Alert } from "./ui";
@@ -33,7 +33,8 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     const [alert, setAlert] = useState(""); // alert to display on error, not rendered when empty
     const [versions, setVersions] = useState({}); // all possible versions for current server
     const [currentSoftware, setCurrentSoftware] = useState(""); // current software name
-    const [currentVersion, setCurrentVersion] = useState(""); // current software version
+    const [currentMinor, setCurrentMinor] = useState(""); // current minor software version
+    const [currentMajor, setCurrentMajor] = useState(""); // current major software version
     const [currentName, setCurrentName] = useRestrictedState("", (n) => n.match(/^[a-zA-Z0-9_\-\. ]{0,48}$/), () => {}); // name entered in name field
     const [currentRam, setCurrentRam] = useRestrictedState(2, (r) => r <= maxRam && r > 0, () => {});
     const [creating, setCreating] = useState(false); // whether the server is creating at the moment
@@ -42,22 +43,70 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
 
     useEffect(() => {
-        if (javaVersions)
-        setCurrentJavaVersion(Object.keys(javaVersions)[0]);
-    }, [javaVersions])
+        if (javaVersions) {
+            setCurrentJavaVersion(Object.keys(javaVersions)[0]);
+        }
+    }, [javaVersions]);
 
     useEffect(() => {
         // fetch possible software and versions from server
-        fetchVersions().then(res => {
+        fetchSoftwaresAndTheirMajors().then(res => {
+            const newVersions = Object.assign({}, versions);
+            Object.entries(res.data).forEach(([key, val]) => {
+                const softwareVersions = {};
+                val.forEach(major => {
+                    softwareVersions[major] = {
+                        fetched: false,
+                        data: [],
+                    };
+                });
+                newVersions[key] = softwareVersions;
+            });
+            setVersions(newVersions);
             let server = Object.keys(res.data)[0]; // select first software option
-            let serverVersions = res.data[server]; // get all versions for first server
-            let version = serverVersions[serverVersions.length - 1]; // select latest version of software
-            setVersions(res.data);
+            let majorVersion = Object.keys(newVersions[server])[0]; // select first major version of software
             setCurrentSoftware(server);
-            setCurrentVersion(version);
+            setCurrentMajor(majorVersion);
             setVersionsLoaded(true);
         });
     }, []);
+
+    function fetchCurrentMinors() {
+        console.log("majorchanged");
+        if (!(currentSoftware && currentMajor)) return;
+        if (!versions[currentSoftware][currentMajor].fetched) {
+            setVersionsLoaded(false);
+            fetchMinorVersions(currentSoftware, currentMajor).then(res => {
+                const newVersions = Object.assign({}, versions);
+                newVersions[currentSoftware][currentMajor] = {
+                    data: res.data,
+                    fetched: true,
+                };
+                setVersions(newVersions);
+                setVersionsLoaded(true);
+                setCurrentMinor(res.data[res.data.length - 1]);
+            });
+        } else {
+            setCurrentMinor(versions[currentSoftware][currentMajor].data[versions[currentSoftware][currentMajor].data.length - 1]);
+        }
+
+    }
+
+    useEffect(fetchCurrentMinors, [currentMajor]);
+
+    /**
+     * called when the software changed, sets version to latest
+     */
+     useEffect(() => {
+        if (!currentSoftware) return;
+        let serverVersions = Object.keys(versions[currentSoftware]);
+        let version = serverVersions[serverVersions.length - 1];
+        if (currentMajor === version) {
+            fetchCurrentMinors();
+        } else {
+            setCurrentMajor(version);
+        }
+    }, [currentSoftware]);
 
     async function createServer() {
         // check if server name is specified
@@ -78,7 +127,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
         // display loading animation
         setCreating(true);
         // send server creation, backend downloads server jar
-        await putServer(currentName, currentSoftware, currentVersion, currentRam, currentPort, currentJavaVersion).then(res => {
+        await putServer(currentName, currentSoftware, currentMajor, currentMinor, currentRam, currentPort, currentJavaVersion).then(res => {
             status = res.data.add.server.id;
             addFirstServer(res.data.add.server);
             // cancel loading animation when server is created and ready to start
@@ -99,7 +148,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
                     alert = "There is no server type called " + currentSoftware;
                     break;
                 case "Invalid Version":
-                    alert = "The " + currentSoftware + " version is not supported: " + currentVersion;
+                    alert = "The " + currentSoftware + " version is not supported: " + currentMajor + " " + currentMinor;
                     break;
                 case "Too Much RAM":
                     alert = "The maximal possible ram is " + maxRam;
@@ -121,32 +170,28 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
         return status;
     }
 
-    /**
-     * called when the software changed, sets version to latest
-     */
-    function serverChanged(e) {
-        let server = e.target.value;
-        let serverVersions = versions[server];
-        let version = serverVersions[serverVersions.length - 1];
-        setCurrentSoftware(server);
-        setCurrentVersion(version);
-    }
-
     // capitalize softwares
     let servers = Object.keys(versions).map(v => {
-        return <option value={v} key={v}>{v.charAt(0).toUpperCase() + v.slice(1)}</option>
+        return <option value={v} key={v}>{capitalize(v)}</option>
     });
-    
-    let currentServerVersions;
-    // display versions for current server when versions loaded
-    if (currentVersion) {
-        currentServerVersions = versions[currentSoftware].map(v => {
-            return <option value={v} key={v}>{v}</option>
+
+    let currentMajorVersions = [];
+    if (currentSoftware) {
+        currentMajorVersions = Object.keys(versions[currentSoftware]).map(major => {
+            return <option value={major} key={major}>{capitalize(major)}</option>;
         });
-    // otherwise nothing
-    } else {
-        currentServerVersions = [];
-    }
+    };
+    
+    let currentMinorVersions = [];
+    // display versions for current server when versions loaded
+    console.log(versions);
+    console.log(currentSoftware);
+    console.log(currentMajor);
+    if (currentMajor && currentMinor && versions[currentSoftware][currentMajor]) {
+        currentMinorVersions = versions[currentSoftware][currentMajor].data.map(minor => {
+            return <option value={minor} key={minor}>{capitalize(minor)}</option>;
+        })
+    };
 
     return <>{versionsLoaded ? (<div id="page-content">
         { !creating ? (
@@ -158,13 +203,18 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
                         <input className="mcweb-ui" type="text" onChange={e => setCurrentName(e.target.value)} value={currentName}
                     />} />
                     <FormLine label="Software" input={
-                        <Select value={currentSoftware} onChange={serverChanged}>
+                        <Select value={currentSoftware} onChange={e => setCurrentSoftware(e.target.value)}>
                             {servers}
                         </Select>
                     } />
-                    <FormLine label="Version" input={
-                        <Select value={currentVersion} onChange={e => setCurrentVersion(e.target.value)}>
-                        {currentServerVersions}
+                    <FormLine label="Minecraft Version" input={
+                        <Select value={currentMajor} onChange={e => setCurrentMajor(e.target.value)}>
+                            {currentMajorVersions}
+                        </Select>
+                    } />
+                    <FormLine label="Software Version" input={
+                        <Select value={currentMinor} onChange={e => setCurrentMinor(e.target.value)}>
+                        {currentMinorVersions}
                     </Select>
                     } />
                     <FormLine label="RAM" input={
