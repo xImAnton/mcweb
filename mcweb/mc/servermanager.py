@@ -28,7 +28,10 @@ class ServerManager:
         try:
             async for server in self.mc.mongo["server"].find({}):
                 s = MinecraftServer(self.mc, server)
-                await s.set_online_status(0)
+                if s.status == 2:  # if the server was online, start it
+                    await s.start()
+                elif s.status != 0:
+                    await s.set_online_status(0)
                 self.servers.append(s)
         except pymongo.errors.ServerSelectionTimeoutError:
             print("No connection to mongodb could be established. Check your preferences in the config.json and if your mongo server is running!")
