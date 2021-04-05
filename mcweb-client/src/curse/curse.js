@@ -27,7 +27,7 @@ function AddonsListEntry({data, onClick}) {
 }
 
 
-function AddonInstallationFileSelection({currentServer, addonId, installAddon, addonName}) {
+function AddonInstallationFileSelection({currentServer, addonId, installAddon, addonName, hideIncompatible}) {
 
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -43,20 +43,25 @@ function AddonInstallationFileSelection({currentServer, addonId, installAddon, a
                 fileObjs.push({
                     fileName: e.fileName,
                     fileId: e.id,
-                    gameVersion: e.gameVersion[0]
+                    gameVersion: e.gameVersion
                 })
             });
             setFiles(fileObjs);
         })
     }, [addonId]);
 
-    let fileElements = files.map((e) => <AddonInstallationFileEntry
-            gameVersion={e.gameVersion}
-            fileName={e.fileName}
-            key={e.fileId}
-            onClick={() => installAddon(addonId, e.fileId, addonName)}
-        />
-    )
+    const fileElements = [];
+
+    files.forEach((e) => {
+        if (e.gameVersion.includes(currentServer.software.minecraftVersion) | !hideIncompatible) {
+            fileElements.push(<AddonInstallationFileEntry
+                gameVersion={e.gameVersion}
+                fileName={e.fileName}
+                key={e.fileId}
+                onClick={() => installAddon(addonId, e.fileId, addonName)}
+            />);
+        }
+    });
 
     return  <div className="file-selection-list">
                 { !loading ?
@@ -70,12 +75,12 @@ function AddonInstallationFileSelection({currentServer, addonId, installAddon, a
 function AddonInstallationFileEntry({fileName, gameVersion, onClick}) {
     return  <div className="file-selection-list-entry" onClick={onClick}>
                 <div className="file-selection-list-entry-field">{fileName}</div>
-                <div className="file-selection-list-entry-field">{gameVersion}</div>
+                <div className="file-selection-list-entry-field">{gameVersion.join(", ")}</div>
             </div>
 }
 
 
-function AddonInstallationDialog({data, close, currentServer, installAddon}) {
+function AddonInstallationDialog({data, close, currentServer, installAddon, hideIncompatible}) {
 
     const [fileSelection, setFileSelection] = useState(false);
 
@@ -90,10 +95,23 @@ function AddonInstallationDialog({data, close, currentServer, installAddon}) {
                     <span><a href={data.websiteUrl} target="_blank" rel="noreferrer">{data.websiteUrl + "/files"}</a></span>
                     { fileSelection && <>
                         Lookup the File Name from the Link above and click to install it.
-                        <AddonInstallationFileSelection currentServer={currentServer} addonId={data.id} installAddon={installAddon} addonName={data.name} />
+                        <AddonInstallationFileSelection currentServer={currentServer} addonId={data.id} installAddon={installAddon} addonName={data.name} hideIncompatible={hideIncompatible} />
                     </>}
                     <div style={{display: "flex", marginTop: "6px"}}>
-                        <button className="mcweb-ui" style={{marginRight: "6px", flexGrow: "1"}} onClick={() => installAddon(data.id, data.latestFiles[0].id, data.name)}>Install Latest</button>
+                        <button className="mcweb-ui" style={{marginRight: "6px", flexGrow: "1"}} onClick={() => {
+                            if (hideIncompatible) {
+                                for (let i = 0; i < data.gameVersionLatestFiles.length; i++) {
+                                    if (data.gameVersionLatestFiles[i].gameVersion === currentServer.software.minecraftVersion) {
+                                        installAddon(data.id, data.gameVersionLatestFiles[i].projectFileId, data.name);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                installAddon(data.id, data.latestFiles[0].id, data.name);
+                            }
+                        }}>
+                            Install Latest{hideIncompatible ? " Compatible" : ""}
+                        </button>
                         { !fileSelection && <button className="mcweb-ui" style={{flexGrow: "1"}} onClick={toggleFileSelection}>Select Version</button> }
                     </div>
                     <button className="mcweb-ui" style={{width: "100%", marginTop: "6px"}} onClick={close}>Cancel</button>
@@ -102,7 +120,7 @@ function AddonInstallationDialog({data, close, currentServer, installAddon}) {
 }
 
 
-function AddonsList({currentServer, addons, setLoadingText, setLoaded}) {
+function AddonsList({currentServer, addons, setLoadingText, setLoaded, hideIncompatible}) {
 
     const [selected, setSelected] = useState(null);
 
@@ -123,15 +141,19 @@ function AddonsList({currentServer, addons, setLoadingText, setLoaded}) {
         );
     }
 
-    const data = addons.map(e => {
-        return <AddonsListEntry data={e} key={e.id} onClick={() => setSelected(e) } />
+    const data = []
+
+    addons.forEach(e => {
+        if (e.gameVersionLatestFiles.map(v => v.gameVersion).includes(currentServer.software.minecraftVersion) | !hideIncompatible) {
+            data.push(<AddonsListEntry data={e} key={e.id} onClick={() => setSelected(e) } />);
+        }
     });
 
     return  <div className={"addon-list"}>
                 <div ref={listDiv} className={"inner" + (selected ? " unscrollable" : "")}>
                     {data}
                 </div>
-                { selected && <AddonInstallationDialog data={selected} close={() => setSelected(null)} currentServer={currentServer} installAddon={installAddon} /> }
+                { selected && <AddonInstallationDialog data={selected} close={() => setSelected(null)} currentServer={currentServer} installAddon={installAddon} hideIncompatible={hideIncompatible} /> }
             </div>
 }
 
@@ -152,7 +174,7 @@ function PaginatorButtons({page, setPage}) {
 }
 
 
-function SearchBar({search}) {
+function SearchBar({search, hideIncompatible, setHideIncompatible}) {
 
     let searchText = "";
 
@@ -169,27 +191,39 @@ function SearchBar({search}) {
                     onKeyDown={(e) => { if (e.key === "Enter") search(searchText); }}
                     ref={searchBar}
                 />
-                <button className="mcweb-ui" style={{width: "32px", display: "inline-block"}} onClick={() => search(searchText)}>🔍</button>
+                <button className="mcweb-ui" style={{width: "32px", display: "inline-block", marginRight: "3px"}} onClick={() => search(searchText)}>
+                    <span style={{fontSize: ".875em", marginRight: ".125em", position: "relative", top: "-.1em", left: "-.125em"}}>
+                        🔍
+                    </span>
+                </button>
+                <button className="mcweb-ui" style={{width: "32px", display: "inline-block", color: hideIncompatible ? "red" : "var(--font)"}} onClick={() => {setHideIncompatible(!hideIncompatible)}}>
+                    <span style={{fontSize: ".875em", marginRight: "-.3em", position: "relative", top: "-.16em", left: "-.125em"}}>
+                        ✗
+                    </span>
+                </button>
             </div>
 }
 
 
-function AddonSelectHeader({search}) {
+function AddonSelectHeader({search, hideIncompatible, setHideIncompatible}) {
     return  <div className="curse-head">
-                <SearchBar search={search} />
+                <SearchBar search={search} hideIncompatible={hideIncompatible} setHideIncompatible={setHideIncompatible} />
             </div>;
 }
 
 
 function AddonSelector({currentServer, page, setPage, setSearch, addons, setLoadingText, setLoaded}) {
+
+    const [hideIncompatible, setHideIncompatible] = useState(true);
     
     return  <div className="curse-selector">
-                <AddonSelectHeader search={setSearch} />
+                <AddonSelectHeader search={setSearch} hideIncompatible={hideIncompatible} setHideIncompatible={setHideIncompatible} />
                 <AddonsList
                     currentServer={currentServer}
                     addons={addons}
                     setLoaded={setLoaded}
                     setLoadingText={setLoadingText}
+                    hideIncompatible={hideIncompatible}
                 />
                 <AddonSelectFooter page={page} setPage={setPage} />
             </div>;
