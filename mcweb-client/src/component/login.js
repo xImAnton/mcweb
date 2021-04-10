@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { login, getLogin } from "../services";
+import { login, getLogin, setTitle } from "../services";
 import LoadingAnimation from "./loading";
 import { Alert } from "./ui";
 import { Redirect } from "react-router-dom";
@@ -17,6 +17,7 @@ function LoginView({setSessionId}) {
     const ummounted = useRef(false);
 
     useEffect(() => {
+        setTitle("Login")
         setLoading(true);
         // check if current session is valid
         getLogin().then(res => {

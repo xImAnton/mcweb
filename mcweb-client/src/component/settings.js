@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { patchServer } from "../services";
+import { patchServer, setTitle } from "../services";
 import LoadingAnimation from "./loading";
 import { FormTable, FormLine, Select } from "./ui";
 
@@ -11,6 +11,10 @@ function SettingsView({currentServer, javaVersions, maxRam}) {
     const [currentRam, setRam] = useState(2);
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
     const [loadingText, setLoadingText] = useState("");
+
+    useEffect(() => {
+        setTitle("Settings");
+    }, []);
 
     useEffect(() => {
         setName(currentServer.displayName);

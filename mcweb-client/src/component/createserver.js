@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchSoftwaresAndTheirMajors, fetchMinorVersions, putServer, useRestrictedState, capitalize } from "../services";
+import { fetchSoftwaresAndTheirMajors, fetchMinorVersions, putServer, useRestrictedState, capitalize, setTitle } from "../services";
 import history from "../history";
 import LoadingAnimation from "./loading";
 import { Select, FormTable, FormLine, LastFormLine, Alert } from "./ui";
@@ -49,6 +49,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     }, [javaVersions]);
 
     useEffect(() => {
+        setTitle("Server Creation");
         // fetch possible software and versions from server
         fetchSoftwaresAndTheirMajors().then(res => {
             const newVersions = Object.assign({}, versions);

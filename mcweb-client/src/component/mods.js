@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { getAddons } from "../curse/curseapi";
 import LoadingAnimation from "./loading";
 import { TabArea, Tab } from "./ui";
-import { removeAddon } from "../services";
+import { removeAddon, setTitle } from "../services";
 
 
 function AddonRemoveDialog({data, close, removeAddon}) {
@@ -74,6 +74,10 @@ function ModView({currentServer}) {
             setLoaded(true);
         });
     }, [page, searchText]);
+
+    useEffect(() => {
+        setTitle("Mods")
+    }, []);
 
     // 12: Texture Packs, 4471: Modpacks, 6: Mods, 17: Worlds
     return  <div id="page-content">

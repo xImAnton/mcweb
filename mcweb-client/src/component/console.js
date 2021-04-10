@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { sendCommand } from "../services"
+import { sendCommand, setTitle } from "../services"
 
 /**
  * Input field and button of console
@@ -46,6 +46,10 @@ function ConsoleView(props) {
     useEffect(() => {
         textRef.current.scrollTop = textRef.current.scrollHeight;
     })
+
+    useEffect(() => {
+        setTitle("Console");
+    }, []);
 
     return  <div id="page-content">
                 <h1 id="page-headline">Console</h1>
