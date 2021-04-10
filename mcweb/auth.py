@@ -12,7 +12,7 @@ class User:
     """
     def __init__(self, db):
         self.db = db
-        self.id = 0
+        self.id = None
         self.name = ""
         self.password = ""
         self.perms = ""
@@ -115,6 +115,7 @@ class Session:
         self.sid = ""
         self.user_id = 0
         self.expiration = 0
+        self.id = None
 
     async def fetch_by_sid(self, sid):
         """
@@ -124,6 +125,7 @@ class Session:
         """
         s = await self.db["session"].find_one({"sid": sid})
         if s:
+            self.id = s["_id"]
             self.sid = s["sid"]
             self.user_id = s["userId"]
             self.expiration = s["expiration"]
@@ -137,6 +139,9 @@ class Session:
         """
         user = User(self.db)
         return await user.fetch_by_sid(self.sid)
+
+    async def refresh(self):
+        await self.db["user"].update_one({"_id": self.sid}, {"$set": {"expiration": int(time.time() + Config.SESSION_EXPIRATION)}})
 
     async def logout(self) -> None:
         """

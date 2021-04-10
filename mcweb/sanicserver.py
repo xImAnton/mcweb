@@ -55,6 +55,7 @@ class MCWeb(Sanic):
             session = Session(self.mongo)
             await session.fetch_by_sid(sid)
             if session.expiration > time.time():
+                await session.refresh()
                 user = User(self.mongo)
                 req.ctx.user = await user.fetch_by_sid(sid)
                 req.ctx.session = session
