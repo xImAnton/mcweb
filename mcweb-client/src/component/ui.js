@@ -1,10 +1,15 @@
 import React, { useEffect } from "react";
+import Clipboard from "react-clipboard.js";
 
 /**
  * Displays a value and gives the oppotunity to copy it
  */
 function CopyField(props) {
-    return <div className="mcweb-ui copy-field">{props.text} <button onClick={() => navigator.clipboard.writeText(props.text)}>📋</button></div>;
+    return <div className="mcweb-ui copy-field">{props.text}
+        <Clipboard data-clipboard-text={props.text}>
+            📋
+        </Clipboard>
+    </div>;
 }
 
 
