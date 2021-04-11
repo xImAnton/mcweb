@@ -1,0 +1,49 @@
+.select {
+    width: 200px;
+    border-radius: 8px;
+    padding: 4px 6px;
+    background-color: var(--ui-background);
+    border: var(--ui-border);
+    position: relative;
+    user-select: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.select:hover {
+    background-color: var(--ui-hover);
+}
+
+.select::after {
+    content: "";
+    width: 0.8em;
+    height: 0.5em;
+    background-color: white;
+    clip-path: polygon(100% 0%, 0 0%, 50% 100%);
+    right: 11px;
+    top: 11px;
+    position: absolute;
+    pointer-events: none;
+}
+
+.select select {
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    outline: none;
+    color: white;
+    width: 100%;
+}
+
+.select select::-ms-expand {
+    display: none;
+}
+
+.select select option {
+    color: black;
+}

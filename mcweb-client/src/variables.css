@@ -1,0 +1,23 @@
+#app.darkmode {
+    --main-bg-color: #0d1625;
+    --sec-bg-color: #4e5358;
+    --bg: #1b2330;
+    --font: white;
+    --console-bg: #2a2f3b;
+    --ui-background: #171a1f;
+    --ui-hover: #1d2127;
+    --ui-disabled: #41404a;
+    --ui-border: 1px solid black;
+}
+
+#app.brightmode {
+    --main-bg-color: #378af0;
+    --sec-bg-color: #9da7b3;
+    --bg: white;
+    --font: black;
+    --console-bg: #c2c2c3;
+    --ui-background: #9da7b3;
+    --ui-hover: #acb5c0;
+    --ui-disabled: #41404a;
+    --ui-border: 1px solid black;
+}

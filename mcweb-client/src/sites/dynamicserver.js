@@ -1,0 +1,20 @@
+import { useEffect } from "react";
+import { setTitle } from "../services";
+import Site, { HeadLine } from "./site";
+
+
+/**
+ * View for managing dynamic server management
+ */
+function DSMView({currentServer}) {
+
+    useEffect(() => {
+        setTitle("Dynamic Server Management");
+    }, []);
+
+    return  <Site>
+                <HeadLine>Dynamic Server Management</HeadLine>
+            </Site>;
+}
+
+export default DSMView;

@@ -1,0 +1,24 @@
+.button {
+    outline: none;
+    border: var(--ui-border);
+    padding: 4px 6px;
+    background-color: var(--ui-background);
+    border-radius: 8px;
+    display: block;
+    color: white;
+    user-select: none;
+    font-size: inherit;
+    cursor: pointer;
+}
+
+.button[disabled] {
+    color: var(--ui-disabled);
+}
+
+.button:not([disabled]):hover {
+    background-color: var(--ui-hover);
+}
+
+.button:not([disabled]):active {
+    transform: translateY(1px);
+}

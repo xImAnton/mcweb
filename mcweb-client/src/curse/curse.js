@@ -1,7 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import { getFiles } from "./curseapi";
-import LoadingAnimation from "../component/loading";
+import LoadingAnimation from "../component/loading/loading";
 import { addAddon } from "../services";
+import Input from "../component/ui/input/text";
+import Button from "../component/ui/button/button";
 
 
 function AddonsListEntry({data, onClick}) {
@@ -98,7 +100,7 @@ function AddonInstallationDialog({data, close, currentServer, installAddon, hide
                         <AddonInstallationFileSelection currentServer={currentServer} addonId={data.id} installAddon={installAddon} addonName={data.name} hideIncompatible={hideIncompatible} />
                     </>}
                     <div style={{display: "flex", marginTop: "6px"}}>
-                        <button className="mcweb-ui" style={{marginRight: "6px", flexGrow: "1"}} onClick={() => {
+                        <Button style={{marginRight: "6px", flexGrow: "1"}} onClick={() => {
                             if (hideIncompatible) {
                                 for (let i = 0; i < data.gameVersionLatestFiles.length; i++) {
                                     if (data.gameVersionLatestFiles[i].gameVersion === currentServer.software.minecraftVersion) {
@@ -111,10 +113,10 @@ function AddonInstallationDialog({data, close, currentServer, installAddon, hide
                             }
                         }}>
                             Install Latest{hideIncompatible ? " Compatible" : ""}
-                        </button>
-                        { !fileSelection && <button className="mcweb-ui" style={{flexGrow: "1"}} onClick={toggleFileSelection}>Select Version</button> }
+                        </Button>
+                        { !fileSelection && <Button style={{flexGrow: "1"}} onClick={toggleFileSelection}>Select Version</Button> }
                     </div>
-                    <button className="mcweb-ui" style={{width: "100%", marginTop: "6px"}} onClick={close}>Cancel</button>
+                    <Button style={{width: "100%", marginTop: "6px"}} onClick={close}>Cancel</Button>
                 </div>
             </div>;
 }
@@ -167,9 +169,9 @@ function AddonSelectFooter({page, setPage}) {
 
 function PaginatorButtons({page, setPage}) {
     return  <div className="curse-paginator">
-                <button className="mcweb-ui" disabled={page === 0} onClick={() => setPage(page - 1)}>⮜</button>
-                <button className="mcweb-ui" onClick={() => setPage(0)}>⭮</button>
-                <button className="mcweb-ui" onClick={() => setPage(page + 1)}>⮞</button>
+                <Button disabled={page === 0} onClick={() => setPage(page - 1)}>⮜</Button>
+                <Button onClick={() => setPage(0)}>⭮</Button>
+                <Button onClick={() => setPage(page + 1)}>⮞</Button>
             </div>
 }
 
@@ -181,26 +183,25 @@ function SearchBar({search, hideIncompatible, setHideIncompatible}) {
     const searchBar = useRef(null);
 
     return  <div className="search">
-                <button className="mcweb-ui" style={{width: "32px", display: "inline-block", marginRight: "3px"}} onClick={() => {search(""); searchBar.current.value = ""}}>×</button>
-                <input
+                <Button style={{width: "32px", display: "inline-block", marginRight: "3px"}} onClick={() => {search(""); searchBar.current.value = ""}}>×</Button>
+                <Input
                     onChange={(e) => {searchText = e.currentTarget.value}}
                     placeholder="Search Mods"
-                    className="mcweb-ui"
                     type="text"
                     style={{display: "inline-block", flexGrow: "1", marginRight: "3px"}}
                     onKeyDown={(e) => { if (e.key === "Enter") search(searchText); }}
                     ref={searchBar}
                 />
-                <button className="mcweb-ui" style={{width: "32px", display: "inline-block", marginRight: "3px"}} onClick={() => search(searchText)}>
+                <Button style={{width: "32px", display: "inline-block", marginRight: "3px"}} onClick={() => search(searchText)}>
                     <span style={{fontSize: ".875em", marginRight: ".125em", position: "relative", top: "-.1em", left: "-.125em"}}>
                         🔍
                     </span>
-                </button>
-                <button className="mcweb-ui" style={{width: "32px", display: "inline-block", color: hideIncompatible ? "red" : "var(--font)"}} onClick={() => {setHideIncompatible(!hideIncompatible)}}>
+                </Button>
+                <Button style={{width: "32px", display: "inline-block", color: hideIncompatible ? "red" : "var(--font)"}} onClick={() => {setHideIncompatible(!hideIncompatible)}}>
                     <span style={{fontSize: ".875em", marginRight: "-.3em", position: "relative", top: "-.16em", left: "-.125em"}}>
                         ✗
                     </span>
-                </button>
+                </Button>
             </div>
 }
 

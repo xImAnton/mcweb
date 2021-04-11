@@ -1,0 +1,71 @@
+.serverinfo {
+    background-color: var(--main-bg-color);
+    color: white;
+    display: block;
+    padding: 16px;
+    white-space: pre-line;
+    transition: background-color 500ms;
+    position: relative;
+}
+
+.serverstatus {
+    display: block;
+    border: 1px solid white;
+    border-radius: 8px;
+    padding: 1px 4px;
+    font-size: inherit;
+    text-align: center;
+}
+
+.serverstatus.online {
+    background-color: #16ab25;
+}
+
+.serverstatus.online::before {
+    content: "Online";
+}
+
+.serverstatus.starting {
+    background-color: #dec223;
+}
+
+.serverstatus.starting::before {
+    content: "Starting";
+}
+
+.serverstatus.stopping {
+    background-color: #de9323;
+}
+
+.serverstatus.stopping::before {
+    content: "Stopping"
+}
+
+.serverstatus.offline {
+    background-color: #de2323;
+}
+
+.serverstatus.offline::before {
+    content: "Offline";
+}
+
+.serverstatus.unknown {
+    background-color: #de2323;
+}
+
+.serverstatus.unknown::before {
+    content: "No Information";
+}
+
+.start-add-wrapper button {
+    display: inline-block !important;
+    width: 49% !important;
+}
+
+.start-add-wrapper button:first-child {
+    margin-right: 2%;
+}
+
+.start-add-wrapper {
+    position: relative;
+}

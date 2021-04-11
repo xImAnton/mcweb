@@ -1,0 +1,11 @@
+.formtable tr td:not(:last-child) {
+    padding-right: 14px;
+}
+
+.formtable tr:last-child td {
+    position: relative;
+}
+
+.formtable tr:last-child td * {
+    width: 100%;
+}

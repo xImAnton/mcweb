@@ -1,0 +1,33 @@
+.copyfield {
+    display: inline-block;
+    background-color: var(--ui-background);
+    border: var(--ui-border);
+    width: 200px;
+    border-radius: 8px;
+    font-family: 'Inconsolata', monospace;
+    position: relative;
+    height: 18px;
+    cursor: text;
+}
+
+.copyfield button {
+    background-color: #171a1f;
+    border: none;
+    border-radius: 6px;
+    text-align: center;
+    border: var(--ui-border);
+    outline: none;
+    transition: background-color 50ms;
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    cursor: pointer;
+}
+
+.copyfield button:hover {
+    transform: translate(0, 1px);
+}
+
+.copyfield button:active {
+    background-color: #252931;
+}

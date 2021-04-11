@@ -1,0 +1,23 @@
+.wrapper {
+    color: white;
+    background-color: var(--main-bg-color);
+    width: 100%;
+    transition: background-color 500ms;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 2rem;
+    grid-area: header;
+}
+
+header {
+    padding: 0.7rem 0.9rem;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.image {
+    height: 36px;
+    width: auto;
+}

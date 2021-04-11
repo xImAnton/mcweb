@@ -1,0 +1,36 @@
+.text-right {
+    float: right;
+}
+
+.contentwrapper {
+    color: var(--font);
+    background-color: var(--bg);
+    overflow-y: auto;
+    transition: background-color 500ms;
+    grid-area: content;
+    position: relative;
+}
+
+.gridcontainer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    inset: 0;
+    display: grid;
+    grid-template-columns: 0.5fr 1.5fr;
+    grid-template-rows: 0.2fr 2.6fr 0.2fr;
+    gap: 0px 0px;
+    grid-template-areas:
+        "header header"
+        "sidebar content"
+        "footer footer";
+}
+
+.full {
+    grid-template-areas:
+        "header header"
+        "content content"
+        "footer footer";
+}
