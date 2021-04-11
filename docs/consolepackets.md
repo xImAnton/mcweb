@@ -9,23 +9,21 @@ Sent by the server when something on the minecraft server changed (e.g. onlineSt
     "packetType": "StateChangePacket",
     "update": {
         "server": {
-            "serverId": "123456",
             "onlineStatus": 2
         }
     }
 }
 ```
 
-## ServerConsoleMessagePacket
+## ConsoleMessagePacket
 
 Sent when a console message is put out by the minecraft server
 
 ```json
 {
-    "packetType": "ServerConsoleMessagePacket",
+    "packetType": "ConsoleMessagePacket",
     "data": {
         "message": "Message",
-        "serverId": "123456"
     }
 }
 ```
@@ -36,8 +34,7 @@ Sent when the client successfully connects to the ws endpoint
 
 ```json
 {
-    "packetType": "ConsoleConnectedPacket",
-    "data": {}
+    "packetType": "ConsoleConnectedPacket"
 }
 ```
 
@@ -69,16 +66,31 @@ sent when a server was created on another client
 }
 ```
 
-## AddonAddPacket
+## AddonUpdatePacket
 
-sent when an addon gets added to this server
+sent when an addon gets added or removed to this server
 
 ```json
 {
     "packetType": "AddonUpdatePacket",
-    "type": "add",
+    "type": "<add|remove>",
     "data": {
         "addon_": "data"
     }
 }
 ```
+
+## BulkConsoleMessagePacket
+
+Sent on WS Connect and has all previous console lines as payload
+
+```json
+{
+    "packetType": "BulkConsoleMessagePacket",
+    "data": {
+        "lines": ["lines", "to", "show"],
+        "reset": true
+    }
+}
+```
+

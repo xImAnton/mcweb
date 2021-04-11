@@ -6,16 +6,29 @@ represents a minecraft server
 
 ``````json
 {
-    "name": "myserver",                  -- Name of the Server (unique)        "^[a-z0-9\-_]{3,32}$"
-    "displayName": "My Server",          -- name to display in the interface   "^[a-zA-Z0-9_\- ]{3,15}$"
-    "allocatedRAM": 2,                   -- java -Xmx2G                        int
-    "dataDir": "/var/servers/myserver",  -- working dir of server              path
-    "jarFile": "server.jar",             -- jarfile to start                   "^.*\.jar$"
-    "onlineStatus": 2,                   -- 0 = Offline, 1 = Starting, 2 = Online, 3 = Stopping
-    "software": {
-    	"server": "paper",
-    	"version": "1.16.4"
-	}
+	"name": "myserver",                  -- Name of the Server (unique)        "^[a-z0-9\-_]*$"
+	"displayName": "My Server",          -- name to display in the interface   "^[a-zA-Z0-9_\- ]*$"
+	"allocatedRAM": 2,                   -- java -Xmx2G                        int
+	"dataDir": "/var/servers/myserver",  -- working dir of server              path
+	"jarFile": "server.jar",             -- jarfile to start                   "^.*\.jar$"
+	"onlineStatus": 2,                   -- 0 = Offline, 1 = Starting, 2 = Online, 3 = Stopping
+	"software": {
+		"server": "paper",
+		"majorVersion": "1.16.4",
+		"minorVersion": "443",
+		"minecraftVersion": "1.16.4"
+	},
+	"port": 25565,
+	"addons": [
+        {
+            "filePath": "/var/servers/myserver/mods/immersiveengineering.jar",
+            "name": "Immersive Engineering",
+            "id": 231951,
+            "fileId": 3141693,
+            "imageUrl": "https://media.forgecdn.net/avatars/thumbnails/20/135/256/256/635707329671959611.png"
+        }
+    ],
+	"javaVersion": "default"
 }
 ``````
 
@@ -27,7 +40,7 @@ represents a user that is able to login to the webinterface
 {
     "name": "xImAnton_",                    -- name of the user  (unique) "^[a-z0-9_-A-Z]{6,15}$"
     "email": "ximanton@example.com",        -- email for login and first password creation --> users cannot sign up by theirselfes (unique) "/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/"
-    "password": "...",                      -- password hash
+    "password": "...",                      -- argon2 password hash
     "salt": "...",                          -- random salt, 20 bytes
     "permissions": {
     	"global": [
@@ -62,7 +75,7 @@ represents a login session of a specific user
 ```json
 {
     "sid": "...",             -- 32 bit session id (unique)
-    "userId": "1"             -- owner of the session
+    "userId": 1,             -- owner of the session
     "expiration": 1615676934  -- expiration timestamp
 }
 ```
