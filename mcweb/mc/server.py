@@ -11,6 +11,13 @@ from ..mc.communication import ServerCommunication
 
 
 class MinecraftServer:
+    CHANGEABLE_FIELDS = {
+        "displayName": lambda x: Regexes.SERVER_DISPLAY_NAME.match(x),
+        "port": lambda x: isinstance(x, int) and 25000 < x < 30000,
+        "allocatedRAM": lambda x: isinstance(x, int) and x <= Config.MAX_RAM,
+        "javaVersion": lambda x: x in Config.JAVA["installations"].keys()
+    }
+
     """
     class for representing a single minecraft server
     """
@@ -53,9 +60,9 @@ class MinecraftServer:
         self.addons = record["addons"]
         self.java_version = record["javaVersion"]
 
-    async def update(self):
-        await StateChangePacket(**self.update_doc()).send(self.connections)
-        await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": self.update_doc()})
+    async def update(self, data):
+        await StateChangePacket(**data).send(self.connections)
+        await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": data})
 
     async def set_online_status(self, status) -> None:
         """
@@ -203,14 +210,6 @@ class MinecraftServer:
         for addon in self.addons:
             zipf.write(addon["filePath"], os.path.relpath(addon["filePath"], self.run_dir))
         zipf.close()
-
-    def update_doc(self):
-        return {
-            "allocatedRAM": self.ram,
-            "displayName": self.display_name,
-            "port": self.port,
-            "javaVersion": self.java_version
-        }
 
     def light_json(self):
         return {

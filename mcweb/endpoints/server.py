@@ -7,8 +7,7 @@ from websockets.exceptions import ConnectionClosed
 
 from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, \
     console_ws, catch_keyerrors
-from ..io.config import Config
-from ..io.regexes import Regexes
+from ..mc.server import MinecraftServer
 from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket, BulkConsoleMessagePacket
 from ..util import TempDir
 
@@ -123,31 +122,15 @@ async def restart(req, i):
 @requires_login()
 @server_endpoint()
 async def update_server(req, i):
+    out = {}
     for k, v in req.json.items():
-        if k == "displayName":
-            if not Regexes.SERVER_DISPLAY_NAME.match(v):
-                return json_res({"error": "Illegal Server Name", "description": f"the server name doesn't match the regex for server names", "status": 400, "regex": Regexes.SERVER_DISPLAY_NAME.pattern}, status=400)
-            req.ctx.server.display_name = v
-        elif k == "port":
-            if not isinstance(v, int):
-                return json_res({"error": "TypeError", "description": "port has to be int", "status": 400}, status=400)
-            if v < 25000 | v > 30000:
-                return json_res(
-                    {"error": "Invalid Port", "description": f"Port range is between 25000 and 30000", "status": 400}, status=400)
-            req.ctx.server.port = v
-        elif k == "allocatedRAM":
-            if not isinstance(v, int):
-                return json_res({"error": "TypeError", "description": "allocatedRAM has to be int", "status": 400}, status=400)
-            if v > Config.MAX_RAM:
-                return json_res({"error": "Too Much RAM", "description": "maximal ram is " + str(Config.MAX_RAM), "status": 400, "maxRam": Config.MAX_RAM}, status=400)
-            req.ctx.server.ram = v
-        elif k == "javaVersion":
-            if v not in Config.JAVA["installations"].keys():
-                return json_res({"error": "Invalid Java Version", "description": "there is no such java version: " + v, "status": 400}, status=400)
-            req.ctx.server.java_version = v
-        else:
-            return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {v}", "status": 400}, status=400)
-    await req.ctx.server.update()
+        if k not in MinecraftServer.CHANGEABLE_FIELDS.keys():
+            return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {k}", "status": 400}, status=400)
+        if not MinecraftServer.CHANGEABLE_FIELDS[k](v):
+            return json_res({"error": "ValueError", "description": f"the value you specified is not valid for {k}", "status": 400}, status=400)
+        out[k] = v
+    await req.ctx.server.update(out)
+    await req.ctx.server.refetch()
     return json_res({"success": "Updated Server", "update": {"server": req.ctx.server.json()}})
 
 
