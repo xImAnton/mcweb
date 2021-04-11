@@ -1,16 +1,17 @@
-from typing import Optional
-from .server import MinecraftServer
-import aiofiles
-from mcweb.io.config import Config
 import os
-from .versions.manager import VersionManager
-from ..util import json_res, download_and_save
-import pymongo.errors
 import sys
-from json import dumps as json_dumps
-from ..io.regexes import Regexes
+from typing import Optional
+
+import aiofiles
+import pymongo.errors
+
+from mcweb.io.config import Config
+from .server import MinecraftServer
 from .versions.base import VersionProvider
+from .versions.manager import VersionManager
+from ..io.regexes import Regexes
 from ..io.wspackets import ServerCreationPacket
+from ..util import json_res, download_and_save
 
 
 class ServerManager:

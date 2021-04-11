@@ -1,6 +1,7 @@
-from .responses import *
-from .exceptions import ApiError
 import requests as rq
+
+from .exceptions import ApiError
+from .responses import *
 
 
 def get_uuid(player_name):

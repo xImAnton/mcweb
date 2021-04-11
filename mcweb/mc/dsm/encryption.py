@@ -1,9 +1,10 @@
-from OpenSSL import crypto
 import hashlib
+
 from Crypto.Cipher import AES
+from OpenSSL import crypto
+from bitstring import BitStream
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
-from bitstring import BitStream
 
 
 def generate_keypair():

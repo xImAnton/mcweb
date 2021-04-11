@@ -1,16 +1,18 @@
+import os
+import time
+
+import aiohttp
+from argon2 import PasswordHasher
 from sanic import Sanic
-from .mc.servermanager import ServerManager
-from .endpoints.server import server_blueprint
+
+from mcweb.auth import User, Session
+from mcweb.util import json_res
 from .endpoints.auth import account_blueprint
 from .endpoints.misc import misc_blueprint
-from mcweb.auth import User, Session
-import time
-from mcweb.util import json_res
-import aiohttp
-import os
-from .io.mongo import MongoClient
-from argon2 import PasswordHasher
+from .endpoints.server import server_blueprint
 from .io.config import Config
+from .io.mongo import MongoClient
+from .mc.servermanager import ServerManager
 
 
 class MCWeb(Sanic):

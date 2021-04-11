@@ -1,6 +1,6 @@
+import asyncio
 import subprocess
 import threading
-import asyncio
 
 
 class ServerCommunication:

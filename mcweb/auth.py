@@ -1,9 +1,11 @@
 import secrets
 import time
 from typing import Optional
-from mcweb.io.config import Config
+
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+
+from mcweb.io.config import Config
 
 
 class User:

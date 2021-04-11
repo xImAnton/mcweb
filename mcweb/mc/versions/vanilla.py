@@ -1,6 +1,7 @@
 import aiohttp
-from ...io.config import Config
+
 from .base import VersionProvider
+from ...io.config import Config
 
 
 class SnapshotVersionProvider(VersionProvider):

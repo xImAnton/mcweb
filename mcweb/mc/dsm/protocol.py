@@ -1,6 +1,6 @@
+import uuid
 from io import BytesIO
 from struct import pack, unpack
-import uuid
 
 
 class PacketBuilder:

@@ -1,9 +1,11 @@
-from PIL import Image
-from .util import decode_base64_str, json_str_to_dict, long_uuid
-from .exceptions import DirectoryNotFoundError
-import shutil
 import os
+import shutil
+
 import requests as rq
+from PIL import Image
+
+from .exceptions import DirectoryNotFoundError
+from .util import decode_base64_str, json_str_to_dict
 
 
 class UUIDResponse:

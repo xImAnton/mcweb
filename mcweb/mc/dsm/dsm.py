@@ -1,8 +1,9 @@
-from .protocol import PacketBuilder, TextComponent
+import socket
 from json import dumps as json_dumps
+
 from .connection import ClientConnection
 from .encryption import generate_keypair
-import socket
+from .protocol import PacketBuilder, TextComponent
 
 
 class Messages:

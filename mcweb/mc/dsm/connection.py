@@ -1,10 +1,10 @@
-from .protocol import PacketBuilder, Packet, HandshakePacket, EncryptionResponsePacket, EncryptionRequestPacket
-from os import urandom
-from ..mojang import has_player_joined
-from time import sleep
-from json import dumps as json_dumps
 import uuid
+from json import dumps as json_dumps
+from os import urandom
+
 from .encryption import generate_login_hash, fit_to_secret_lenght, create_cipher, decode_token_and_secret
+from .protocol import PacketBuilder, Packet, HandshakePacket, EncryptionResponsePacket, EncryptionRequestPacket
+from ..mojang import has_player_joined
 
 
 class ClientConnection:

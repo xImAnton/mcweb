@@ -1,13 +1,13 @@
-from typing import Any, Dict
-from ..mc.communication import ServerCommunication
-from ..io.wsmanager import WebsocketConnectionManager
+import os
 import zipfile
 from time import strftime
-from ..io.regexes import Regexes
+from typing import Any, Dict
+
 from ..io.config import Config
-import os
+from ..io.regexes import Regexes
+from ..io.wsmanager import WebsocketConnectionManager
 from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket
-from ..util import TempDir
+from ..mc.communication import ServerCommunication
 
 
 class MinecraftServer:

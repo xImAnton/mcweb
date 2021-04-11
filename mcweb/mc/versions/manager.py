@@ -1,5 +1,5 @@
-from .paper import PaperVersionProvider
 from .forge import ForgeVersionProvider
+from .paper import PaperVersionProvider
 from .vanilla import SnapshotVersionProvider, VanillaVersionProvider
 
 

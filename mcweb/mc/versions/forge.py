@@ -1,8 +1,10 @@
-import aiohttp
-from ...io.config import Config
-from .base import VersionProvider
 import os
 import subprocess
+
+import aiohttp
+
+from .base import VersionProvider
+from ...io.config import Config
 from ...util import get_path, download_and_save
 
 

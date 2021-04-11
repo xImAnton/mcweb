@@ -1,5 +1,5 @@
-import json
 import base64 as b64
+import json
 
 
 def decode_base64_str(string):

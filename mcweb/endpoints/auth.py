@@ -1,9 +1,10 @@
-from sanic.blueprints import Blueprint
-from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
-from mcweb.auth import User
 import secrets
-from bson.objectid import ObjectId
 
+from bson.objectid import ObjectId
+from sanic.blueprints import Blueprint
+
+from mcweb.auth import User
+from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
 
 account_blueprint = Blueprint("account", url_prefix="account")
 
