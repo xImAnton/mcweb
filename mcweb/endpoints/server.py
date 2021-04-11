@@ -6,6 +6,7 @@ from time import strftime
 import asyncio
 from ..io.regexes import Regexes
 from ..io.config import Config
+from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket, BulkConsoleMessagePacket
 
 
 server_blueprint = Blueprint("server", url_prefix="server")
@@ -53,36 +54,16 @@ async def console_websocket(req, ws, i):
     websocket endpoints for console output and server state change
     """
     if not req.ctx.user:
-        await ws.send(json_dumps({
-            "packetType": "ConsoleInfoPacket",
-            "data": {
-                "message": "please login using POST to /account/login before using this"
-            }
-        }))
+        await ConsoleInfoPacket("please login using POST to /account/login before using this").send(ws)
         await ws.close()
         return
     await req.ctx.server.connections.connected(ws)
-    await ws.send(json_dumps({
-            "packetType": "ConsoleConnectedPacket",
-            "data": {
-            }
-        }))
-    await ws.send(json_dumps({
-        "packetType": "BulkConsoleMessagePacket",
-        "data": {
-            "lines": req.ctx.server.output,
-            "reset": True
-        }
-    }))
+    await ConsoleConnectedPacket().send(ws)
+    await BulkConsoleMessagePacket(req.ctx.server.output).send(ws)
     try:
         while True:
             await ws.recv()
-            await ws.send(json_dumps({
-                "packetType": "ConsoleInfoPacket",
-                "data": {
-                    "message": "Don't send messages via websocket, use http methods instead"
-                }
-            }))
+            await ConsoleInfoPacket("Don't send messages via websocket, use http endpoints instead").send(ws)
     except ConnectionClosed:
         await req.ctx.server.connections.disconnected(ws)
 

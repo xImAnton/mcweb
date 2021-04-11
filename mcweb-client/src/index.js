@@ -72,7 +72,7 @@ class App extends React.Component {
                 return x;
             })});
         } else
-        if (data.packetType === "ServerConsoleMessagePacket") {
+        if (data.packetType === "ConsoleMessagePacket") {
             // add message to console
             const consoleMessages = this.state.consoleLines.slice();
             consoleMessages.push(data.data.message);

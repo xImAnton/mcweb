@@ -10,6 +10,7 @@ import sys
 from json import dumps as json_dumps
 from ..io.regexes import Regexes
 from .versions.base import VersionProvider
+from ..io.wspackets import ServerCreationPacket
 
 
 class ServerManager:
@@ -140,12 +141,7 @@ class ServerManager:
             await self.mc.mongo["server"].delete_one({"_id": insert_result.inserted_id})
             return json_res({"error": "Error during Server Creation", "description": " ".join(e.args), "status": 500}, status=500)
 
-        await self.global_broadcast(json_dumps({
-            "packetType": "ServerCreationPacket",
-            "data": {
-                "server": s.json()
-            }
-        }))
+        await ServerCreationPacket(s).send(self)
 
         return json_res({"success": "Server successfully created", "add": {"server": s.json()}})
 
@@ -168,6 +164,9 @@ class ServerManager:
 #Wed Mar 10 14:26:14 CEST 2020
 eula=true
 """)
+
+    async def send(self, msg):
+        return await self.global_broadcast(msg)
 
     async def global_broadcast(self, msg):
         """

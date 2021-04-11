@@ -36,6 +36,9 @@ class WebsocketConnectionManager:
             except (ConnectionClosedOK, ConnectionClosedError):
                 await self.disconnected(ws)
 
+    async def send(self, msg):
+        return await self.broadcast(msg)
+
     async def disconnect_all(self):
         for conn in self.connections:
             await conn.close()

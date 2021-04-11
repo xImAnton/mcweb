@@ -6,6 +6,7 @@ from time import strftime
 from ..io.regexes import Regexes
 from ..io.config import Config
 import os
+from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket
 
 
 class MinecraftServer:
@@ -52,7 +53,7 @@ class MinecraftServer:
         self.java_version = record["javaVersion"]
 
     async def update(self):
-        await self.connections.broadcast(json_dumps({"packetType": "StateChangePacket", "update": {"server": self.update_doc()}}))
+        await StateChangePacket(**self.update_doc()).send(self.connections)
         await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": self.update_doc()})
 
     async def set_online_status(self, status) -> None:
@@ -65,7 +66,7 @@ class MinecraftServer:
         :param status: the server status to update
         """
         await self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": {"onlineStatus": status}})
-        await self.connections.broadcast(json_dumps({"packetType": "StateChangePacket", "update": {"server": {"onlineStatus": status}}}))
+        await StateChangePacket(onlineStatus=status).send(self.connections)
         self.status = status
 
     @property
@@ -89,13 +90,7 @@ class MinecraftServer:
         try:
             await self.communication.begin()
         except FileNotFoundError as e:
-            await self.connections.broadcast(json_dumps({
-                "packetType": "ServerConsoleMessagePacket",
-                "data": {
-                    "message": "FileNotFoundError: " + str(e),
-                    "serverId": str(self.id)
-                }
-            }))
+            await ConsoleMessagePacket("FileNotFoundError: " + str(e)).send(self.connections)
             await self.set_online_status(0)
 
     async def stop(self, force=False) -> None:
@@ -132,26 +127,14 @@ class MinecraftServer:
         if self.status == 1:
             if Regexes.DONE.match(line.strip()):
                 await self.set_online_status(2)
-        await self.connections.broadcast(json_dumps({
-            "packetType": "ServerConsoleMessagePacket",
-            "data": {
-                "message": line,
-                "serverId": str(self.id)
-            }
-        }))
+        await ConsoleMessagePacket(line).send(self.connections)
 
     async def send_command(self, cmd) -> None:
         """
         prints a command to the server stdin and flushes it
         :param cmd: the command to print
         """
-        await self.connections.broadcast(json_dumps({
-            "packetType": "ServerConsoleMessagePacket",
-            "data": {
-                "message": f"[{strftime('%H:%M:%S')} MCWEB CONSOLE COMMAND]: " + cmd,
-                "serverId": str(self.id)
-            }
-        }))
+        await ConsoleMessagePacket(f"[{strftime('%H:%M:%S')} MCWEB CONSOLE COMMAND]: {cmd}").send(self.connections)
         if cmd.startswith("stop"):
             await self.set_online_status(3)
         await self.communication.write_stdin(cmd)
@@ -185,11 +168,7 @@ class MinecraftServer:
         await self.remove_addon(addon_id)
         res = await (await self.get_version_provider()).add_addon(addon_id, addon_type, addon_version, self.run_dir)
         if res:
-            await self.connections.broadcast(json_dumps({
-                "packetType": "AddonUpdatePacket",
-                "type": "add",
-                "data": res
-            }))
+            await AddonUpdatePacket(AddonUpdatePacket.Mode.ADD, res).send(self.connections)
             await self.mc.mongo["server"].update_one({"_id": self.id}, {"$addToSet": {"addons": res}})
         return res
 
@@ -205,11 +184,7 @@ class MinecraftServer:
         for ad in self.addons:
             if ad["id"] != addon_id:
                 new_addon_list.append(ad)
-        await self.connections.broadcast(json_dumps({
-            "packetType": "AddonUpdatePacket",
-            "type": "remove",
-            "data": addon
-        }))
+        await AddonUpdatePacket(AddonUpdatePacket.Mode.REMOVE, addon).send(self.connections)
         self.mc.mongo["server"].update_one({"_id": self.id}, {"$set": {"addons": new_addon_list}})
         return True
 
