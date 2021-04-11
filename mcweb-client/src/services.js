@@ -172,6 +172,35 @@ export function setSessionId(sid) {
     sessionStorage.setItem("MCWeb_Session", sid);
 }
 
+export function downloadFile(url, defaultname) {
+    axios({
+        url: url,
+        method: 'GET',
+        responseType: 'blob', // important,
+        headers: { "Authorization": "Token " + getSessionId() }
+    }).then((response) => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        var filename = defaultname;
+        var disposition = response.headers["content-disposition"];
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            var matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) { 
+            filename = matches[1].replace(/['"]/g, '');
+            }
+        }
+        link.setAttribute('download', filename); //or any other extension
+        document.body.appendChild(link);
+        link.click();
+    });
+}
+
+export function downloadAddons(server) {
+    return downloadFile(getApiBase() + "/server/" + server + "/addons/download", "addons.zip");
+}
+
 export function usePrevious(state, def=undefined) {
     const ref = useRef(def);
     useEffect(() => {

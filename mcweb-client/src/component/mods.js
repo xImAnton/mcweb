@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { getAddons } from "../curse/curseapi";
 import LoadingAnimation from "./loading";
 import { TabArea, Tab } from "./ui";
-import { removeAddon, setTitle } from "../services";
+import { removeAddon, setTitle, downloadAddons } from "../services";
 
 
 function AddonRemoveDialog({data, close, removeAddon}) {
@@ -82,7 +82,7 @@ function ModView({currentServer}) {
     // 12: Texture Packs, 4471: Modpacks, 6: Mods, 17: Worlds
     return  <div id="page-content">
                 { loaded ? <>
-                    <h1 id="page-headline">Mods</h1>
+                    <h1 id="page-headline" style={{display: "inline"}}>Mods</h1><button style={{display: "inline", marginLeft: "6px"}} className="mcweb-ui" onClick={() => downloadAddons(currentServer.id)}>Download All</button>
                         <TabArea tab={tab}>
                             <Tab name="Installed Addons">
                                 <InstalledAddonsList

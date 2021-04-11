@@ -7,6 +7,9 @@ import aiofiles
 import aiohttp
 from bson.objectid import ObjectId
 from sanic.response import json, redirect
+import os
+import shutil
+from contextlib import asynccontextmanager
 
 from mcweb.auth import User
 
@@ -208,3 +211,24 @@ def catch_keyerrors():
                 return json_res({"error": "KeyError", "description": str(e)})
         return decorated_function
     return decorator
+
+
+class TmpDir:
+    def __init__(self, path):
+        self._path = path
+
+    @property
+    def path(self):
+        return self._path
+
+    def use_file(self, name):
+        return os.path.join(self.path, name)
+
+
+@asynccontextmanager
+async def TempDir(path="."):
+    d = TmpDir(os.path.join(path, "tmp"))
+    if not os.path.isdir(d.path):
+        os.mkdir(d.path)
+    yield d
+    shutil.rmtree(d.path)

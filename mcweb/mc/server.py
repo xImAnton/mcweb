@@ -1,12 +1,13 @@
 from typing import Any, Dict
 from ..mc.communication import ServerCommunication
 from ..io.wsmanager import WebsocketConnectionManager
-from json import dumps as json_dumps
+import zipfile
 from time import strftime
 from ..io.regexes import Regexes
 from ..io.config import Config
 import os
 from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket
+from ..util import TempDir
 
 
 class MinecraftServer:
@@ -196,6 +197,12 @@ class MinecraftServer:
 
     async def supports(self, addon_type):
         return Config.VERSIONS[self.software["server"]]["supports"][addon_type]
+
+    async def pack_addons(self, f):
+        zipf = zipfile.ZipFile(f, "w")
+        for addon in self.addons:
+            zipf.write(addon["filePath"], os.path.relpath(addon["filePath"], self.run_dir))
+        zipf.close()
 
     def update_doc(self):
         return {

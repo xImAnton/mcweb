@@ -1,12 +1,13 @@
 from sanic.blueprints import Blueprint
 from websockets.exceptions import ConnectionClosed
 from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, console_ws, catch_keyerrors
-from json import dumps as json_dumps
 from time import strftime
 import asyncio
 from ..io.regexes import Regexes
 from ..io.config import Config
 from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket, BulkConsoleMessagePacket
+from ..util import TempDir
+from sanic.response import file
 
 
 server_blueprint = Blueprint("server", url_prefix="server")
@@ -198,3 +199,14 @@ async def get_minor_versions(req, software, major_version):
     if not prov:
         return json_res({"error": "Invalid Software", "description": "there is no server software with that name: " + str(software), "status": 400}, status=400)
     return json_res(await prov.get_minor_versions(major_version))
+
+
+@server_blueprint.get("/<i:string>/addons/download")
+@requires_login()
+@server_endpoint()
+async def download_addons(req, i):
+    async with TempDir() as tmp:
+        name = f"addons-{req.ctx.server.name}.zip"
+        f = tmp.use_file(name)
+        await req.ctx.server.pack_addons(f)
+        return await file(f, filename=name)
