@@ -1,17 +1,6 @@
 .wrapper {
-    display: block;
     background-color: var(--sec-bg-color);
     transition: background-color 500ms;
     overflow: auto;
     grid-area: sidebar;
-}
-
-.contentwrapper {
-    position: relative;
-}
-
-.content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
 }
