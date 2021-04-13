@@ -3,7 +3,7 @@ import styles from "./form.module.css";
 
 function LastFormLine(props) {
     return <tr>
-        <td colSpan={2}>
+        <td colSpan={2} className={styles.value}>
             {props.children}
         </td>
     </tr>
@@ -12,8 +12,8 @@ function LastFormLine(props) {
 
 function FormLine({label, input}) {
     return  <tr>
-                <td>{label + ": "}</td>
-                <td>{input}</td>
+                <td className={styles.label}>{label + ": "}</td>
+                <td className={styles.value}>{input}</td>
             </tr>
 }
 

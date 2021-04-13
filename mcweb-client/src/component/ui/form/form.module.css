@@ -1,3 +1,14 @@
 .formtable {
     width: 100%;
+    table-layout: auto;
+}
+
+.label {
+    width: auto;
+    white-space: nowrap;
+    padding-right: 1em;
+}
+
+.value {
+    width: 100%;
 }
