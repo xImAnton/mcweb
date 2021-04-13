@@ -95,11 +95,11 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
     return  <div className={styles.serverinfo}>
                 <FormTable mergeLast={false}>
                     <FormLine label="Server" input={
-                        <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)}>
+                        <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)} style={{maxWidth: "12em"}}>
                             {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
                         </Select>
                     } />
-                    <FormLine label="IP" input={<CopyField text={ip + ":" + port} />} />
+                    <FormLine label="IP" input={<CopyField text={ip + ":" + port} style={{maxWidth: "10em"}} />} />
                     <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                     <tr>
                         <td colSpan={2}>

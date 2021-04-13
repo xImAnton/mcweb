@@ -3,4 +3,5 @@
     transition: background-color 500ms;
     overflow: auto;
     grid-area: sidebar;
+    position: relative;
 }
