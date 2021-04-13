@@ -19,8 +19,8 @@
     left: 0;
     inset: 0;
     display: grid;
-    grid-template-columns: 0.5fr 1.5fr;
-    grid-template-rows: 0.2fr 2.6fr 0.2fr;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr auto;
     gap: 0px 0px;
     grid-template-areas:
         "header header"
