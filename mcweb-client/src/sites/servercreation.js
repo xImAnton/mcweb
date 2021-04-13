@@ -7,7 +7,7 @@ import { FormTable, FormLine, LastFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
 import Button from "../component/ui/button/button";
 import Input from "../component/ui/input/text";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 /**
@@ -195,11 +195,10 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
         })
     };
 
-    return  <Site>
+    return  <Site name="Create a new Server">
                 {versionsLoaded ? <>
                     { !creating ? 
                         <>
-                            <HeadLine>Create a new Server</HeadLine>
                             <Alert text={alert} />
                             <FormTable mergeLast={true}>
                                 <FormLine label="Name" input={

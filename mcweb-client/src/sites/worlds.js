@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setTitle } from "../services";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 function WorldsView({currentServer}) {
@@ -9,8 +9,7 @@ function WorldsView({currentServer}) {
         setTitle("World Management");
     }, []);
 
-    return  <Site>
-                <HeadLine>World Management</HeadLine>
+    return  <Site name="World Management">
             </Site>
 }
 

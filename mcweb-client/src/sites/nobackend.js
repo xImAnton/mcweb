@@ -1,5 +1,7 @@
 import history from "../history";
 import Site, { HeadLine } from "./site";
+import Button from "../component/ui/button/button";
+import appstyles from "../index.module.css";
 
 
 /**
@@ -12,14 +14,11 @@ function NoBackend({refetch}) {
         refetch();
     }
 
-    return  <div id="content-wrapper" className="full">
-                <div className="page-full">
-                    <div id="page-content">
-                        <HeadLine>Server Error</HeadLine>
-                        The Server is not responding
-                        <button className="mcweb-ui" onClick={retry}>Retry</button>
-                    </div>
-                </div>
+    return  <div className={appstyles.contentwrapper}>
+                <Site name="Server Error">
+                    The Server is not responding
+                    <Button onClick={retry}>Retry</Button>
+                </Site>
             </div>
 }
 

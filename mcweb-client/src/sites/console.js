@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { sendCommand, setTitle } from "../services"
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 import Input from "../component/ui/input/text";
 import Button from "../component/ui/button/button";
 import styles from "./console.module.css";
+import uistyles from "../component/ui/ui.module.css";
 
 /**
  * Input field and button of console
@@ -28,14 +29,14 @@ function ConsoleInput(props) {
     }
 
     return <div className={styles.inputwrapper}>
-        <Input style={{display: "inline-block", flexGrow: "1", marginRight: "3px"}} 
+        <Input className={styles.input}
             ref={inputRef}
             type="text"
             onChange={e => setText(e.target.value)}
             placeholder="Enter Command"
             onKeyPress={(e) => {if (e.key === "Enter") submitCommand()}}
         />
-        <Button style={{display: "inline-block", width: "auto"}} onClick={submitCommand}>Send</Button>
+        <Button className={styles.sendbtn} onClick={submitCommand}>Send</Button>
     </div>
 }
 
@@ -55,10 +56,9 @@ function ConsoleView(props) {
         setTitle("Console");
     }, []);
 
-    return  <Site>
-                <HeadLine>Console</HeadLine>
+    return  <Site name="Console">
                 <div className={styles.wrapper}>
-                    <textarea className={styles.out} readOnly value={props.lines.length === 0 ? "Start your Server to see its Output":  props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />
+                    <textarea className={[uistyles.ui, styles.out].join(" ")} readOnly value={props.lines.length === 0 ? "Start your Server to see its Output" :  props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />
                     <ConsoleInput currentServer={props.currentServer} getSessionId={props.getSessionId} />
                 </div>
             </Site>

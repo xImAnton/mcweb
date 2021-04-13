@@ -42,7 +42,7 @@ function ServerStatus({status}) {
             break;
     }
 
-    return <div className={[styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
+    return <div className={[uistyles.ui, styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
 }
 
 function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers}) {
@@ -103,7 +103,7 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
                     <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                     <tr>
                         <td colSpan={2}>
-                            <div className={[styles["start-add-wrapper"], uistyles.ui].join(" ")} style={{"padding": "0"}}>
+                            <div className={styles["start-add-wrapper"]}>
                                 <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
                                 <AddServerButton setCreationCancellable={setCreationCancellable} />
                             </div>

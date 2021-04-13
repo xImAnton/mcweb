@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setTitle } from "../services";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 /**
@@ -12,8 +12,7 @@ function DSMView({currentServer}) {
         setTitle("Dynamic Server Management");
     }, []);
 
-    return  <Site>
-                <HeadLine>Dynamic Server Management</HeadLine>
+    return  <Site name="Dynamic Server Management">
             </Site>;
 }
 

@@ -4,7 +4,7 @@ import { getAddons } from "../curse/curseapi";
 import LoadingAnimation from "../component/loading/loading";
 import { TabArea, Tab } from "../component/ui/tab/tab";
 import { removeAddon, setTitle, downloadAddons } from "../services";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 function AddonRemoveDialog({data, close, removeAddon}) {
@@ -81,9 +81,9 @@ function ModView({currentServer}) {
     }, []);
 
     // 12: Texture Packs, 4471: Modpacks, 6: Mods, 17: Worlds
-    return  <Site>
+    return  <Site name="Mods">
                 { loaded ? <>
-                    <HeadLine style={{display: "inline"}}>Mods</HeadLine><button style={{display: "inline", marginLeft: "6px"}} className="mcweb-ui" onClick={() => downloadAddons(currentServer.id)}>Download All</button>
+                    <button style={{display: "inline", marginLeft: "6px"}} className="mcweb-ui" onClick={() => downloadAddons(currentServer.id)}>Download All</button>
                         <TabArea tab={tab}>
                             <Tab name="Installed Addons">
                                 <InstalledAddonsList

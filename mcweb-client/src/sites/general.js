@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setTitle } from "../services";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 function GeneralView({currentServer}) {
@@ -9,8 +9,7 @@ function GeneralView({currentServer}) {
         setTitle("General");
     }, []);
 
-    return  <Site>
-                <HeadLine>General</HeadLine>
+    return  <Site name="General">
             </Site>;
 }
 

@@ -2,12 +2,11 @@
     display: inline-block;
     background-color: var(--ui-background);
     border: var(--ui-border);
-    width: 200px;
     border-radius: 8px;
     font-family: 'Inconsolata', monospace;
     position: relative;
-    height: 18px;
     cursor: text;
+    font-size: 1.2em;
 }
 
 .copyfield button {

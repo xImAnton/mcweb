@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setTitle } from "../services";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 function UserView({currentServer}) {
@@ -9,8 +9,7 @@ function UserView({currentServer}) {
         setTitle("User Management");
     }, []);
 
-    return  <Site>
-                <HeadLine>User Management</HeadLine>
+    return  <Site name="User Management">
             </Site>;
 }
 

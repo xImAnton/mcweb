@@ -19,7 +19,7 @@ function FormLine({label, input}) {
 
 
 function FormTable(props) {
-    return  <table className={props.mergeLast ? styles.formtable : undefined}>
+    return  <table className={[styles.formtable, props.mergeLast ? styles.mergelast : undefined].join(" ")}>
                 <tbody>
                     {props.children}
                 </tbody>

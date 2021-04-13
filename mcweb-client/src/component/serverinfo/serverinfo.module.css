@@ -9,10 +9,8 @@
 }
 
 .serverstatus {
-    display: block;
     border: 1px solid white;
     border-radius: 8px;
-    padding: 1px 4px;
     font-size: inherit;
     text-align: center;
 }
@@ -57,15 +55,12 @@
     content: "No Information";
 }
 
-.start-add-wrapper button {
-    display: inline-block !important;
-    width: 49% !important;
-}
-
 .start-add-wrapper button:first-child {
     margin-right: 2%;
 }
 
 .start-add-wrapper {
-    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
 }

@@ -36,6 +36,8 @@ services:
       - mongo_user
       - config
       - pepper
+    ports:
+      - "25500-25600:25500-25600"
 volumes:
   mcweb-data:
     name: mcweb-data

@@ -3,7 +3,7 @@ import { patchServer, setTitle } from "../services";
 import LoadingAnimation from "../component/loading/loading";
 import { FormTable, FormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 import Input from "../component/ui/input/text";
 import Button from "../component/ui/button/button";
 
@@ -38,10 +38,9 @@ function SettingsView({currentServer, javaVersions, maxRam}) {
         patchServer(currentServer.id, out).finally(() => setLoadingText(""));
     }
 
-    return  <Site>
+    return  <Site name="Settings">
                 { !loadingText ? 
                     <>
-                        <HeadLine>Settings</HeadLine>
                         <FormTable mergeLast={true}>
                             <FormLine label="Name" input={<Input type="text" defaultValue={currentServer.displayName} onChange={(e) => setName(e.currentTarget.value)}/>} />
                             <FormLine label="Port" input={<Input type="number" min={25000} defaultValue={currentServer.port} max={30000} onChange={(e) => setPort(parseInt(e.currentTarget.value))} />} />

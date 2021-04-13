@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { setTitle } from "../services";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 
 
 function PlayerView({currentServer}) {
@@ -9,8 +9,7 @@ function PlayerView({currentServer}) {
         setTitle("Player");
     }, []);
 
-    return  <Site>
-                <HeadLine>Player</HeadLine>
+    return  <Site name="Player">
             </Site>;
 }
 
