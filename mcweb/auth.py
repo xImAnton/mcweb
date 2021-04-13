@@ -28,14 +28,17 @@ class User:
         """
         user = await self.db["user"].find_one({"name": name})
         if user:
-            self.id = user["_id"]
-            self.name = user["name"]
-            self.password = user["password"]
-            self.perms = user["permissions"]
-            self.salt = user["salt"].encode()
+            await self._populate(user)
             return self
         else:
             return None
+
+    async def _populate(self, user):
+        self.id = user["_id"]
+        self.name = user["name"]
+        self.password = user["password"]
+        self.perms = user["permissions"]
+        self.salt = user["salt"].encode()
 
     async def fetch_by_id(self, i):
         """
@@ -45,11 +48,7 @@ class User:
         """
         user = await self.db["user"].find_one({"_id": i})
         if user:
-            self.id = user["_id"]
-            self.name = user["name"]
-            self.password = user["password"]
-            self.perms = user["permissions"]
-            self.salt = user["salt"].encode()
+            await self._populate(user)
             return self
         else:
             return None
@@ -110,9 +109,11 @@ class User:
         ticket = await self.db["wsticket"].find_one({"ticket": ticket})
         if not ticket:
             return None
-        # TODO: return user object and not record
         user = await self.db["user"].find_one({"_id": ticket["userId"]})
-        return user
+        if user:
+            await self._populate(user)
+            return self
+        return None
 
     def __repr__(self):
         return f"User[name={self.name}]"
