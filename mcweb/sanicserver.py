@@ -36,7 +36,14 @@ class MCWeb(Sanic):
         self.blueprint(account_blueprint)
         self.blueprint(misc_blueprint)
         self.register_listener(self.after_server_start, "after_server_start")
+        self.register_listener(self.before_server_start, "before_server_start")
         self.register_middleware(self.set_session_middleware, "request")
+
+    async def before_server_start(self, app, loop):
+        async with aiohttp.ClientSession() as session:
+            async with session.get("https://api.ipify.org/") as resp:
+                self.public_ip = await resp.text()
+
 
     async def after_server_start(self, app, loop) -> None:
         """
@@ -44,9 +51,6 @@ class MCWeb(Sanic):
         """
         self.mongo = MongoClient(self, loop).db
         await self.server_manager.init()
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.ipify.org/") as resp:
-                self.public_ip = await resp.text()
 
     async def set_session_middleware(self, req) -> None:
         """
