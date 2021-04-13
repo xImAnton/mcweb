@@ -1,5 +1,5 @@
 import os
-import time
+import socket
 
 import aiohttp
 from argon2 import PasswordHasher
@@ -42,8 +42,12 @@ class MCWeb(Sanic):
     async def before_server_start(self, app, loop):
         async with aiohttp.ClientSession() as session:
             async with session.get("https://api.ipify.org/") as resp:
-                self.public_ip = await resp.text()
-
+                ip = await resp.text()
+                try:
+                    socket.inet_aton(ip)
+                    self.public_ip = ip
+                except socket.error:
+                    raise ValueError("ip address from api is not a valid ip")
 
     async def after_server_start(self, app, loop) -> None:
         """
@@ -60,7 +64,7 @@ class MCWeb(Sanic):
         if sid:
             session = Session(self.mongo)
             await session.fetch_by_sid(sid)
-            if session.expiration > time.time():
+            if not await session.is_expired():
                 await session.refresh()
                 user = User(self.mongo)
                 req.ctx.user = await user.fetch_by_sid(sid)

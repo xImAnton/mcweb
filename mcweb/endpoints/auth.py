@@ -1,10 +1,12 @@
 import secrets
+import time
 
 from bson.objectid import ObjectId
 from sanic.blueprints import Blueprint
 
 from mcweb.auth import User
 from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
+from mcweb.io.config import Config
 
 account_blueprint = Blueprint("account", url_prefix="account")
 
@@ -73,11 +75,20 @@ async def open_ticket(req):
         # save ObjectId string from request as ObjectId in mongo
         data["serverId"] = ObjectId(data["serverId"])
     rec = await req.app.mongo["wsticket"].find_one({"userId": user.id, "endpoint": {"type": type_, "data": data}})
-    if rec:
+    if rec and rec["expiration"] >= time.time():
         del rec["_id"]
         return json_res(rec)
-    ticket = secrets.token_urlsafe(24)
-    doc = {"ticket": ticket, "userId": user.id, "endpoint": {"type": type_, "data": data}}
+    elif rec:
+        await req.app.mongo["wsticket"].delete_one({"_id": rec["_id"]})
+    ticket = await get_new_ticket(req.app.mongo)
+    doc = {"ticket": ticket, "userId": user.id, "endpoint": {"type": type_, "data": data}, "expiration": int(time.time() + Config.SESSION_EXPIRATION)}
     await req.app.mongo["wsticket"].insert_one(doc)
     del doc["_id"]
     return json_res(doc)
+
+
+async def get_new_ticket(db):
+    ticket = secrets.token_urlsafe(24)
+    while await db["wsticket"].find_one({"ticket": ticket}):
+        ticket = secrets.token_urlsafe(24)
+    return ticket

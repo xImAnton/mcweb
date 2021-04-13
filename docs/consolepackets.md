@@ -94,3 +94,17 @@ Sent on WS Connect and has all previous console lines as payload
 }
 ```
 
+## PermissionErrorPacket
+
+Sent when something is requested via websocket and the user is not permitted to do that.  
+Currently only used for expired sessions.
+
+```json
+{
+    "packetType": "PermissionErrorPacket",
+    "data": {
+        "error": "short error type",
+        "description": "error description"
+    }
+}
+```

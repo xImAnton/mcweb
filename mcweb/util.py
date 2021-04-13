@@ -5,6 +5,7 @@ from functools import wraps
 from json import dumps as json_dumps, loads as json_loads
 from os.path import split as split_path
 from urllib.parse import urlparse
+import time
 
 import aiofiles
 import aiohttp
@@ -186,11 +187,14 @@ def console_ws():
             if not rec:
                 return json_res({"error": "Invalid Ticket", "status": 401,
                                  "description": "open a ticket using /account/ticket/<endpoint>"}, status=401)
+            if rec["expiration"] < time.time():
+                return json_res({"error": "Ticket expired", "status": 401, "description": "open a new ticket using /account/ticket/<endpoint>"}, status=401)
+            req.ctx.ticket = rec
             server = req.ctx.server
             endpoint = rec["endpoint"]
             if endpoint["type"] == "server.console" and endpoint["data"]["serverId"] != server.id:
                 return json_res({"error": "Invalid Ticket", "status": 401, "description": "the ticket you provided is not opened for this server"})
-            await req.app.mongo["server"].delete_one({"ticket": t})
+            await req.app.mongo["wsticket"].delete_one({"_id": rec["_id"]})
             response = await f(req, *args, **kwargs)
             return response
         return decorated_function

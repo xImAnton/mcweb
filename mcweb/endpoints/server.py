@@ -55,11 +55,11 @@ async def console_websocket(req, ws, i):
     """
     websocket endpoints for console output and server state change
     """
-    if not req.ctx.user:
+    if req.ctx.user is None:
         await ConsoleInfoPacket("please login using POST to /account/login before using this").send(ws)
         await ws.close()
         return
-    await req.ctx.server.connections.connected(ws)
+    await req.ctx.server.connections.connected(ws, req.ctx.ticket, req.ctx.user)
     await ConsoleConnectedPacket().send(ws)
     await BulkConsoleMessagePacket(req.ctx.server.output).send(ws)
     try:

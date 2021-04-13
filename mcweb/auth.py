@@ -76,12 +76,22 @@ class User:
         except VerifyMismatchError:
             return False
 
+    async def get_new_sid(self):
+        """
+        Method to make sure that the session id is unique
+        :return: a unique session id
+        """
+        sid = secrets.token_urlsafe(32)
+        while await self.db["session"].find_one({"sid": sid}):
+            sid = secrets.token_urlsafe(32)
+        return sid
+
     async def login(self) -> str:
         """
         creates a new session for the user
         :return: the new session id
         """
-        sess_id = secrets.token_urlsafe(32)
+        sess_id = await self.get_new_sid()
         expires = int(time.time() + Config.SESSION_EXPIRATION)
         await self.db["session"].insert_one({"sid": sess_id, "userId": self.id, "expiration": expires})
         return sess_id
@@ -118,6 +128,11 @@ class Session:
         self.user_id = 0
         self.expiration = 0
         self.id = None
+        self.fetched = False
+
+    async def refetch(self):
+        assert self.fetched
+        await self.fetch_by_sid(self.sid)
 
     async def fetch_by_sid(self, sid):
         """
@@ -127,6 +142,7 @@ class Session:
         """
         s = await self.db["session"].find_one({"sid": sid})
         if s:
+            self.fetched = True
             self.id = s["_id"]
             self.sid = s["sid"]
             self.user_id = s["userId"]
@@ -141,6 +157,9 @@ class Session:
         """
         user = User(self.db)
         return await user.fetch_by_sid(self.sid)
+
+    async def is_expired(self):
+        return self.expiration < time.time()
 
     async def refresh(self):
         await self.db["user"].update_one({"_id": self.sid}, {"$set": {"expiration": int(time.time() + Config.SESSION_EXPIRATION)}})

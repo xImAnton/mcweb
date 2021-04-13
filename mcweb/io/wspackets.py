@@ -74,3 +74,14 @@ class BulkConsoleMessagePacket(ServerWebSocketPacket):
             "lines": msgs,
             "reset": reset
         }
+
+
+class PermissionErrorPacket(ServerWebSocketPacket):
+    PACKET_TYPE = "PermissionErrorPacket"
+
+    def __init__(self, error, description):
+        super(PermissionErrorPacket, self).__init__()
+        self.json["data"] = {
+            "error": error,
+            "description": description
+        }
