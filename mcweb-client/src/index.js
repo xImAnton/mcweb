@@ -1,26 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Header from "./component/header/header";
-import GeneralView from "./sites/general";
-import Footer from "./component/footer/footer";
-import LoginView from "./sites/login";
-import { Route, Switch, Redirect, Router } from "react-router-dom";
-import PlayerView from "./sites/player";
-import ConsoleView from "./sites/console";
-import BackupsView from "./sites/backups";
-import SettingsView from "./sites/settings";
-import WorldsView from "./sites/worlds";
-import DSMView from "./sites/dynamicserver";
-import UserView from "./sites/user";
+import { Router } from "react-router-dom";
 import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser, fetchConfig } from "./services";
-import CreateServerView from "./sites/servercreation";
 import history from "./history";
-import NoBackend from "./sites/nobackend";
-import LoadingAnimation from "./component/loading/loading";
-import InfoBox from "./component/ui/infobox/infobox";
-import ModView from "./sites/mods";
-import ServerInfo from "./component/serverinfo/serverinfo";
-import NavBar from "./component/navbar/navbar";
+import AppContainer from "./appcontainer";
 
 import styles from "./index.module.css";
 import "./variables.css";
@@ -247,93 +230,29 @@ class App extends React.Component {
         const sid = this.getSessionId();
         return  <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
                     <div className={styles.gridcontainer}>
-                        <Switch history={history} >
-                            <Route path="/login">
-                                {/*Display LoginView when path is login*/}
-                                <LoginView setSessionId={(i) => this.setSessionId(i)} logout={() => this.logout()} />
-                            </Route>
-                            <Route path="/">
-                                <Header />
-                                <Switch history={history} >
-                                    <Route path="/apierror">
-                                        {/*display backend error*/}
-                                        <NoBackend refetch={() => this.refetch()} />
-                                    </Route>
-                                    {/*redirect to login when no session id present, down here bc apierror has higher priority*/}
-                                    {!sid && <Redirect to="/login" />}
-                                    <Route path="/createserver">
-                                        <div className={[styles.contentwrapper, styles.full].join(" ")}>
-                                            <CreateServerView cancellable={this.state.serverCreationCancellable}
-                                            changeServer={(i) => this.changeServer(i)}
-                                            addFirstServer={(s) => this.addFirstServer(s)}
-                                            maxRam={this.state.config.maxRam}
-                                            javaVersions={this.state.config.javaVersions}
-                                            />
-                                        </div>
-                                    </Route>
-                                    <Route path="/">
-                                        {/*display app when no fetches are missing*/}
-                                        <>{ this.state.missingFetches <= 0 && this.state.user ? (<>
-                                        <ServerInfo
-                                            servers={this.state.servers}
-                                            currentServer={this.state.currentServer}
-                                            changeServer={(i) => this.changeServer(i)}
-                                            sessionId={() => this.getSessionId()}
-                                            setConsoleLines={(a) => this.setState({consoleLines: a})}
-                                            setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
-                                            openInfoBox={(h, b) => this.openInfoBox(h, b)}
-                                            publicIP={this.state.config.publicIP}
-                                        />
-                                        <NavBar logout={() => this.logout()} username={this.state.user.username} currentServer={this.state.currentServer} />
-                                        <div className={styles.contentwrapper}>
-                                            <InfoBox close={(e) => this.setState({infoBox: "", infoBoxCaption: ""})} text={this.state.infoBox} head={this.state.infoBoxCaption} />
-                                            {this.state.currentServer && 
-                                                <Switch history={history} >
-                                                    <Route path="/general">
-                                                        <GeneralView currentServer={this.state.currentServer} />
-                                                    </Route>
-                                                    <Route path="/player">
-                                                        <PlayerView currentServer={this.state.currentServer} />
-                                                    </Route>
-                                                    <Route path="/console">
-                                                        <ConsoleView lines={this.state.consoleLines} currentServer={this.state.currentServer} getSessionId={() => this.getSessionId()} />
-                                                    </Route>
-                                                    <Route path="/backups">
-                                                        <BackupsView currentServer={this.state.currentServer} />
-                                                    </Route>
-                                                    <Route path="/settings">
-                                                        <SettingsView currentServer={this.state.currentServer} javaVersions={this.state.config.javaVersions} maxRam={this.state.config.maxRam} />
-                                                    </Route>
-                                                    { this.state.currentServer.supports.mods &&
-                                                        <Route path="/mods">
-                                                            <ModView currentServer={this.state.currentServer} />
-                                                        </Route>
-                                                    }
-                                                    <Route path="/worlds">
-                                                        <WorldsView currentServer={this.state.currentServer} />
-                                                    </Route>
-                                                    <Route path="/dsm">
-                                                        <DSMView currentServer={this.state.currentServer} />
-                                                    </Route>
-                                                    <Route path="/user">
-                                                        <UserView currentServer={this.state.currentServer} />
-                                                    </Route>
-                                                    <Route path="/">
-                                                        <Redirect to="/general" />
-                                                    </Route>
-                                                </Switch>
-                                            }
-                                        {/*display LoadingAnimation when fetches are missing*/}
-                                        </div></>) : (<LoadingAnimation loadingText="Loading Server Information" />)}</>
-                                    </Route>
-                                </Switch>
-                                <Footer toggleDarkMode={() => {
-                                    let darkmode = !this.state.darkmode;
-                                    this.setState({darkmode: darkmode});
-                                    localStorage.setItem("MCWeb_Darkmode", darkmode);
-                                }} darkmode={this.state.darkmode} />
-                            </Route>
-                        </Switch>
+                        <AppContainer
+                            sid={sid} 
+                            setSessionId={(i) => this.setSessionId(i)}
+                            logout={() => this.logout()}
+                            refetch={() => this.refetch()}
+                            config={this.state.config}
+                            serverCreationCancellable={this.state.serverCreationCancellable}
+                            changeServer={(i) => this.changeServer(i)}
+                            addFirstServer={(s) => this.addFirstServer(s)}
+                            missingFetches={this.state.missingFetches}
+                            user={this.state.user}
+                            currentServer={this.state.currentServer}
+                            servers={this.state.servers}
+                            setConsoleLines={(a) => this.setState({consoleLines: a})}
+                            setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
+                            openInfoBox={(h, b) => this.openInfoBox(h, b)}
+                            closeInfoBox={() => this.setState({infoBox: "", infoBoxCaption: ""})}
+                            infoText={this.state.infoBox}
+                            infoCaption={this.state.infoBoxCaption}
+                            consoleLines={this.state.consoleLines}
+                            darkmode={this.state.darkmode}
+                            setDarkMode={(v) => this.setState({darkmode: v})}
+                         />
                     </div>
                 </div>
     }

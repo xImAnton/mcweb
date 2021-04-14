@@ -27,6 +27,10 @@ function SearchBar({search, hideIncompatible, setHideIncompatible}) {
 
     const searchBar = useRef(null);
 
+    function toggleHideIncomcatible() {
+        setHideIncompatible(!hideIncompatible);
+    }
+
     return  <div className={styles.search}>
                 <Button style={{marginRight: "3px"}} onClick={() => {search(""); searchBar.current.value = ""}} noMargin>×</Button>
                 <Input
@@ -42,7 +46,7 @@ function SearchBar({search, hideIncompatible, setHideIncompatible}) {
                         🔍
                     </span>
                 </Button>
-                <Button style={{color: hideIncompatible ? "red" : "var(--font)"}} onClick={() => {setHideIncompatible(!hideIncompatible)}} noMargin>
+                <Button style={{color: hideIncompatible ? "red" : "var(--font)"}} onClick={toggleHideIncomcatible} noMargin>
                     <span style={{fontSize: ".875em", marginRight: "-.3em", position: "relative", top: "-.16em", left: "-.125em"}}>
                         ✗
                     </span>

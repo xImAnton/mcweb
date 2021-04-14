@@ -4,7 +4,7 @@
 }
 
 .tab {
-    padding: 12px 10px;
+    padding: .5em .4em;
     flex-grow: 1;
     text-align: center;
     user-select: none;
