@@ -9,7 +9,7 @@ import uistyles from "../component/ui/ui.module.css";
 /**
  * Input field and button of console
  */
-function ConsoleInput(props) {
+function ConsoleInput({currentServer, alert}) {
 
     const [text, setText] = useState("");
     // keep ref to input to clear value on submit
@@ -22,7 +22,11 @@ function ConsoleInput(props) {
             return
         }
         // send command
-        await sendCommand(props.currentServer.id, text)
+        await sendCommand(currentServer.id, text).catch((e) => {
+            if (e.response.status === 423) {
+                alert.info("Server is Offline");
+            }
+        })
         // clear input field
         inputRef.current.value = "";
         setText("");
@@ -56,7 +60,7 @@ function ConsoleOutput({lines}) {
 /**
  * Console Page of Webinterface
  */
-function ConsoleView(props) {
+function ConsoleView({lines, currentServer, getSessionId, alert}) {
 
     useEffect(() => {
         setTitle("Console");
@@ -64,8 +68,8 @@ function ConsoleView(props) {
 
     return  <Site name="Console">
                 <div className={styles.wrapper}>
-                    <ConsoleOutput lines={props.lines} />
-                    <ConsoleInput currentServer={props.currentServer} getSessionId={props.getSessionId} />
+                    <ConsoleOutput lines={lines} />
+                    <ConsoleInput currentServer={currentServer} getSessionId={getSessionId} alert={alert} />
                 </div>
             </Site>
 }

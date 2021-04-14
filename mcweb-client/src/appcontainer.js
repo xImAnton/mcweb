@@ -19,7 +19,7 @@ import LoginView from "./sites/login";
 import history from "./history";
 import styles from "./index.module.css";
 import { useMediaQuery } from "react-responsive";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useAlert } from 'react-alert';
 
 
@@ -115,7 +115,7 @@ export default function AppContainer({
                                                 <PlayerView currentServer={currentServer} />
                                             </Route>
                                             <Route path="/console">
-                                                <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} />
+                                                <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} alert={alert} />
                                             </Route>
                                             <Route path="/backups">
                                                 <BackupsView currentServer={currentServer} />
