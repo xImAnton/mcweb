@@ -10,7 +10,7 @@
     justify-content: space-between;
 }
 
-.copyfield button {
+.button {
     background-color: var(--ui-background);
     border: none;
     border-radius: 6px;
@@ -23,11 +23,11 @@
     margin-left: 6px;
 }
 
-.copyfield button:hover {
+.button:hover {
     transform: translate(0, 1px);
 }
 
-.copyfield button:active {
+.button:active {
     background-color: var(--ui-hover);
 }
 

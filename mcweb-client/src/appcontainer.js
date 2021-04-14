@@ -19,13 +19,8 @@ import LoginView from "./sites/login";
 import history from "./history";
 import styles from "./index.module.css";
 import { useMediaQuery } from "react-responsive";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAlert } from 'react-alert';
-
-
-function xor(a, b) {
-    return (a && !b) || (!a && b)
-}
 
 
 export default function AppContainer({
@@ -61,11 +56,17 @@ export default function AppContainer({
         classes.push(styles.navopen);
     }
 
+    function logoutAndAlert() {
+        logout().then(() => 
+            alert.success("Logged Out Successfully")
+        );
+    }
+
     return  <div className={classes.join(" ")}>
                 <Switch history={history} >
                     <Route path="/login">
                         {/*Display LoginView when path is login*/}
-                        <LoginView setSessionId={setSessionId} logout={logout} />
+                        <LoginView setSessionId={setSessionId} logout={logoutAndAlert} />
                     </Route>
                     <Route path="/">
                         <Header responsive={responsive} toggleNavbar={() => openNavbar(!navbarOpened)}/>
@@ -103,7 +104,7 @@ export default function AppContainer({
                                     closeNavbar={() => openNavbar(false)}
                                     responsive={responsive}
                                 />}
-                                { renderSidebar && <NavBar logout={logout} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)}/> }
+                                { renderSidebar && <NavBar logout={logoutAndAlert} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)}/> }
                                 { renderContent && <div className={styles.contentwrapper}>
                                     {currentServer && 
                                         <Switch history={history} >

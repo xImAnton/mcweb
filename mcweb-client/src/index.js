@@ -180,16 +180,19 @@ class App extends React.Component {
     }
 
     logout() {
-        // close socket when open
-        if (this.serverSocket !== null) {
-            this.serverSocket.close();
-        }
-        // logout in backend
-        logoutUser();
-        // clear session
-        sessionStorage.removeItem("MCWeb_Session");
-        // rerender
-        this.forceUpdate();
+        return new Promise(async (resolve, reject)  => {
+            // close socket when open
+            if (this.serverSocket !== null) {
+                this.serverSocket.close();
+            }
+            // logout in backend
+            await logoutUser();
+            // clear session
+            sessionStorage.removeItem("MCWeb_Session");
+            // rerender
+            this.forceUpdate();
+            resolve();
+        })
     }
 
     refetch() {
