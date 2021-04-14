@@ -3,6 +3,7 @@ aiohttp==3.7.4
 argon2-cffi==20.1.0
 asn1==2.4.1
 asn1tools==0.155.3
+async-generator==1.10
 async-timeout==3.0.1
 attrs==20.3.0
 Automat==20.2.0

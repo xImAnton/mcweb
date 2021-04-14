@@ -55,7 +55,7 @@
     "installations": {
       "default": {
         "displayName": "Java 8",
-        "path": "/usr/lib/jvm/java-1.8.0-openjdk/bin/java",
+        "path": "java",
         "additionalArguments": ""
       }
     }

@@ -100,6 +100,7 @@ class MinecraftServer:
         try:
             await self.communication.begin()
         except FileNotFoundError as e:
+            print("Couldn't find Start Command")
             await ConsoleMessagePacket("FileNotFoundError: " + str(e)).send(self.connections)
             await self.set_online_status(0)
 

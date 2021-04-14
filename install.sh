@@ -95,7 +95,7 @@ sudo docker build --tag mcweb-client mcweb-client
 echo "Building Database"
 sudo docker build --tag mcweb-mongo mcweb-mongo
 
-echo -e "Everything is set up! Run \"sudo docker-compose up\" to start MCWeb."
+echo -e "Everything is set up! Run \"sudo docker-compose up -d\" to start MCWeb."
 
 MCWEB_ROOT_PW_FIRST=""
 MCWEB_ROOT_PW_SEC=""

@@ -1,7 +1,11 @@
 import os
 import shutil
 import time
-from contextlib import asynccontextmanager
+import sys
+if sys.version_info.minor < 7:
+    from async_generator import asynccontextmanager
+else:
+    from contextlib import asynccontextmanager
 from functools import wraps
 from json import dumps as json_dumps, loads as json_loads
 from os.path import split as split_path
