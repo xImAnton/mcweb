@@ -36,8 +36,21 @@ function ConsoleInput(props) {
             placeholder="Enter Command"
             onKeyPress={(e) => {if (e.key === "Enter") submitCommand()}}
         />
-        <Button className={styles.sendbtn} onClick={submitCommand}>Send</Button>
+        <Button className={styles.sendbtn} onClick={submitCommand} noMargin>Send</Button>
     </div>
+}
+
+function ConsoleOutput({lines}) {
+
+    const textRef = useRef(null);
+
+    // scroll to bottom of textarea after render
+    useEffect(() => {
+        textRef.current.scrollTop = textRef.current.scrollHeight;
+    }, [lines]);
+
+    return <textarea className={[uistyles.ui, styles.out].join(" ")} readOnly value={lines.length === 0 ? "Start your Server to see its Output" : lines.map((l) => l.trim()).join("\n")} ref={textRef} />
+
 }
 
 /**
@@ -45,20 +58,13 @@ function ConsoleInput(props) {
  */
 function ConsoleView(props) {
 
-    const textRef = useRef(null);
-
-    // scroll to bottom of textarea after render
-    useEffect(() => {
-        textRef.current.scrollTop = textRef.current.scrollHeight;
-    })
-
     useEffect(() => {
         setTitle("Console");
     }, []);
 
     return  <Site name="Console">
                 <div className={styles.wrapper}>
-                    <textarea className={[uistyles.ui, styles.out].join(" ")} readOnly value={props.lines.length === 0 ? "Start your Server to see its Output" :  props.lines.map((l) => l.trim()).join("\n")} ref={textRef} />
+                    <ConsoleOutput lines={props.lines} />
                     <ConsoleInput currentServer={props.currentServer} getSessionId={props.getSessionId} />
                 </div>
             </Site>
