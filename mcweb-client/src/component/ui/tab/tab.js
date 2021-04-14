@@ -2,11 +2,15 @@ import React, { useEffect } from "react";
 import styles from "./tab.module.css";
 
 
-function Tab({name, children}) { }
+function Tab({}) { }
 
 
 function TabSelector({name, changeTab, selected}) {
-    return <div className={[styles.tab, selected | ""].join(" ")} onClick={() => changeTab(name)}>{name}</div>
+    let classes = [styles.tab];
+    if (selected) {
+        classes.push(styles.selected);
+    }
+    return <div className={classes.join(" ")} onClick={() => changeTab(name)}>{name}</div>
 }
 
 

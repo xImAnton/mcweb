@@ -1,21 +1,28 @@
-import { AddonSelector, AddonsListEntry } from "../curse/curse";
+import { AddonsListEntry } from "../curse/list";
+import { AddonSelector } from "../curse/selector";
 import { useState, useEffect } from "react";
 import { getAddons } from "../curse/curseapi";
 import LoadingAnimation from "../component/loading/loading";
 import { TabArea, Tab } from "../component/ui/tab/tab";
 import { removeAddon, setTitle, downloadAddons } from "../services";
 import Site from "./site";
+import styles from "./mods.module.css";
+import Button from "../component/ui/button/button";
+import installstyles from "../curse/install.module.css";
+import { FormTable, DistributedFormLine } from "../component/ui/form/form";
 
 
 function AddonRemoveDialog({data, close, removeAddon}) {
-    return  <div className="addon-popup-wrapper" id="addon-popup-wrapper">
-                <div className="addon-popup">
+    return  <div className={installstyles.popupwrap}>
+                <div className={installstyles.popup}>
                     <h1>{data.name}</h1>
                     <span>{data.summary}</span>
-                    <div style={{display: "flex", marginTop: "6px"}}>
-                        <button className="mcweb-ui" style={{marginRight: "6px", flexGrow: 1}} onClick={() => removeAddon(data)}>Remove Addon</button>
-                        <button className="mcweb-ui" onClick={close} style={{flexGrow: 1}}>Cancel</button>
-                    </div>
+                    <FormTable>
+                        <DistributedFormLine>
+                            <Button onClick={close}>Cancel</Button>
+                            <Button onClick={() => removeAddon(data)}>Remove Addon</Button>
+                        </DistributedFormLine>
+                    </FormTable>
                 </div>
             </div>
 }
@@ -47,14 +54,10 @@ function InstalledAddonsList({addons, currentServer, setLoaded, setLoadingText})
         })
     }
 
-    return  <div className="installed-addons-wrapper">
-                <div className={"addon-list"}>
-                    <div className={"inner"}>
-                        {data}
-                    </div>
-                    { toRemove && <AddonRemoveDialog data={toRemove} close={() => setToRemove(null)} removeAddon={removeAddon_} />}
-                </div>
-            </div>
+    return  <>
+                {data}
+                { toRemove && <AddonRemoveDialog data={toRemove} close={() => setToRemove(null)} removeAddon={removeAddon_} />}
+            </>
 }
 
 
@@ -82,33 +85,36 @@ function ModView({currentServer}) {
 
     // 12: Texture Packs, 4471: Modpacks, 6: Mods, 17: Worlds
     return  <Site name="Mods">
-                { loaded ? <>
-                    <button style={{display: "inline", marginLeft: "6px"}} className="mcweb-ui" onClick={() => downloadAddons(currentServer.id)}>Download All</button>
-                        <TabArea tab={tab}>
-                            <Tab name="Installed Addons">
-                                <InstalledAddonsList
-                                    addons={currentServer.addons}
-                                    currentServer={currentServer}
-                                    setLoaded={setLoaded}
-                                    setLoadingText={setLoadingText}
-                                />
-                            </Tab>
-                            <Tab name="Add Addons">
-                                <AddonSelector
-                                    sectionId={6}
-                                    currentServer={currentServer}
-                                    page={page} setPage={setPage}
-                                    setAddons={setAddons}
-                                    addons={addons}
-                                    searchText={searchText}
-                                    setSearch={setSearch}
-                                    setLoaded={setLoaded}
-                                    setLoadingText={setLoadingText}
-                                />
-                            </Tab>
-                        </TabArea>
-                    </>
-                : <LoadingAnimation loadingText={loadingText} /> }
+                <div className={styles.wrapper}>
+                    { loaded ? 
+                        <>
+                            <Button onClick={() => downloadAddons(currentServer.id)}>Download All</Button>
+                            <TabArea tab={tab}>
+                                <Tab name="Installed Addons">
+                                    <InstalledAddonsList
+                                        addons={currentServer.addons}
+                                        currentServer={currentServer}
+                                        setLoaded={setLoaded}
+                                        setLoadingText={setLoadingText}
+                                    />
+                                </Tab>
+                                <Tab name="Add Addons">
+                                    <AddonSelector
+                                        sectionId={6}
+                                        currentServer={currentServer}
+                                        page={page} setPage={setPage}
+                                        setAddons={setAddons}
+                                        addons={addons}
+                                        searchText={searchText}
+                                        setSearch={setSearch}
+                                        setLoaded={setLoaded}
+                                        setLoadingText={setLoadingText}
+                                    />
+                                </Tab>
+                            </TabArea>
+                        </>
+                    : <LoadingAnimation loadingText={loadingText} /> }
+                </div>
             </Site>;
 }
 

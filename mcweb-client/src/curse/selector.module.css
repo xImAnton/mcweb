@@ -1,0 +1,46 @@
+.selector {
+    display: flex;
+    flex-direction: column;
+    color: white;
+    background-color: #0d1625;
+    height: 100%;
+}
+
+.head {
+    padding: 12px 16px;
+    font-weight: 700;
+    font-size: 20px;
+    -webkit-box-shadow: 0px 7px 25px -11px #000000;
+    -moz-box-shadow: 0px 7px 25px -11px #000000;
+    box-shadow: 0px 7px 25px -11px #000000;
+    z-index: 1;
+}
+
+.search {
+    display: flex;
+}
+
+.footer {
+    padding: 5px 6px;
+    -webkit-box-shadow: 0px -7px 25px -11px #000000;
+    -moz-box-shadow: 0px -7px 25px -11px #000000;
+    box-shadow: 0px -7px 25px -11px #000000;
+    z-index: 1;
+}
+
+.paginator {
+    display: flex;
+    justify-content: space-between;
+}
+
+.paginator button {
+    width: 1em;
+}
+
+.search button {
+    width: 1em;
+}
+
+.search > *:not(:last-child) {
+    margin-right: .2rem;
+}

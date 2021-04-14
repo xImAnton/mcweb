@@ -1,4 +1,5 @@
 .tabs {
+    margin-top: .4em;
     display: flex;
 }
 
@@ -20,7 +21,6 @@
 }
 
 .tab.selected {
-    /*box-shadow: 4px 0px 7px 0px black;*/
     border: 1px solid var(--font);
     border-bottom: none;
 }
@@ -30,12 +30,7 @@
 }
 
 .wrapper {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    top: 72px;
-    left: 0;
-    z-index: 5;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
