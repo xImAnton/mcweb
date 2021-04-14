@@ -22,3 +22,10 @@
     color: blue;
     font-weight: 500;
 }
+
+.wrapper {
+    grid-area: navbar;
+    position: relative;
+    background-color: var(--sec-bg-color);
+    transition: background-color 500ms;
+}

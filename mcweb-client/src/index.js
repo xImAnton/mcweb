@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Header from "./component/header/header";
-import Sidebar from "./component/sidebar/sidebar";
 import GeneralView from "./sites/general";
 import Footer from "./component/footer/footer";
 import LoginView from "./sites/login";
@@ -20,6 +19,8 @@ import NoBackend from "./sites/nobackend";
 import LoadingAnimation from "./component/loading/loading";
 import InfoBox from "./component/ui/infobox/infobox";
 import ModView from "./sites/mods";
+import ServerInfo from "./component/serverinfo/serverinfo";
+import NavBar from "./component/navbar/navbar";
 
 import styles from "./index.module.css";
 import "./variables.css";
@@ -273,9 +274,7 @@ class App extends React.Component {
                                     <Route path="/">
                                         {/*display app when no fetches are missing*/}
                                         <>{ this.state.missingFetches <= 0 && this.state.user ? (<>
-                                        <Sidebar
-                                            logout={() => this.logout()}
-                                            username={this.state.user.username}
+                                        <ServerInfo
                                             servers={this.state.servers}
                                             currentServer={this.state.currentServer}
                                             changeServer={(i) => this.changeServer(i)}
@@ -285,6 +284,7 @@ class App extends React.Component {
                                             openInfoBox={(h, b) => this.openInfoBox(h, b)}
                                             publicIP={this.state.config.publicIP}
                                         />
+                                        <NavBar logout={() => this.logout()} username={this.state.user.username} currentServer={this.state.currentServer} />
                                         <div className={styles.contentwrapper}>
                                             <InfoBox close={(e) => this.setState({infoBox: "", infoBoxCaption: ""})} text={this.state.infoBox} head={this.state.infoBoxCaption} />
                                             {this.state.currentServer && 

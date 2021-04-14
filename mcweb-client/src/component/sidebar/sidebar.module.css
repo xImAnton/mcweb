@@ -1,7 +1,0 @@
-.wrapper {
-    background-color: var(--sec-bg-color);
-    transition: background-color 500ms;
-    overflow: auto;
-    grid-area: sidebar;
-    position: relative;
-}

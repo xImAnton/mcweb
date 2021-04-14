@@ -12,8 +12,8 @@ function NavbarEntry(props) {
 
 
 function Navbar(props) {
-    if (!props.currentServer.full) return <></>;
-    return  <div id="navbar-wrapper">
+    if (!props.currentServer.full) return <></>
+    return  <div className={styles.wrapper}>
                 <ul className={styles.options}>
                     <NavbarEntry name="General" href="general" index={1}/>
                     <NavbarEntry name="Player" href="player" index={2}/>

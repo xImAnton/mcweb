@@ -1,3 +1,8 @@
+.container {
+    grid-area: serverinfo;
+    position: relative;
+}
+
 .serverinfo {
     background-color: var(--main-bg-color);
     color: white;

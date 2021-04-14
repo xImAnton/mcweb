@@ -90,21 +90,23 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
         port = currentServer.port;
     }
 
-    return  <div className={styles.serverinfo}>
-                <FormTable mergeLast={false}>
-                    <FormLine label="Server" input={
-                        <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)} style={{maxWidth: "12em"}}>
-                            {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
-                        </Select>
-                    } />
-                    <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={{maxWidth: "10em"}} />} />
-                    <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
-                    <DistributedFormLine>
-                        <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
-                        <AddServerButton setCreationCancellable={setCreationCancellable} />
-                    </DistributedFormLine>
-                </FormTable>
-            </div>;
+    return  <div className={styles.container}>
+                <div className={styles.serverinfo}>
+                    <FormTable mergeLast={false}>
+                        <FormLine label="Server" input={
+                            <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)} style={{maxWidth: "12em"}}>
+                                {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
+                            </Select>
+                        } />
+                        <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={{maxWidth: "10em"}} />} />
+                        <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
+                        <DistributedFormLine>
+                            <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
+                            <AddServerButton setCreationCancellable={setCreationCancellable} />
+                        </DistributedFormLine>
+                    </FormTable>
+                </div>
+            </div>
 }
 
 export default ServerInfo;
