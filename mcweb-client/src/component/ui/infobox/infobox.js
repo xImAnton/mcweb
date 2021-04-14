@@ -1,15 +1,16 @@
 import { useState } from "react";
 import styles from "./infobox.module.css";
+import Button from "../button/button";
 
 
-export default function InfoBox({infobox}) {
-    return <>{ infobox.text && <div className={styles.wrapper}>
+export default function InfoBox({text, head, close}) {
+    return <>{ text && <div className={styles.wrapper}>
         <div className={styles.contentwrapper}>
             <div className={styles.infobox}>
-                <h1>{infobox.caption}</h1>
+                <h1>{head}</h1>
                 <div className={styles.inputform}>
-                    {infobox.text}
-                    <button onClick={infobox.close}>Close</button>
+                    {text}
+                    <Button style={{marginTop: ".7em"}} onClick={close}>Close</Button>
                 </div>
             </div>
         </div>
