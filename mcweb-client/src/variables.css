@@ -8,6 +8,7 @@
     --ui-hover: #1d2127;
     --ui-disabled: #41404a;
     --ui-border: 1px solid black;
+    --bright-hover: #253042;
 }
 
 #app.brightmode {
@@ -20,4 +21,5 @@
     --ui-hover: #acb5c0;
     --ui-disabled: #41404a;
     --ui-border: 1px solid black;
+    --bright-hover: rgb(209, 209, 209);
 }

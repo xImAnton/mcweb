@@ -11,7 +11,7 @@
 }
 
 .copyfield button {
-    background-color: #171a1f;
+    background-color: var(--ui-background);
     border: none;
     border-radius: 6px;
     text-align: center;
@@ -28,7 +28,7 @@
 }
 
 .copyfield button:active {
-    background-color: #252931;
+    background-color: var(--ui-hover);
 }
 
 .text {
