@@ -46,7 +46,7 @@ function ServerStatus({status}) {
     return <div className={[uistyles.ui, styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
 }
 
-function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers, publicIP, closeNavbar, responsive}) {
+function ServerInfo({changeServer, currentServer, setConsoleLines, alert, setCreationCancellable, servers, publicIP, closeNavbar, responsive}) {
 
     function toggleCurrentServer() {
         // start/ stop current server
@@ -55,7 +55,7 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
             setConsoleLines([]);
             startServer(currentServer.id).catch((e) => {
                 if (e.response.data.error === "Port Unavailable") {
-                    openInfoBox("Port Unavailable", "There is already a server running on that port!")
+                    alert.error("Port Unavailable");
                 }
             });
         // when server online or starting, stop it
@@ -106,7 +106,7 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
                                 {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
                             </Select>
                         } />
-                        <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={ipstyle} />} />
+                        <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={ipstyle} onCopy={() => alert.success("Copied Server IP")}/>} />
                         <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                         <DistributedFormLine>
                             <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>

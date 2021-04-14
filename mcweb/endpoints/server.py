@@ -125,9 +125,9 @@ async def update_server(req, i):
     out = {}
     for k, v in req.json.items():
         if k not in MinecraftServer.CHANGEABLE_FIELDS.keys():
-            return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {k}", "status": 400}, status=400)
+            return json_res({"error": "Invalid Key", "description": f"Server has no editable attribute: {k}", "status": 400, "key": k}, status=400)
         if not MinecraftServer.CHANGEABLE_FIELDS[k](v):
-            return json_res({"error": "ValueError", "description": f"the value you specified is not valid for {k}", "status": 400}, status=400)
+            return json_res({"error": "ValueError", "description": f"the value you specified is not valid for {k}", "status": 400, "key": k}, status=400)
         out[k] = v
     await req.ctx.server.update(out)
     await req.ctx.server.refetch()

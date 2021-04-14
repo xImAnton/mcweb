@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { fetchSoftwaresAndTheirMajors, fetchMinorVersions, putServer, useRestrictedState, capitalize, setTitle } from "../services";
 import history from "../history";
 import LoadingAnimation from "../component/loading/loading";
-import { Alert } from "../component/ui/alert/alert";
 import { FormTable, FormLine, DistributedFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
 import Button from "../component/ui/button/button";
@@ -34,8 +33,7 @@ function CreateServerButton(props) {
 /**
  * Component for creating new servers
  */
-function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, javaVersions}) {
-    const [alert, setAlert] = useState(""); // alert to display on error, not rendered when empty
+function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, javaVersions, alert}) {
     const [versions, setVersions] = useState({}); // all possible versions for current server
     const [currentSoftware, setCurrentSoftware] = useState(""); // current software name
     const [currentMinor, setCurrentMinor] = useState(""); // current minor software version
@@ -116,16 +114,16 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     async function createServer() {
         // check if server name is specified
         if (!currentName) {
-            setAlert("Please enter a name for the new server!");
+            alert.info("Please enter a name for the new server!");
             return false;
         }
         // check if ram is set
         if (!currentRam) {
-            setAlert("Please specify how much ram the server should have!");
+            alert.info("Please specify how much ram the server should have!");
             return false;
         }
         if (!currentPort) {
-            setAlert("Please specify the server port!")
+            alert.info("Please specify the server port!")
             return false;
         }
         var status = false; // 0 or false when error, server id when server created successfully
@@ -170,7 +168,7 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
             }
             // cancel loading animation, display alert
             setCreating(false);
-            setAlert(alert);
+            alert.error(alert);
         });
         return status;
     }
@@ -199,7 +197,6 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
                 {versionsLoaded ? <>
                     { !creating ? 
                         <>
-                            <Alert text={alert} />
                             <FormTable mergeLast={true}>
                                 <FormLine label="Name" input={
                                     <Input type="text" onChange={e => setCurrentName(e.target.value)} value={currentName}

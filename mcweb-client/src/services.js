@@ -227,6 +227,10 @@ export function capitalize(string) {
     return string.split(" ").map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(" ");
 }
 
+export function splitCamelCase(string) {
+    return string.replace(/([a-z])([A-Z])/g, '$1 $2');
+}
+
 export function setTitle(section) {
     document.title = section + " | MCWeb Client"
 }

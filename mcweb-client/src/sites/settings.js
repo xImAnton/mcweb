@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { patchServer, setTitle } from "../services";
+import { patchServer, setTitle, splitCamelCase, capitalize } from "../services";
 import LoadingAnimation from "../component/loading/loading";
 import { FormTable, FormLine, MergedFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
@@ -8,7 +8,7 @@ import Input from "../component/ui/input/text";
 import Button from "../component/ui/button/button";
 
 
-function SettingsView({currentServer, javaVersions, maxRam}) {
+function SettingsView({currentServer, javaVersions, maxRam, alert}) {
 
     const [currentName, setName] = useState("");
     const [currentPort, setPort] = useState(25565);
@@ -20,11 +20,15 @@ function SettingsView({currentServer, javaVersions, maxRam}) {
         setTitle("Settings");
     }, []);
 
-    useEffect(() => {
+    function update(currentServer) {
         setName(currentServer.displayName);
         setPort(currentServer.port);
         setRam(currentServer.allocatedRAM);
         setCurrentJavaVersion(currentServer.javaVersion);
+    }
+
+    useEffect(() => {
+        update(currentServer);
     }, [currentServer]);
 
     function submit() {
@@ -35,7 +39,15 @@ function SettingsView({currentServer, javaVersions, maxRam}) {
             allocatedRAM: currentRam,
             javaVersion: currentJavaVersion
         }
-        patchServer(currentServer.id, out).finally(() => setLoadingText(""));
+        patchServer(currentServer.id, out).finally(() => setLoadingText("")).then(() => {
+            alert.success("Updated Server Settings");
+        }).catch((e) => {
+            if (e.response.status === 400) {
+                alert.error("Invalid " + capitalize(splitCamelCase(e.response.data.key)));
+            }
+            // reset states on error
+            update(currentServer);
+        });
     }
 
     return  <Site name="Settings">

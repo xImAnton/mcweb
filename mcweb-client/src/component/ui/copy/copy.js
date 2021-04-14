@@ -5,10 +5,10 @@ import uistyles from "../ui.module.css";
 /**
  * Displays a value and gives the oppotunity to copy it
  */
-export default function CopyField({text, style}) {
+export default function CopyField({text, style, onCopy}) {
     return <div className={[uistyles.ui, styles.copyfield].join(" ")} style={style}>
         <div className={styles.text}>{text}</div>
-        <Clipboard data-clipboard-text={text}>
+        <Clipboard data-clipboard-text={text} onSuccess={onCopy} button-title="Copy IP">
             📋
         </Clipboard>
     </div>;
