@@ -1,5 +1,5 @@
 import history from "../history";
-import Site, { HeadLine } from "./site";
+import Site from "./site";
 import Button from "../component/ui/button/button";
 import appstyles from "../index.module.css";
 import { useEffect } from "react";
@@ -14,6 +14,11 @@ function NoBackend({refetch}) {
         history.push("/");
         refetch();
     }
+
+    useEffect(() => {
+        window.addEventListener("focus", retry);
+        return () => window.removeEventListener("focus", retry);
+    }, [])
 
     return  <div className={appstyles.contentwrapper}>
                 <Site name="Server Error">
