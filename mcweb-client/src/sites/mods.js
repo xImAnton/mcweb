@@ -9,6 +9,7 @@ import Site from "./site";
 import styles from "./mods.module.css";
 import Button from "../component/ui/button/button";
 import installstyles from "../curse/install.module.css";
+import liststyles from "../curse/list.module.css";
 import { FormTable, DistributedFormLine } from "../component/ui/form/form";
 
 
@@ -54,10 +55,17 @@ function InstalledAddonsList({addons, currentServer, setLoaded, setLoadingText})
         })
     }
 
-    return  <>
-                {data}
+    let classes = [liststyles.inner];
+    if (toRemove) {
+        classes.push(liststyles.unscrollable);
+    }
+
+    return  <div className={liststyles.list} style={{height: "100%"}}>
                 { toRemove && <AddonRemoveDialog data={toRemove} close={() => setToRemove(null)} removeAddon={removeAddon_} />}
-            </>
+                <div className={classes.join(" ")}>
+                    {data}
+                </div>
+            </div>
 }
 
 

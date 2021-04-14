@@ -14,7 +14,7 @@ function AddonsList({currentServer, addons, setLoadingText, setLoaded, hideIncom
         if (listDiv.current) {
             listDiv.current.scrollTop = 0;
         }
-    }, [addons])
+    }, [addons]);
 
     function installAddon(addonId, fileId, addonName) {
         setLoadingText("Installing " + addonName);
