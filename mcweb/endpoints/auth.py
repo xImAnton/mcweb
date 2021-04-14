@@ -5,8 +5,8 @@ from bson.objectid import ObjectId
 from sanic.blueprints import Blueprint
 
 from mcweb.auth import User
-from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
 from mcweb.io.config import Config
+from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
 
 account_blueprint = Blueprint("account", url_prefix="account")
 

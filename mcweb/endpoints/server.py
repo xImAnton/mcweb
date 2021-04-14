@@ -7,8 +7,8 @@ from websockets.exceptions import ConnectionClosed
 
 from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, \
     console_ws, catch_keyerrors
-from ..mc.server import MinecraftServer
 from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket, BulkConsoleMessagePacket
+from ..mc.server import MinecraftServer
 from ..util import TempDir
 
 server_blueprint = Blueprint("server", url_prefix="server")

@@ -1,6 +1,8 @@
-from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
-from ..io.wspackets import PermissionErrorPacket
 import time
+
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
+
+from ..io.wspackets import PermissionErrorPacket
 
 
 class WebsocketConnectionManager:

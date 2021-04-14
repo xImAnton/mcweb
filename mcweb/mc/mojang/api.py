@@ -1,5 +1,3 @@
-import requests as rq
-
 from .exceptions import ApiError
 from .responses import *
 
