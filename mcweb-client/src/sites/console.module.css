@@ -27,6 +27,9 @@
 .inputwrapper .input {
     display: inline-block;
     flex-grow: 1;
+}
+
+.inputwrapper *:not(:last-child) {
     margin-right: .2em;
 }
 

@@ -9,7 +9,7 @@ import uistyles from "../component/ui/ui.module.css";
 /**
  * Input field and button of console
  */
-function ConsoleInput({currentServer, alert}) {
+function ConsoleInput({currentServer, alert, toggleAutoscroll, autoscroll}) {
 
     const [text, setText] = useState("");
     // keep ref to input to clear value on submit
@@ -33,6 +33,7 @@ function ConsoleInput({currentServer, alert}) {
     }
 
     return <div className={styles.inputwrapper}>
+        <Button className={styles.sendbtn} onClick={toggleAutoscroll} noMargin title={(autoscroll ? "Disable" : "Enable") + " Autoscroll"} >{autoscroll ? "▼" : "▲"}</Button>
         <Input className={styles.input}
             ref={inputRef}
             type="text"
@@ -44,14 +45,20 @@ function ConsoleInput({currentServer, alert}) {
     </div>
 }
 
-function ConsoleOutput({lines}) {
+function ConsoleOutput({lines, autoscroll}) {
 
     const textRef = useRef(null);
 
+    function updateScroll() {
+        if (autoscroll) {
+            textRef.current.scrollTop = textRef.current.scrollHeight;
+        }
+    }
+
     // scroll to bottom of textarea after render
     useEffect(() => {
-        textRef.current.scrollTop = textRef.current.scrollHeight;
-    }, [lines]);
+        updateScroll();
+    }, [lines, autoscroll]);
 
     return <textarea className={[uistyles.ui, styles.out].join(" ")} readOnly value={lines.length === 0 ? "Start your Server to see its Output" : lines.map((l) => l.trim()).join("\n")} ref={textRef} />
 
@@ -62,14 +69,16 @@ function ConsoleOutput({lines}) {
  */
 function ConsoleView({lines, currentServer, getSessionId, alert}) {
 
+    const [autoscroll, setAutoscroll] = useState(true);
+
     useEffect(() => {
         setTitle("Console");
     }, []);
 
     return  <Site name="Console">
                 <div className={styles.wrapper}>
-                    <ConsoleOutput lines={lines} />
-                    <ConsoleInput currentServer={currentServer} getSessionId={getSessionId} alert={alert} />
+                    <ConsoleOutput lines={lines} autoscroll={autoscroll} />
+                    <ConsoleInput currentServer={currentServer} getSessionId={getSessionId} alert={alert} toggleAutoscroll={() => setAutoscroll(!autoscroll)} autoscroll={autoscroll} />
                 </div>
             </Site>
 }
