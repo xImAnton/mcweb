@@ -1,9 +1,7 @@
 import os
-import sys
 from typing import Optional
 
 import aiofiles
-import pymongo.errors
 
 from mcweb.io.config import Config
 from .server import MinecraftServer
@@ -27,18 +25,14 @@ class ServerManager:
         """
         fetches all servers and adds them to its server list
         """
-        try:
-            async for server in self.mc.mongo["server"].find({}):
-                s = MinecraftServer(self.mc, server)
-                if s.status == 2:  # if the server was online, start it
-                    await s.start()
-                elif s.status != 0:
-                    await s.set_online_status(0)
-                self.servers.append(s)
-        except pymongo.errors.ServerSelectionTimeoutError:
-            print("No connection to mongodb could be established. Check your preferences in the config.json and if your mongo server is running!")
-            self.mc.stop()
-            sys.exit(1)
+        self.servers = []
+        async for server in self.mc.mongo["server"].find({}):
+            s = MinecraftServer(self.mc, server)
+            if s.status == 2:  # if the server was online, start it
+                await s.start()
+            elif s.status != 0:
+                await s.set_online_status(0)
+            self.servers.append(s)
 
         await self.versions.reload_all()
 

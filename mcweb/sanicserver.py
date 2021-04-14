@@ -1,8 +1,10 @@
 import os
 import socket
+import time
 
 import aiohttp
 from argon2 import PasswordHasher
+import pymongo.errors
 from sanic import Sanic
 
 from mcweb.auth import User, Session
@@ -56,12 +58,22 @@ class MCWeb(Sanic):
                     ip = await resp.text()
         self.public_ip = await self.check_ip(ip)
 
+    async def reload(self):
+        try:
+            await self.mongo["session"].delete_many({"expiration": {"$lt": time.time()}})
+            await self.mongo["wsticket"].delete_many({"expiration": {"$lt": time.time()}})
+            await self.server_manager.init()
+        except pymongo.errors.ServerSelectionTimeoutError:
+            print("No connection to mongodb could be established. Check your preferences in the config.json and if your mongo server is running!")
+            self.stop()
+            exit(1)
+
     async def after_server_start(self, app, loop) -> None:
         """
         listener to be called after server start
         """
         self.mongo = MongoClient(self, loop).db
-        await self.server_manager.init()
+        await self.reload()
 
     async def set_session_middleware(self, req) -> None:
         """
