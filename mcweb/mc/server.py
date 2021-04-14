@@ -6,7 +6,7 @@ from typing import Any, Dict
 from ..io.config import Config
 from ..io.regexes import Regexes
 from ..io.wsmanager import WebsocketConnectionManager
-from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket
+from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket, BulkConsoleMessagePacket
 from ..mc.communication import ServerCommunication
 
 
@@ -94,6 +94,8 @@ class MinecraftServer:
         # shell has to be True when running with docker
         self.communication = ServerCommunication(self.mc.loop, await self.generate_command(), self.on_output, self.on_output, self.on_stop, cwd=self.run_dir, shell=Config.get_docker_secret("mongo_user") is not None)
         self.output = []
+        # Clear console on all clients
+        await BulkConsoleMessagePacket([], True).send(self.connections)
         await self.set_online_status(1)
         try:
             await self.communication.begin()
