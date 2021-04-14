@@ -90,6 +90,7 @@ export default function AppContainer({
                                     </div>
                                 </Route>
                                 <Route path="/">
+                                    <InfoBox close={closeInfoBox} text={infoText} head={infoCaption} />
                                     {/*display app when no fetches are missing*/}
                                     <>{ missingFetches <= 0 && user ? (<>
                                     { renderSidebar && <ServerInfo
@@ -106,7 +107,6 @@ export default function AppContainer({
                                     />}
                                     { renderSidebar && <NavBar logout={logout} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)}/> }
                                     { renderContent && <div className={styles.contentwrapper}>
-                                        <InfoBox close={closeInfoBox} text={infoText} head={infoCaption} />
                                         {currentServer && 
                                             <Switch history={history} >
                                                 <Route path="/general">

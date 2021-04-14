@@ -28,4 +28,5 @@
     position: relative;
     background-color: var(--sec-bg-color);
     transition: background-color 500ms;
+    overflow: auto;
 }
