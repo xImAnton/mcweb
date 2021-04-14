@@ -3,6 +3,8 @@ then
   PYTHON_CMD=python3
 fi
 
+set -e
+
 $PYTHON_CMD -m pip install argon2-cffi
 
 # Prompt for username
