@@ -1,12 +1,21 @@
 import styles from "./form.module.css";
 
 
-function LastFormLine(props) {
+function MergedFormLine({children}) {
     return <tr>
-        <td colSpan={2} className={styles.value}>
-            {props.children}
+        <td colSpan={2} className={[styles.value, styles.lastline].join(" ")}>
+            {children}
         </td>
     </tr>
+}
+
+
+function DistributedFormLine({children}) {
+    return  <MergedFormLine>
+                <div className={styles.distributed}>
+                    {children}
+                </div>
+            </MergedFormLine>;
 }
 
 
@@ -26,4 +35,4 @@ function FormTable(props) {
             </table>
 }
 
-export { LastFormLine, FormLine, FormTable };
+export { MergedFormLine, FormLine, FormTable, DistributedFormLine };

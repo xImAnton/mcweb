@@ -12,3 +12,17 @@
 .value {
     width: 100%;
 }
+
+.lastline button {
+    margin-top: 0;
+}
+
+.distributed :first-child {
+    margin-right: .3em;
+}
+
+.distributed {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}

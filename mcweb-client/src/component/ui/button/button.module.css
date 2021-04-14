@@ -9,6 +9,11 @@
     user-select: none;
     font-size: inherit;
     cursor: pointer;
+    margin-top: .7em;
+}
+
+.nomargin {
+    margin-top: 0;
 }
 
 .button[disabled] {

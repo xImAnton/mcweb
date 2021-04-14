@@ -3,7 +3,7 @@ import { fetchSoftwaresAndTheirMajors, fetchMinorVersions, putServer, useRestric
 import history from "../history";
 import LoadingAnimation from "../component/loading/loading";
 import { Alert } from "../component/ui/alert/alert";
-import { FormTable, FormLine, LastFormLine } from "../component/ui/form/form";
+import { FormTable, FormLine, DistributedFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
 import Button from "../component/ui/button/button";
 import Input from "../component/ui/input/text";
@@ -23,12 +23,12 @@ function CreateServerButton(props) {
         }
     }
 
-    return <div className="server-create-btns">
-            <Button onClick={createServer}>Create Server</Button>
+    return <DistributedFormLine>
             { props.cancellable &&
                 <Button onClick={() => history.push("/general")}>Cancel</Button>
             }
-        </div>
+            <Button onClick={createServer}>Create Server</Button>
+        </DistributedFormLine>
 }
 
 /**
@@ -232,9 +232,9 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
                                         })}
                                     </Select>
                                 } />
-                                <LastFormLine>
+                                
                                     <CreateServerButton createServer={createServer} cancellable={cancellable} changeServer={changeServer} />
-                                </LastFormLine>
+                                
                             </FormTable>
                         </>
                     : 

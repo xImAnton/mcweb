@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { patchServer, setTitle } from "../services";
 import LoadingAnimation from "../component/loading/loading";
-import { FormTable, FormLine } from "../component/ui/form/form";
+import { FormTable, FormLine, MergedFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
 import Site from "./site";
 import Input from "../component/ui/input/text";
@@ -52,9 +52,9 @@ function SettingsView({currentServer, javaVersions, maxRam}) {
                                     })}
                                 </Select>
                             } />
-                            <tr>
-                                <td colSpan={2}><Button onClick={submit}>Save Changes</Button></td>
-                            </tr>
+                            <MergedFormLine>
+                                <Button onClick={submit}>Save Changes</Button>
+                            </MergedFormLine>
                         </FormTable>
                     </> :
                     <LoadingAnimation loadingText={loadingText} />

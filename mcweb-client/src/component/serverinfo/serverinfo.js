@@ -1,7 +1,7 @@
 import Select from "../ui/select/select";
 import { startServer, stopServer } from "../../services";
 import history from "../../history";
-import { FormTable, FormLine } from "../ui/form/form";
+import { FormTable, FormLine, DistributedFormLine } from "../ui/form/form";
 import styles from "./serverinfo.module.css";
 import Button from "../ui/button/button";
 import uistyles from "../ui/ui.module.css";
@@ -99,14 +99,10 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
                     } />
                     <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={{maxWidth: "10em"}} />} />
                     <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
-                    <tr>
-                        <td colSpan={2}>
-                            <div className={styles["start-add-wrapper"]}>
-                                <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
-                                <AddServerButton setCreationCancellable={setCreationCancellable} />
-                            </div>
-                        </td>
-                    </tr>
+                    <DistributedFormLine>
+                        <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
+                        <AddServerButton setCreationCancellable={setCreationCancellable} />
+                    </DistributedFormLine>
                 </FormTable>
             </div>;
 }
