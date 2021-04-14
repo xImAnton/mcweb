@@ -13,6 +13,7 @@ from .endpoints.server import server_blueprint
 from .io.config import Config
 from .io.mongo import MongoClient
 from .mc.servermanager import ServerManager
+from .io.regexes import Regexes
 
 
 class MCWeb(Sanic):
@@ -21,6 +22,7 @@ class MCWeb(Sanic):
     """
     def __init__(self):
         super().__init__(__name__)
+        Config.load(self)
         self.server_manager = ServerManager(self)
         self.register_routes()
         self.public_ip = ""
@@ -39,15 +41,20 @@ class MCWeb(Sanic):
         self.register_listener(self.before_server_start, "before_server_start")
         self.register_middleware(self.set_session_middleware, "request")
 
+    async def check_ip(self, s):
+        result = Regexes.IP.match(s)
+        if not result:
+            socket.gethostbyname(s)
+        return s
+
     async def before_server_start(self, app, loop):
-        async with aiohttp.ClientSession() as session:
-            async with session.get("https://api.ipify.org/") as resp:
-                ip = await resp.text()
-                try:
-                    socket.inet_aton(ip)
-                    self.public_ip = ip
-                except socket.error:
-                    raise ValueError("ip address from api is not a valid ip")
+        if Config.STATIC_IP:
+            ip = Config.STATIC_IP
+        else:
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://api.ipify.org/") as resp:
+                    ip = await resp.text()
+        self.public_ip = await self.check_ip(ip)
 
     async def after_server_start(self, app, loop) -> None:
         """

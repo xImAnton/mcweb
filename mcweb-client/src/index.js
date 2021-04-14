@@ -258,7 +258,7 @@ class App extends React.Component {
                                         {/*display backend error*/}
                                         <NoBackend refetch={() => this.refetch()} />
                                     </Route>
-                                    {/*redirect to login when no session id present, down here bc. apierror has higher priority*/}
+                                    {/*redirect to login when no session id present, down here bc apierror has higher priority*/}
                                     {!sid && <Redirect to="/login" />}
                                     <Route path="/createserver">
                                         <div className={[styles.contentwrapper, styles.full].join(" ")}>
@@ -283,9 +283,10 @@ class App extends React.Component {
                                             setConsoleLines={(a) => this.setState({consoleLines: a})}
                                             setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
                                             openInfoBox={(h, b) => this.openInfoBox(h, b)}
+                                            publicIP={this.state.config.publicIP}
                                         />
                                         <div className={styles.contentwrapper}>
-                                            { this.state.infoBoxCaption && <InfoBox close={(e) => this.setState({infoBox: "", infoBoxCaption: ""})} text={this.state.infoBox} head={this.state.infoBoxCaption} /> }
+                                            <InfoBox close={(e) => this.setState({infoBox: "", infoBoxCaption: ""})} text={this.state.infoBox} head={this.state.infoBoxCaption} />
                                             {this.state.currentServer && 
                                                 <Switch history={history} >
                                                     <Route path="/general">

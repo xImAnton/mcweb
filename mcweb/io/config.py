@@ -6,6 +6,8 @@ class Config:
     static class for managing configurations
     """
 
+    MCWEB_INSTANCE = None
+
     ATTR_KEYS = {
         "DB_PATH": ("dbPath", "data.db"),
         "SESSION_EXPIRATION": ("sessionExpiration", 7200),
@@ -15,7 +17,8 @@ class Config:
         "SERVER_DIR": ("serverDir", "./servers"),
         "ADDONS": ("addons", {}),
         "JAVA": ("javaSettings", {}),
-        "PEPPER": ("pepper", "20 rndm pepper bytes")
+        "PEPPER": ("pepper", "20 rndm pepper bytes"),
+        "STATIC_IP": ("staticIP", "")
     }
 
     DB_PATH = "data.db"
@@ -27,12 +30,14 @@ class Config:
     ADDONS = {}
     JAVA = {}
     PEPPER = ""
+    STATIC_IP = ""
 
     @staticmethod
-    def load() -> None:
+    def load(mcweb) -> None:
         """
         loads the config file and stores it's values as class attributes
         """
+        Config.MCWEB_INSTANCE = mcweb
         config_secret = Config.get_docker_secret("config")
         if config_secret:
             data = json.loads(config_secret)
@@ -53,7 +58,8 @@ class Config:
             java_versions[k] = v["displayName"]
         return {
             "javaVersions": java_versions,
-            "maxRam": Config.MAX_RAM
+            "maxRam": Config.MAX_RAM,
+            "publicIP": Config.MCWEB_INSTANCE.public_ip
         }
 
     @staticmethod

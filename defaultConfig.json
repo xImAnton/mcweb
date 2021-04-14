@@ -40,6 +40,7 @@
       "getModInfo": "https://addons-ecs.forgesvc.net/api/v2/addon/{addon_id}"
     }
   },
+  "staticIP": "",
   "pepper": "20 rndm pepper bytes",
   "maxRam": 6,
   "mongoDB": {

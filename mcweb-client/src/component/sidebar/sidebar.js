@@ -3,7 +3,7 @@ import ServerInfo from "../serverinfo/serverinfo";
 import styles from "./sidebar.module.css";
 
 
-function Sidebar({servers, currentServer, changeServer, sessionId, setConsoleLines, setCreationCancellable, openInfoBox, logout, username}) {
+function Sidebar({servers, currentServer, changeServer, sessionId, setConsoleLines, setCreationCancellable, openInfoBox, logout, username, publicIP}) {
     return  <div className={styles.wrapper}>
                 <aside>
                     <div className={styles.content}>
@@ -16,6 +16,7 @@ function Sidebar({servers, currentServer, changeServer, sessionId, setConsoleLin
                                 setConsoleLines={setConsoleLines}
                                 setCreationCancellable={setCreationCancellable}
                                 openInfoBox={openInfoBox}
+                                publicIP={publicIP}
                             />
                             <Navbar logout={logout} username={username} currentServer={currentServer} />
                         </div>

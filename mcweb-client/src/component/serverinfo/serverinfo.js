@@ -45,7 +45,7 @@ function ServerStatus({status}) {
     return <div className={[uistyles.ui, styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
 }
 
-function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers}) {
+function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers, publicIP}) {
 
     function toggleCurrentServer() {
         // start/ stop current server
@@ -63,7 +63,6 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
         }
     }
 
-    let ip = "127.0.0.1";
     let buttonText = "Start";
     let buttonEnabled = true;
     let port = 25565;
@@ -88,7 +87,6 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
                 buttonEnabled = false;
                 break;
         };
-        ip = currentServer.ip;
         port = currentServer.port;
     }
 
@@ -99,7 +97,7 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
                             {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
                         </Select>
                     } />
-                    <FormLine label="IP" input={<CopyField text={ip + ":" + port} style={{maxWidth: "10em"}} />} />
+                    <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={{maxWidth: "10em"}} />} />
                     <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                     <tr>
                         <td colSpan={2}>

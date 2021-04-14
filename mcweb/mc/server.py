@@ -159,7 +159,6 @@ class MinecraftServer:
             "dataDir": self.run_dir,
             "jarFile": self.jar,
             "onlineStatus": self.status,
-            "ip": self.mc.public_ip,
             "displayName": self.display_name,
             "software": self.software,
             "port": self.port,

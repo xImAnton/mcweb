@@ -6,3 +6,4 @@ class Regexes:
     SERVER_DISPLAY_NAME = re.compile(r"^[a-zA-Z0-9_\-\. ]*$")
     USER_NAME = re.compile(r"^[a-z0-9A-Z_-]{6,15}$")
     USER_MAIL = re.compile(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")
+    IP = re.compile(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$")
