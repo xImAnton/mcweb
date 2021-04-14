@@ -2,7 +2,6 @@ input[type="text"], input[type="number"] {
     outline: none;
     border: var(--ui-border);
     background-color: var(--ui-background);
-    color: white;
     border-radius: 8px;
     display: block;
 }

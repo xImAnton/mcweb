@@ -10,7 +10,7 @@ function TabSelector({name, changeTab, selected}) {
     if (selected) {
         classes.push(styles.selected);
     }
-    return <div className={classes.join(" ")} onClick={() => changeTab(name)}>{name}</div>
+    return <div className={styles.tabcontainer}><div className={styles.tabwrap}><div className={classes.join(" ")} onClick={() => changeTab(name)}>{name}</div></div></div>
 }
 
 

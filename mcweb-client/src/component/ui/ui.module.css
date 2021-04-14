@@ -4,4 +4,5 @@
     padding: 4px 6px;
     height: 20px;
     box-sizing: content-box;
+    color: var(--font);
 }

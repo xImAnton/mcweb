@@ -8,9 +8,14 @@
 .options li {
     display: block;
     padding: 12px 16px;
-    color: white;
+    color: var(--font);
+    font-weight: 500;
     cursor: pointer;
     text-decoration: none;
+}
+
+.options li:hover {
+    color: white;
 }
 
 .options li:hover {

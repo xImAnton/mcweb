@@ -11,28 +11,28 @@
 
 .field {
     background-color: white;
-    width: 250px;
+    width: 15rem;
     border: 1px solid black;
     position: absolute;
     display: block;
     box-shadow: 6px 6px 11px 7px rgb(0 0 0 / 35%);
-    padding: 26px;
+    padding: 1.6em;
     text-align: center;
     border-radius: 12px;
 }
 
 .field img {
-    width: 250px;
+    width: 15rem;
     height: auto;
     position: absolute;
-    right: 26px;
-    left: 26px;
-    top: -130px;
+    right: 1.6em;
+    left: 1.6em;
+    top: -8em;
 }
 
 .field h1 {
     margin-top: 0;
-    font-size: 40px;
+    font-size: 2.5em;
 }
 
 .field input::-webkit-input-placeholder {
@@ -40,10 +40,10 @@
 }
 
 .field input {
-    padding: 8px 10px;
-    margin-bottom: 10px;
+    padding: .6em .8em;
+    margin-bottom: .9em;
     display: block;
-    background-color: #378af0;
+    background-color: var(--main-bg-color);
     outline: none;
     border: none;
     color: white;
@@ -61,7 +61,7 @@
     text-decoration: none;
     display: block;
     cursor: pointer;
-    background-color: #378af0;
+    background-color: var(--main-bg-color);
     outline: none;
     border: none;
     box-shadow: 2px 2px 3px 1px black;
@@ -75,7 +75,7 @@
 }
 
 .cookiealert {
-    margin: 10px;
+    margin: 1em;
     font-weight: 700;
 }
 

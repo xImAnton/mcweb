@@ -13,13 +13,13 @@
 
 #app.brightmode {
     --main-bg-color: #378af0;
-    --sec-bg-color: #9da7b3;
+    --sec-bg-color: #d7d7d7;
     --bg: white;
     --font: black;
-    --console-bg: #c2c2c3;
-    --ui-background: #9da7b3;
-    --ui-hover: #acb5c0;
-    --ui-disabled: #41404a;
+    --console-bg: white;
+    --ui-background: var(--sec-bg-color);
+    --ui-hover: #c0c1c3;
+    --ui-disabled: #a1a1a1;
     --ui-border: 1px solid black;
     --bright-hover: rgb(209, 209, 209);
 }

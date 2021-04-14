@@ -18,7 +18,7 @@
     content: "";
     width: 0.8em;
     height: 0.5em;
-    background-color: white;
+    background-color: var(--font);
     clip-path: polygon(100% 0%, 0 0%, 50% 100%);
     right: 11px;
     top: 11px;
@@ -35,8 +35,8 @@
     cursor: inherit;
     line-height: inherit;
     outline: none;
-    color: white;
     width: 100%;
+    color: var(--font);
 }
 
 .select select::-ms-expand {

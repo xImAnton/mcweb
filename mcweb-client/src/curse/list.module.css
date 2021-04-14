@@ -2,6 +2,7 @@
     flex-grow: 1;
     position: relative;
     background-color: var(--bg);
+    transition: background-color 500ms;
 }
 
 .inner {
