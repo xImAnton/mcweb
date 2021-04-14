@@ -39,26 +39,30 @@ class MCWeb(Sanic):
         self.blueprint(server_blueprint)
         self.blueprint(account_blueprint)
         self.blueprint(misc_blueprint)
-        self.register_listener(self.after_server_start, "after_server_start")
         self.register_listener(self.before_server_start, "before_server_start")
         self.register_middleware(self.set_session_middleware, "request")
 
-    async def check_ip(self, s):
+    async def _check_ip(self, s):
         result = Regexes.IP.match(s)
         if not result:
             socket.gethostbyname(s)
         return s
 
-    async def before_server_start(self, app, loop):
+    async def reload_ip(self):
         if Config.STATIC_IP:
             ip = Config.STATIC_IP
         else:
             async with aiohttp.ClientSession() as session:
                 async with session.get("https://api.ipify.org/") as resp:
                     ip = await resp.text()
-        self.public_ip = await self.check_ip(ip)
+        self.public_ip = await self._check_ip(ip)
+
+    async def before_server_start(self, app, loop):
+        self.mongo = MongoClient(self, loop).db
+        await self.reload()
 
     async def reload(self):
+        await self.reload_ip()
         try:
             await self.mongo["session"].delete_many({"expiration": {"$lt": time.time()}})
             await self.mongo["wsticket"].delete_many({"expiration": {"$lt": time.time()}})
@@ -67,13 +71,6 @@ class MCWeb(Sanic):
             print("No connection to mongodb could be established. Check your preferences in the config.json and if your mongo server is running!")
             self.stop()
             exit(1)
-
-    async def after_server_start(self, app, loop) -> None:
-        """
-        listener to be called after server start
-        """
-        self.mongo = MongoClient(self, loop).db
-        await self.reload()
 
     async def set_session_middleware(self, req) -> None:
         """
