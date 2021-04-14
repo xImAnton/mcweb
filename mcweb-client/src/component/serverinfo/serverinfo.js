@@ -46,7 +46,7 @@ function ServerStatus({status}) {
     return <div className={[uistyles.ui, styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
 }
 
-function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers, publicIP, closeNavbar}) {
+function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers, publicIP, closeNavbar, responsive}) {
 
     function toggleCurrentServer() {
         // start/ stop current server
@@ -91,15 +91,22 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
         port = currentServer.port;
     }
 
+    const ipstyle = {};
+    const serverliststyle = {};
+    if (!responsive) {
+        ipstyle.maxWidth = "10em";
+        serverliststyle.maxWidth = "12em"
+    }
+
     return  <div className={styles.container}>
                 <div className={styles.serverinfo}>
                     <FormTable mergeLast={false}>
                         <FormLine label="Server" input={
-                            <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)} style={{maxWidth: "12em"}}>
+                            <Select value={currentServer ? currentServer.id : 0} onChange={(e) => changeServer(e.target.value)} style={serverliststyle}>
                                 {servers.map(x => <option key={x.id} value={x.id}>{x.displayName}</option>)}
                             </Select>
                         } />
-                        <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={{maxWidth: "10em"}} />} />
+                        <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={ipstyle} />} />
                         <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                         <DistributedFormLine>
                             <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>

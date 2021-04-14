@@ -102,6 +102,7 @@ export default function AppContainer({
                                         openInfoBox={openInfoBox}
                                         publicIP={config.publicIP}
                                         closeNavbar={() => openNavbar(false)}
+                                        responsive={responsive}
                                     />}
                                     { renderSidebar && <NavBar logout={logout} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)}/> }
                                     { renderContent && <div className={styles.contentwrapper}>
