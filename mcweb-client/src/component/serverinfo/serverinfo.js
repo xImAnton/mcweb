@@ -11,10 +11,11 @@ import CopyField from "../ui/copy/copy";
 /**
  * plus button for opening CreateServerView
  */
-function AddServerButton(props) {
+function AddServerButton({setCreationCancellable, closeNavbar}) {
     function clicked(e) {
         // make server creation cancellable
-        props.setCreationCancellable(true);
+        setCreationCancellable(true);
+        closeNavbar();
         // redirect to server creation
         history.push("/createserver");
     }
@@ -45,7 +46,7 @@ function ServerStatus({status}) {
     return <div className={[uistyles.ui, styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
 }
 
-function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers, publicIP}) {
+function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, setCreationCancellable, servers, publicIP, closeNavbar}) {
 
     function toggleCurrentServer() {
         // start/ stop current server
@@ -102,7 +103,7 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, openInfoBox, 
                         <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                         <DistributedFormLine>
                             <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
-                            <AddServerButton setCreationCancellable={setCreationCancellable} />
+                            <AddServerButton setCreationCancellable={setCreationCancellable} closeNavbar={closeNavbar} />
                         </DistributedFormLine>
                     </FormTable>
                 </div>

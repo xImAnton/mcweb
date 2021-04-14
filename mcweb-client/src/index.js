@@ -229,31 +229,30 @@ class App extends React.Component {
     render() {
         const sid = this.getSessionId();
         return  <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-                    <div className={styles.gridcontainer}>
-                        <AppContainer
-                            sid={sid} 
-                            setSessionId={(i) => this.setSessionId(i)}
-                            logout={() => this.logout()}
-                            refetch={() => this.refetch()}
-                            config={this.state.config}
-                            serverCreationCancellable={this.state.serverCreationCancellable}
-                            changeServer={(i) => this.changeServer(i)}
-                            addFirstServer={(s) => this.addFirstServer(s)}
-                            missingFetches={this.state.missingFetches}
-                            user={this.state.user}
-                            currentServer={this.state.currentServer}
-                            servers={this.state.servers}
-                            setConsoleLines={(a) => this.setState({consoleLines: a})}
-                            setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
-                            openInfoBox={(h, b) => this.openInfoBox(h, b)}
-                            closeInfoBox={() => this.setState({infoBox: "", infoBoxCaption: ""})}
-                            infoText={this.state.infoBox}
-                            infoCaption={this.state.infoBoxCaption}
-                            consoleLines={this.state.consoleLines}
-                            darkmode={this.state.darkmode}
-                            setDarkMode={(v) => this.setState({darkmode: v})}
-                         />
-                    </div>
+                    <AppContainer
+                        sid={sid} 
+                        setSessionId={(i) => this.setSessionId(i)}
+                        logout={() => this.logout()}
+                        refetch={() => this.refetch()}
+                        config={this.state.config}
+                        serverCreationCancellable={this.state.serverCreationCancellable}
+                        changeServer={(i) => this.changeServer(i)}
+                        addFirstServer={(s) => this.addFirstServer(s)}
+                        missingFetches={this.state.missingFetches}
+                        user={this.state.user}
+                        currentServer={this.state.currentServer}
+                        servers={this.state.servers}
+                        setConsoleLines={(a) => this.setState({consoleLines: a})}
+                        setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
+                        openInfoBox={(h, b) => this.openInfoBox(h, b)}
+                        closeInfoBox={() => this.setState({infoBox: "", infoBoxCaption: ""})}
+                        infoText={this.state.infoBox}
+                        infoCaption={this.state.infoBoxCaption}
+                        consoleLines={this.state.consoleLines}
+                        darkmode={this.state.darkmode}
+                        setDarkMode={(v) => this.setState({darkmode: v})}
+                        setServerCreationCancellable={(v) => this.setState({serverCreationCancellable: v})}
+                        />
                 </div>
     }
 }

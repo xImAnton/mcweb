@@ -2,29 +2,32 @@ import history from "../../history"
 import styles from "./navbar.module.css";
 
 
-function NavbarEntry(props) {
+function NavbarEntry({href, index, name, responsive, closeNavbar}) {
     function handleClick() {
-        history.push("/" + props.href);
+        history.push("/" + href);
+        if (responsive) {
+            closeNavbar();
+        }
     }
 
-    return (<li onClick={handleClick} key={props.index}>{props.name}</li>);
+    return (<li onClick={handleClick} key={index}>{name}</li>);
 }
 
 
-function Navbar(props) {
-    if (!props.currentServer.full) return <></>
+function Navbar({username, logout, currentServer, responsive, closeNavbar}) {
+    if (!currentServer.full) return <></>
     return  <div className={styles.wrapper}>
                 <ul className={styles.options}>
-                    <NavbarEntry name="General" href="general" index={1}/>
-                    <NavbarEntry name="Player" href="player" index={2}/>
-                    <NavbarEntry name="Console" href="console" index={3}/>
-                    <NavbarEntry name="Backups" href="backups" index={4}/>
-                    <NavbarEntry name="Settings" href="settings" index={5}/>
-                    { props.currentServer && props.currentServer.supports.mods && <NavbarEntry name="Mods" href="mods" index={6} /> }
-                    <NavbarEntry name="World Management" href="worlds" index={7}/>
-                    <NavbarEntry name="Dynamic Server Management" href="dsm" index={8}/>
-                    <NavbarEntry name="User Management" href="user" index={9}/>
-                    <li key={9}>Logged in as {props.username} (<span onClick={props.logout} className={styles.logout}>Logout</span>)</li>
+                    <NavbarEntry name="General" href="general" index={1} responsive={responsive} closeNavbar={closeNavbar} />
+                    <NavbarEntry name="Player" href="player" index={2} responsive={responsive} closeNavbar={closeNavbar} />
+                    <NavbarEntry name="Console" href="console" index={3} responsive={responsive} closeNavbar={closeNavbar} />
+                    <NavbarEntry name="Backups" href="backups" index={4} responsive={responsive} closeNavbar={closeNavbar} />
+                    <NavbarEntry name="Settings" href="settings" index={5} responsive={responsive} closeNavbar={closeNavbar} />
+                    { currentServer && currentServer.supports.mods && <NavbarEntry name="Mods" href="mods" index={6} responsive={responsive} closeNavbar={closeNavbar} /> }
+                    <NavbarEntry name="World Management" href="worlds" index={7} responsive={responsive} closeNavbar={closeNavbar} />
+                    <NavbarEntry name="Dynamic Server Management" href="dsm" index={8} responsive={responsive} closeNavbar={closeNavbar} />
+                    <NavbarEntry name="User Management" href="user" index={9} responsive={responsive} closeNavbar={closeNavbar} />
+                    <li key={9}>Logged in as {username} (<span onClick={logout} className={styles.logout}>Logout</span>)</li>
                 </ul>
             </div>
 }

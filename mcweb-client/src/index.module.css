@@ -29,6 +29,14 @@
         "footer footer";
 }
 
+.navopen {
+    grid-template-areas:
+        "header header"
+        "serverinfo serverinfo"
+        "navbar navbar"
+        "footer footer";
+}
+
 .full {
     grid-template-areas:
         "header header"
