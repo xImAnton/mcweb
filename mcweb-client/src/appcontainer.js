@@ -21,6 +21,7 @@ import styles from "./index.module.css";
 import { useMediaQuery } from "react-responsive";
 import { useState } from "react";
 import { useAlert } from 'react-alert';
+import { useLocation } from "react-router-dom"
 
 
 export default function AppContainer({
@@ -50,9 +51,12 @@ export default function AppContainer({
     const renderSidebar = !(responsive && !navbarOpened);
 
     const alert = useAlert();
+    const location = useLocation();
+    const fullPage = ["/createserver"].includes(location.pathname);
+    console.log(fullPage);
 
     const classes = [styles.gridcontainer];
-    if (navbarOpened && responsive) {
+    if (navbarOpened && responsive && !fullPage) {
         classes.push(styles.navopen);
     }
 
@@ -62,6 +66,12 @@ export default function AppContainer({
         );
     }
 
+    function toggleNavbar() {
+        if (!fullPage) {
+            openNavbar(!navbarOpened);
+        }
+    }
+
     return  <div className={classes.join(" ")}>
                 <Switch history={history} >
                     <Route path="/login">
@@ -69,7 +79,7 @@ export default function AppContainer({
                         <LoginView setSessionId={setSessionId} logout={logoutAndAlert} alert={alert} />
                     </Route>
                     <Route path="/">
-                        <Header responsive={responsive} toggleNavbar={() => openNavbar(!navbarOpened)}/>
+                        <Header responsive={responsive} toggleNavbar={toggleNavbar}/>
                         <Switch history={history} >
                             <Route path="/apierror">
                                 {/*display backend error*/}
