@@ -66,7 +66,7 @@ export default function AppContainer({
                 <Switch history={history} >
                     <Route path="/login">
                         {/*Display LoginView when path is login*/}
-                        <LoginView setSessionId={setSessionId} logout={logoutAndAlert} />
+                        <LoginView setSessionId={setSessionId} logout={logoutAndAlert} alert={alert} />
                     </Route>
                     <Route path="/">
                         <Header responsive={responsive} toggleNavbar={() => openNavbar(!navbarOpened)}/>
