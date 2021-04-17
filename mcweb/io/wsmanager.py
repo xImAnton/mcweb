@@ -31,18 +31,18 @@ class WebsocketConnectionManager:
                 if conn.ws == ws:
                     self.connections.remove(conn)
 
-    async def broadcast(self, msg, except_=None):
+    async def broadcast(self, msg):
         """
         broadcasts a message to all connections
         :param msg: the msg to broadcast
         :param except_: a websocket the packet shouldn't be sent to
         """
         for ws in self.connections:
-            if ws == except_:
-                continue
             try:
                 await ws.send(msg)
+                print("BREADCAST")
             except (ConnectionClosedOK, ConnectionClosedError):
+                print("ERROR?!?")
                 await self.disconnected(ws)
 
     async def send(self, msg):

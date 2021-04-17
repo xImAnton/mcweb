@@ -196,3 +196,11 @@ async def download_addons(req, i):
         f = tmp.use_file(name)
         await req.ctx.server.pack_addons(f)
         return await file(f, filename=name)
+
+
+@server_blueprint.delete("/<i:string>")
+@requires_login()
+@server_endpoint()
+async def delete_server(req, i):
+    await req.ctx.server.delete()
+    return json_res({"success": "Removed Server Successfully"})

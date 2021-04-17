@@ -108,3 +108,16 @@ Currently only used for expired sessions.
     }
 }
 ```
+
+## ServerDeletionPacket
+
+Sent on server deletion
+
+```json
+{
+    "packetType": "ServerDeletionPacket",
+    "data": {
+        "id": "server id"
+    }
+}
+```

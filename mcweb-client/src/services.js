@@ -169,6 +169,10 @@ export function fetchConfig() {
     return get(getApiBase() + "/config");
 }
 
+export function deleteServer(id) {
+    return delete_(getApiBase() + "/server/" + id);
+}
+
 export function setSessionId(sid) {
     // set session id after login, refetch
     sessionStorage.setItem("MCWeb_Session", sid);

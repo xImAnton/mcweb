@@ -85,3 +85,13 @@ class PermissionErrorPacket(ServerWebSocketPacket):
             "error": error,
             "description": description
         }
+
+
+class ServerDeletionPacket(ServerWebSocketPacket):
+    PACKET_TYPE = "ServerDeletionPacket"
+
+    def __init__(self, server_id):
+        super(ServerDeletionPacket, self).__init__()
+        self.json["data"] = {
+            "id": str(server_id)
+        }

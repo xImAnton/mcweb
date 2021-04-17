@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+import shutil
 
 import aiofiles
 
@@ -8,7 +9,7 @@ from .server import MinecraftServer
 from .versions.base import VersionProvider
 from .versions.manager import VersionManager
 from ..io.regexes import Regexes
-from ..io.wspackets import ServerCreationPacket
+from ..io.wspackets import ServerCreationPacket, ServerDeletionPacket
 from ..util import json_res, download_and_save
 
 
@@ -69,6 +70,19 @@ class ServerManager:
             if s.id != id_:
                 o.append(s)
         self.servers = o
+
+    async def delete_server(self, server):
+        if server not in self.servers:
+            raise ValueError("invalid server")
+        if 0 < server.status < 3:
+            await server.stop(force=True)
+        shutil.rmtree(server.run_dir, ignore_errors=False)
+        await self.mc.mongo["server"].delete_one({"_id": server.id})
+
+        # send packet before unregistering, otherwise we couldn't broadcast to the clients of the server
+        await ServerDeletionPacket(server.id).send(self)
+        self.servers.remove(server)
+        await self.mc.mongo["user"].update_many({"lastServer": server.id}, {"$set": {"lastServer": None}})
 
     async def create_server(self, name, version_provider, major_version, minor_version, ram, port, java_version):
         """

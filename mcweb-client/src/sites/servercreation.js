@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { fetchSoftwaresAndTheirMajors, fetchMinorVersions, putServer, useRestrictedState, capitalize, setTitle } from "../services";
 import history from "../history";
 import LoadingAnimation from "../component/loading/loading";
-import { FormTable, FormLine, DistributedFormLine } from "../component/ui/form/form";
+import { FormTable, FormLine, DistributedFormLine, ExpandableFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
 import Button from "../component/ui/button/button";
 import Input from "../component/ui/input/text";
@@ -219,17 +219,18 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
                                 <FormLine label="RAM" input={
                                     <Input type="number" min={1} value={currentRam} max={maxRam} onChange={e => setCurrentRam(parseInt(e.target.value))} />
                                 } />
-                                <FormLine label="Port" input={
-                                    <Input type="number" min={25000} value={currentPort} max={30000} onChange={e => setCurrentPort(parseInt(e.target.value))} />
-                                } />
-                                <FormLine label="Java Version" input={
-                                    <Select value={currentJavaVersion} onChange={e => setCurrentJavaVersion(e.target.value)}>
-                                        {Object.keys(javaVersions).map((k, i) => {
-                                            return <option value={k} key={k}>{javaVersions[k]}</option>
-                                        })}
-                                    </Select>
-                                } />
-                                
+                                <ExpandableFormLine name="Advanced Settings">
+                                    <FormLine label="Port" input={
+                                        <Input type="number" min={25000} value={currentPort} max={30000} onChange={e => setCurrentPort(parseInt(e.target.value))} />
+                                    } />
+                                    <FormLine label="Java Version" input={
+                                        <Select value={currentJavaVersion} onChange={e => setCurrentJavaVersion(e.target.value)}>
+                                            {Object.keys(javaVersions).map((k, i) => {
+                                                return <option value={k} key={k}>{javaVersions[k]}</option>
+                                            })}
+                                        </Select>
+                                    } />
+                                </ExpandableFormLine>
                                     <CreateServerButton createServer={createServer} cancellable={cancellable} changeServer={changeServer} />
                                 
                             </FormTable>

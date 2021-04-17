@@ -221,3 +221,6 @@ class MinecraftServer:
             "displayName": self.display_name,
             "full": False
         }
+
+    async def delete(self):
+        await self.mc.server_manager.delete_server(self)

@@ -109,6 +109,23 @@ class App extends React.Component {
                     return x;
                 })});
             }
+        } else 
+        if (data.packetType === "ServerDeletionPacket") {
+            const newservers = [];
+            this.state.servers.forEach((s) => {
+                if (s.id !== data.data.id) {
+                    newservers.push(s);
+                }
+            })
+            this.setState({servers: newservers})
+            if (this.state.currentServer.id === data.data.id) {
+                if (newservers.length > 0) {
+                    this.changeServer(newservers[0].id);
+                } else {
+                    this.setState({serverCreationCancellable: false});
+                    history.push("/createserver");
+                }
+            }
         }
     }
 

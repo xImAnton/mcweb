@@ -18,6 +18,20 @@ export default function InfoBox({text, head, close}) {
 }
 
 
+export function CustomPopup({headline, children}) {
+    return  <div className={styles.wrapper}>
+                <div className={styles.contentwrapper}>
+                    <div className={styles.infobox}>
+                        <h1>{headline}</h1>
+                        <div className={styles.inputform}>
+                            {children}
+                        </div>
+                    </div>
+                </div>
+            </div>
+}
+
+
 export function useInfoBox() {
     const [text, setText] = useState("");
     const [caption, setCaption] = useState("");

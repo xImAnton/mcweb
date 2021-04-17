@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { patchServer, setTitle, splitCamelCase, capitalize } from "../services";
+import { patchServer, setTitle, splitCamelCase, capitalize, deleteServer as delServer } from "../services";
 import LoadingAnimation from "../component/loading/loading";
-import { FormTable, FormLine, MergedFormLine } from "../component/ui/form/form";
+import { FormTable, FormLine, MergedFormLine, ExpandableFormLine, DistributedFormLine } from "../component/ui/form/form";
 import Select from "../component/ui/select/select";
 import Site from "./site";
 import Input from "../component/ui/input/text";
 import Button from "../component/ui/button/button";
+import { CustomPopup } from "../component/ui/infobox/infobox";
 
 
 function SettingsView({currentServer, javaVersions, maxRam, alert}) {
@@ -15,6 +16,7 @@ function SettingsView({currentServer, javaVersions, maxRam, alert}) {
     const [currentRam, setRam] = useState(2);
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
     const [loadingText, setLoadingText] = useState("");
+    const [confirmServerDeletion, setConfirmServerDeletion] = useState(false);
 
     useEffect(() => {
         setTitle("Settings");
@@ -50,20 +52,41 @@ function SettingsView({currentServer, javaVersions, maxRam, alert}) {
         });
     }
 
+    function deleteServer() {
+        setConfirmServerDeletion(false);
+        delServer(currentServer.id).then(() => {
+            alert.success("Deleted " + currentServer.name);
+        })
+    }
+
     return  <Site name="Settings">
+                { confirmServerDeletion && <CustomPopup headline="Confirm Server Deletion">
+                    <span>Do you really want to delete the Server: {currentServer.displayName}?</span>
+                    <FormTable>
+                        <DistributedFormLine>
+                            <Button onClick={() => setConfirmServerDeletion(false)}>No</Button>
+                            <Button onClick={deleteServer}>Yes</Button>
+                        </DistributedFormLine>
+                    </FormTable>
+                </CustomPopup> }
                 { !loadingText ? 
                     <>
                         <FormTable mergeLast={true}>
                             <FormLine label="Name" input={<Input type="text" defaultValue={currentServer.displayName} onChange={(e) => setName(e.currentTarget.value)}/>} />
-                            <FormLine label="Port" input={<Input type="number" min={25000} defaultValue={currentServer.port} max={30000} onChange={(e) => setPort(parseInt(e.currentTarget.value))} />} />
                             <FormLine label="RAM" input={<Input type="number" min={1} defaultValue={currentServer.allocatedRAM} max={maxRam} onChange={(e) => setRam(parseInt(e.currentTarget.value))} />} />
-                            <FormLine label="Java Version" input={
-                                <Select value={currentJavaVersion} onChange={e => setCurrentJavaVersion(e.target.value)}>
-                                    {Object.keys(javaVersions).map((k, i) => {
-                                        return <option value={k} key={k}>{javaVersions[k]}</option>
-                                    })}
-                                </Select>
-                            } />
+                            <ExpandableFormLine name="Advanced Settings">
+                                <FormLine label="Port" input={<Input type="number" min={25000} defaultValue={currentServer.port} max={30000} onChange={(e) => setPort(parseInt(e.currentTarget.value))} />} />
+                                <FormLine label="Java Version" input={
+                                    <Select value={currentJavaVersion} onChange={e => setCurrentJavaVersion(e.target.value)}>
+                                        {Object.keys(javaVersions).map((k, i) => {
+                                            return <option value={k} key={k}>{javaVersions[k]}</option>
+                                        })}
+                                    </Select>
+                                } />
+                                <MergedFormLine>
+                                    <Button style={{backgroundColor: "#de2323", color: "white"}} onClick={() => setConfirmServerDeletion(true)}>Delete Server</Button>
+                                </MergedFormLine>
+                            </ExpandableFormLine>
                             <MergedFormLine>
                                 <Button onClick={submit}>Save Changes</Button>
                             </MergedFormLine>
