@@ -1,4 +1,18 @@
 import styles from "./form.module.css";
+import { useState } from "react";
+import Button from "../button/button";
+
+
+function ExpandableFormLine({children, name}) {
+    const [expanded, setExpanded] = useState(false);
+
+    return  <>
+                <MergedFormLine>
+                    <Button onClick={() => setExpanded(!expanded)}>{(expanded ? "Hide " : "Show ") + name}</Button>
+                </MergedFormLine>
+                { expanded && <>{children}</>}
+            </>
+}
 
 
 function MergedFormLine({children}) {
@@ -35,4 +49,4 @@ function FormTable(props) {
             </table>
 }
 
-export { MergedFormLine, FormLine, FormTable, DistributedFormLine };
+export { MergedFormLine, FormLine, FormTable, DistributedFormLine, ExpandableFormLine };
