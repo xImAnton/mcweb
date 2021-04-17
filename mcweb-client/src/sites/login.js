@@ -1,16 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { login, getLogin, setTitle } from "../services";
 import LoadingAnimation from "../component/loading/loading";
-import { Alert } from "../component/ui/alert/alert";
 import { Redirect } from "react-router-dom";
 import styles from "./login.module.css";
 
 
-function LoginView({setSessionId}) {
+function LoginView({setSessionId, alert}) {
 
     const [currentUsername, setCurrentUsername] = useState(""); // current entered username
     const [currentPassword, setCurrentPassword] = useState(""); // current entered password
-    const [alert, setAlert] = useState(""); // displayed alert, not displayed when empty
     const [loading, setLoading] = useState(true); // whether the app is trying to connect to backend, display loading animation
     const [loggingIn, setLoggingIn] = useState(false); // whether the app is currently trying to log in, displays logging in animation
     const [loggedIn, setLoggedIn] = useState(false);
@@ -24,7 +22,12 @@ function LoginView({setSessionId}) {
         getLogin().then(res => {
             // is yes, redirect to app
             setLoggedIn(true);
-        }).finally(() => {
+        }).catch((e) => {
+            if (!e.response) {
+                alert.error("Couldn't reach MCWeb!");
+            }
+        })
+        .finally(() => {
             // if no, show login prompt
             if (!ummounted.current) {
                 setLoading(false);
@@ -36,7 +39,7 @@ function LoginView({setSessionId}) {
     function loginUser() {
         // check if username or password are empty
         if (!currentUsername | !currentPassword) {
-            setAlert("Please enter your credentials!");
+            alert.info("Plase enter your credentials!")
         }
         // display logging in animation
         setLoggingIn(true);
@@ -47,7 +50,16 @@ function LoginView({setSessionId}) {
             setLoggedIn(true);
         })
         // if not, display alert
-        .catch(e => setAlert("Please check your username and password!"))
+        .catch(e => {
+            if (e.toJSON().message === "Network Error") {
+                alert.error("Couldn't reach MCWeb!");
+            } else if
+            (e.status === 401) {
+                alert.error("Please check your credentials!");
+            } else {
+                alert.error("An unknown error occured")
+            }
+        })
         .finally(() => {
             // cancel animation
             setLoggingIn(false);
@@ -62,7 +74,6 @@ function LoginView({setSessionId}) {
         <div className={styles.field}>
             <img src={process.env.PUBLIC_URL + "logo_wide_bright.png"} alt="MCWeb Logo" />
             <h1>Login</h1>
-            <Alert text={alert} />
             <div className={styles.form}>
                 <input type={"text"} placeholder={"Username"} onChange={e => setCurrentUsername(e.target.value)} />
                 <input type={"password"} placeholder={"Password"} onChange={e => setCurrentPassword(e.target.value)} />
@@ -70,7 +81,7 @@ function LoginView({setSessionId}) {
                 <div className={styles.cookiealert}>This website uses cookies for managing your login session. By logging in you agree to that.</div>
             </div>
         </div>
-    </div>) : (<LoadingAnimation loadingText={loading ? "Connecting..." : "Loggin in"}/>)}</>
+    </div>) : (<LoadingAnimation loadingText={loading ? "Connecting..." : "Logging in"}/>)}</>
 }
 
 export default LoginView;
