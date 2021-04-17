@@ -11,6 +11,8 @@ from ..mc.communication import ServerCommunication
 
 
 class MinecraftServer:
+    __slots__ = "mc", "connections", "id", "name", "display_name", "ram", "run_dir", "jar", "status", "software", "port", "addons", "java_version", "communication", "output", "files_to_remove"
+
     CHANGEABLE_FIELDS = {
         "displayName": lambda x: Regexes.SERVER_DISPLAY_NAME.match(x),
         "port": lambda x: isinstance(x, int) and 25000 < x < 30000,

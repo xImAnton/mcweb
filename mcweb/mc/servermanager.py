@@ -13,6 +13,8 @@ from ..util import json_res, download_and_save
 
 
 class ServerManager:
+    __slots__ = "mc", "servers", "versions"
+
     """
     class for managing all servers of the mcweb instance
     """

@@ -9,6 +9,8 @@ from mcweb.io.config import Config
 
 
 class User:
+    __slots__ = "db", "id", "name", "password", "perms", "salt", "last_server"
+
     """
     class for representing a single registered user
     """
@@ -125,6 +127,8 @@ class User:
 
 
 class Session:
+    __slots__ = "db", "sid", "user_id", "expiration", "id", "fetched"
+
     """
     represents a users session
     """

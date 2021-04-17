@@ -7,12 +7,16 @@ from .protocol import PacketBuilder, TextComponent
 
 
 class Messages:
+    __slots__ = ()
+
     DISCONNECT_STARTING_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()).add_extra(TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("Please wait a Moment").set_color(TextComponent.Color.RED).build()).add_extra(TextComponent.Builder(", this ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("Server ").set_color(TextComponent.Color.GOLD).set_flag(TextComponent.Flag.BOLD).build()).add_extra(TextComponent.Builder("is ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("starting ").set_color(TextComponent.Color.GREEN).build()).add_extra(TextComponent.Builder("now!").set_color(TextComponent.Color.GRAY).build()).build().as_json()
     DISCONNECT_NO_PERM_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()).add_extra(TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("You are not permitted ").set_color(TextComponent.Color.RED).build()).add_extra(TextComponent.Builder("to ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("start ").set_color(TextComponent.Color.GREEN).build()).add_extra(TextComponent.Builder("this ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("Server!").set_color(TextComponent.Color.GOLD).set_flag(TextComponent.Flag.BOLD).build()).build().as_json()
     DISCONNECT_ERROR_MESSAGE = TextComponent.Builder("[").set_color(TextComponent.Color.GRAY).add_extra(TextComponent.Builder("DSM").set_flag(TextComponent.Flag.BOLD).set_color(TextComponent.Color.GOLD).build()).add_extra(TextComponent.Builder("] ").set_color(TextComponent.Color.GRAY).build()).add_extra(TextComponent.Builder("There was an error while checking your username").set_color(TextComponent.Color.RED).build()).add_extra(TextComponent.Builder("!\n\nPlease try again in a few seconds").set_color(TextComponent.Color.GRAY).build()).build().as_json()
 
 
 class DSMClientConnection(ClientConnection):
+    __slots__ = "permitted_players", "onclose"
+
     QUERY_RESPONSE = {
         "version": {
             "name": "MCWeb DSM Server",
@@ -74,6 +78,8 @@ class DSMClientConnection(ClientConnection):
 
 
 class DSMServer:
+    __slots__ = "conn", "serversocket", "keypair", "running", "eligible_players", "loop"
+
     def __init__(self, conn, loop):
         self.conn = conn
         self.serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

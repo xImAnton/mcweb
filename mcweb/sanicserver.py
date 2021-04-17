@@ -19,6 +19,8 @@ from .io.regexes import Regexes
 
 
 class MCWeb(Sanic):
+    __slots__ = "server_manager", "public_ip", "mongo", "password_hasher", "pepper"
+
     """
     class that represents this Sanic instance
     """

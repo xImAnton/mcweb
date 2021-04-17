@@ -8,6 +8,7 @@ from ..mojang import has_player_joined
 
 
 class ClientConnection:
+    __slots__ = "secret", "token", "cipher", "socket", "username", "uuid", "public_key", "private_key", "encrypted", "connected", "state", "loop"
 
     DEFAULT_QUERY = {
         "version": {

@@ -4,6 +4,8 @@ import threading
 
 
 class ServerCommunication:
+    __slots__ = "loop", "command", "cwd", "process", "on_output", "on_close", "running", "on_stderr", "shell"
+
     """
     A class for abstracting away sending commands to and receiving output from the server
     """
@@ -50,6 +52,8 @@ class ServerCommunication:
 
 
 class AsyncStreamWatcher(threading.Thread):
+    __slots__ = "loop", "stream", "proc", "on_close", "on_out"
+
     def __init__(self, loop, stream, proc, on_out, on_close):
         super(AsyncStreamWatcher, self).__init__()
         self.loop = loop
