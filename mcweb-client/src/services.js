@@ -107,8 +107,8 @@ export function logoutUser() {
     return get(getApiBase() + "/account/logout");
 }
 
-export function fetchUser() {
-    return get(getApiBase() + "/account");
+export async function fetchUser() {
+    return await get(getApiBase() + "/account");
 }
 
 export function fetchAllServers() {

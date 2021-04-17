@@ -126,6 +126,7 @@ class ServerManager:
         doc = {"name": name, "allocatedRAM": ram, "dataDir": dir_, "jarFile": "server.jar", "onlineStatus": 0, "software": {"server": version_provider.NAME, "majorVersion": major_version, "minorVersion": minor_version, "minecraftVersion": await version_provider.get_minecraft_version(major_version, minor_version)}, "displayName": display_name, "port": port, "addons": [], "javaVersion": java_version}
         insert_result = await self.mc.mongo["server"].insert_one(doc)
         doc["_id"] = insert_result.inserted_id
+
         # add server record to db and register to server manager
         s = MinecraftServer(self.mc, doc)
         await s.set_online_status(0)

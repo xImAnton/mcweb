@@ -195,14 +195,16 @@ class App extends React.Component {
         })
     }
 
-    refetch() {
+    async refetch() {
         this.setState({missingFetches: 3});
         if (this.getSessionId()) {
             // refetch user informations
-            fetchUser().then(res => {
-                this.setState({user: res.data});
-                this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
-            });
+            let userData = (await fetchUser()).data;
+
+            this.setState({user: userData});
+            this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
+            let lastServerId = userData.lastServer;
+
             // refetch servers
             fetchAllServers().then(res => {
                 // create server when none existing
@@ -212,7 +214,8 @@ class App extends React.Component {
                     return;
                 }
                 this.setState({servers: res.data});
-                this.changeServer(this.state.servers[0].id);
+                
+                this.changeServer(lastServerId || this.state.servers[0].id);
             }).finally(() => {
                 this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
             });
