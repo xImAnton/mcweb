@@ -214,7 +214,6 @@ class App extends React.Component {
                     return;
                 }
                 this.setState({servers: res.data});
-
                 this.changeServer(lastServerId || this.state.servers[0].id);
             }).finally(() => {
                 this.setState((s) => {return {missingFetches: s.missingFetches - 1}});
