@@ -117,6 +117,7 @@ class MinecraftServer:
         """
         if self.status == 0 or self.status == 3:
             return
+        await self.send_command("stop")
         self._stop_event = Event()
         return self._stop_event
 
@@ -130,8 +131,9 @@ class MinecraftServer:
         for f in self.files_to_remove:
             os.remove(f)
         self.files_to_remove = []
-        self._stop_event.set()
-        self._stop_event = None
+        if self._stop_event is not None:
+            self._stop_event.set()
+            self._stop_event = None
 
     async def on_output(self, line) -> None:
         """
