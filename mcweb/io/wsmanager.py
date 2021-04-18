@@ -40,9 +40,7 @@ class WebsocketConnectionManager:
         for ws in self.connections:
             try:
                 await ws.send(msg)
-                print("BREADCAST")
             except (ConnectionClosedOK, ConnectionClosedError):
-                print("ERROR?!?")
                 await self.disconnected(ws)
 
     async def send(self, msg):

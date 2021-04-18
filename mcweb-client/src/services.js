@@ -173,6 +173,10 @@ export function deleteServer(id) {
     return delete_(getApiBase() + "/server/" + id);
 }
 
+export function restartServer(id) {
+    return get(getApiBase() + "/server/" + id + "/restart");
+}
+
 export function setSessionId(sid) {
     // set session id after login, refetch
     sessionStorage.setItem("MCWeb_Session", sid);

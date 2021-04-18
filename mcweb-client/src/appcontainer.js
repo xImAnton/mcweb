@@ -114,7 +114,7 @@ export default function AppContainer({
                                     closeNavbar={() => openNavbar(false)}
                                     responsive={responsive}
                                 />}
-                                { renderSidebar && <NavBar logout={logoutAndAlert} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)}/> }
+                                { renderSidebar && <NavBar logout={logoutAndAlert} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)} setCreationCancellable={setServerCreationCancellable} /> }
                                 { renderContent && <div className={styles.contentwrapper}>
                                     {currentServer && 
                                         <Switch history={history} >

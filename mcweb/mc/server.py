@@ -1,7 +1,8 @@
 import os
 import zipfile
 from time import strftime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
+from asyncio import Event
 
 from ..io.config import Config
 from ..io.regexes import Regexes
@@ -11,7 +12,7 @@ from ..mc.communication import ServerCommunication
 
 
 class MinecraftServer:
-    __slots__ = "mc", "connections", "id", "name", "display_name", "ram", "run_dir", "jar", "status", "software", "port", "addons", "java_version", "communication", "output", "files_to_remove"
+    __slots__ = "mc", "connections", "id", "name", "display_name", "ram", "run_dir", "jar", "status", "software", "port", "addons", "java_version", "communication", "output", "files_to_remove", "stop_event"
 
     CHANGEABLE_FIELDS = {
         "displayName": lambda x: Regexes.SERVER_DISPLAY_NAME.match(x),
@@ -40,6 +41,7 @@ class MinecraftServer:
         self.communication = None
         self.output = []
         self.files_to_remove = []
+        self.stop_event = None
 
     async def generate_command(self) -> str:
         return f"{Config.JAVA['installations'][self.java_version]['path'] + Config.JAVA['installations'][self.java_version]['additionalArguments']} -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
@@ -106,24 +108,30 @@ class MinecraftServer:
             await ConsoleMessagePacket("FileNotFoundError: " + str(e)).send(self.connections)
             await self.set_online_status(0)
 
-    async def stop(self, force=False) -> None:
+    async def stop(self, force=False) -> Optional[Event]:
         """
         stops the server
         check if server is running before calling
         :param force: whether the process should be killed or the stop command should be executed
         :return:
         """
+        if self.status == 0 or self.status == 3:
+            return
         if not force:
             await self.send_command("stop")
         else:
             await self.set_online_status(3)
             self.communication.process.kill()
+        self.stop_event = Event()
+        return self.stop_event
 
     async def on_stop(self) -> None:
         """
         called on server process end
         sets the server status to offline
         """
+        self.stop_event.set()
+        self.stop_event = None
         self.communication.running = False
         await self.set_online_status(0)
         for f in self.files_to_remove:

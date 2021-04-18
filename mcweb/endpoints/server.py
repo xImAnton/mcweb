@@ -101,7 +101,7 @@ async def stop_server(req, i):
     return json_res({"success": "server stopped", "update": {"server": {"online_status": 3}}})
 
 
-@server_blueprint.get("<i:string>/restart")
+@server_blueprint.get("/<i:string>/restart")
 @requires_login()
 @server_endpoint()
 @requires_server_online()
@@ -109,14 +109,12 @@ async def restart(req, i):
     """
     endpoints for restarting the specified server
     """
-    await req.ctx.server.stop()
-
-    async def server_stopped(s):
-        while s.running:
-            pass
-
-    await asyncio.wait_for(server_stopped(req.ctx.server), 30)
+    stop_event = await req.ctx.server.stop()
+    if not stop_event:
+        raise ValueError("impossible")
+    await stop_event.wait()
     await req.ctx.server.start()
+    return json_res({"success": "Server Restarted"})
 
 
 @server_blueprint.patch("/<i:string>")

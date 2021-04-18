@@ -1,5 +1,5 @@
 import Select from "../ui/select/select";
-import { startServer, stopServer } from "../../services";
+import { startServer, stopServer, restartServer } from "../../services";
 import history from "../../history";
 import { FormTable, FormLine, DistributedFormLine } from "../ui/form/form";
 import styles from "./serverinfo.module.css";
@@ -8,20 +8,35 @@ import uistyles from "../ui/ui.module.css";
 import CopyField from "../ui/copy/copy";
 
 
-/**
- * plus button for opening CreateServerView
- */
-function AddServerButton({setCreationCancellable, closeNavbar}) {
-    function clicked(e) {
-        // make server creation cancellable
-        setCreationCancellable(true);
-        closeNavbar();
-        // redirect to server creation
-        history.push("/createserver");
+function ToggleServerButton({server, onClick}) {
+    let buttonText = "Start";
+    let buttonEnabled = true;
+    
+    // determine button text
+    if (server) {
+        switch (server.onlineStatus) {
+            case 0:
+                break;
+            case 1:
+                buttonText = "Stop";
+                break;
+            case 2:
+                buttonText = "Stop";
+                break;
+            case 3:
+                buttonText = "Stop";
+                buttonEnabled = false;
+                break;
+            default:
+                buttonText = "Start"
+                buttonEnabled = false;
+                break;
+        };
     }
 
-    return <Button onClick={clicked}>+</Button>
+    return <Button id="control-server" onClick={onClick} disabled={!buttonEnabled}>{buttonText}</Button>
 }
+
 
 function ServerStatus({status}) {
     let serverStatus;
@@ -109,8 +124,8 @@ function ServerInfo({changeServer, currentServer, setConsoleLines, alert, setCre
                         <FormLine label="IP" input={<CopyField text={publicIP + (port !== 25565 ? ":" + port : "")} style={ipstyle} onCopy={() => alert.success("Copied Server IP")}/>} />
                         <FormLine label="Status" input={<ServerStatus status={currentServer ? currentServer.onlineStatus : undefined} />} />
                         <DistributedFormLine>
-                            <Button id="control-server" onClick={toggleCurrentServer} disabled={!buttonEnabled}>{buttonText}</Button>
-                            <AddServerButton setCreationCancellable={setCreationCancellable} closeNavbar={closeNavbar} />
+                            <ToggleServerButton onClick={toggleCurrentServer} server={currentServer} />
+                            { currentServer.onlineStatus === 2 && <Button onClick={() => restartServer(currentServer.id)}>Restart</Button> }
                         </DistributedFormLine>
                     </FormTable>
                 </div>
