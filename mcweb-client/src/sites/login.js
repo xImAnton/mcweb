@@ -38,8 +38,9 @@ function LoginView({setSessionId, alert}) {
 
     function loginUser() {
         // check if username or password are empty
-        if (!currentUsername | !currentPassword) {
-            alert.info("Plase enter your credentials!")
+        if (!currentUsername) {
+            alert.info("Please enter your username!")
+            return;
         }
         // display logging in animation
         setLoggingIn(true);
@@ -54,7 +55,7 @@ function LoginView({setSessionId, alert}) {
             if (e.toJSON().message === "Network Error") {
                 alert.error("Couldn't reach MCWeb!");
             } else if
-            (e.status === 401) {
+            (e.response.status === 401) {
                 alert.error("Please check your credentials!");
             } else {
                 alert.error("An unknown error occured")
