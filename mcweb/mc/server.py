@@ -12,6 +12,9 @@ from ..mc.communication import ServerCommunication
 
 
 class MinecraftServer:
+    """
+    class for representing a single minecraft server
+    """
     __slots__ = "mc", "connections", "id", "name", "display_name", "ram", "run_dir", "jar", "status", "software", "port", "addons", "java_version", "communication", "output", "files_to_remove", "_stop_event"
 
     CHANGEABLE_FIELDS = {
@@ -21,9 +24,6 @@ class MinecraftServer:
         "javaVersion": lambda x: x in Config.JAVA["installations"].keys()
     }
 
-    """
-    class for representing a single minecraft server
-    """
     def __init__(self, mc, record):
         self.mc = mc
         self.connections = WebsocketConnectionManager()
@@ -117,7 +117,6 @@ class MinecraftServer:
         """
         if self.status == 0 or self.status == 3:
             return
-        await self.send_command("stop")
         self._stop_event = Event()
         return self._stop_event
 
@@ -126,6 +125,7 @@ class MinecraftServer:
         called on server process end
         sets the server status to offline
         """
+        self.communication.running = False
         await self.set_online_status(0)
         for f in self.files_to_remove:
             os.remove(f)

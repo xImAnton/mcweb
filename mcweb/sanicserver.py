@@ -42,7 +42,11 @@ class MCWeb(Sanic):
         self.blueprint(account_blueprint)
         self.blueprint(misc_blueprint)
         self.register_listener(self.before_server_start, "before_server_start")
+        self.register_listener(self.after_server_stop, "after_server_stop")
         self.register_middleware(self.set_session_middleware, "request")
+
+    async def after_server_stop(self, app, loop):
+        await self.server_manager.shutdown_all()
 
     async def _check_ip(self, s):
         result = Regexes.IP.match(s)

@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 import shutil
+import asyncio
 
 import aiofiles
 
@@ -200,6 +201,12 @@ eula=true
         """
         for server in self.servers:
             await server.connections.broadcast(msg)
+
+    async def shutdown_all(self):
+        stop_events = []
+        for server in self.servers:
+            stop_events.append((await server.stop()).wait())
+        await asyncio.gather(*stop_events)
 
     @staticmethod
     def format_name(s):

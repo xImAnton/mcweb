@@ -40,7 +40,7 @@ class ServerCommunication:
         self.running = False
         await self.on_close()
 
-    async def write_stdin(self, cmd) -> None:
+    def write_stdin_sync(self, cmd):
         """
         writes a command to server stdin and flushes it
         :param cmd: the command to send
@@ -51,6 +51,9 @@ class ServerCommunication:
         line = str(cmd).encode(locale.getpreferredencoding()) + b'\n'
         self.process.stdin.write(line)
         self.process.stdin.flush()
+
+    async def write_stdin(self, cmd) -> None:
+        self.write_stdin_sync(cmd)
 
 
 class AsyncStreamWatcher(threading.Thread):
@@ -69,7 +72,6 @@ class AsyncStreamWatcher(threading.Thread):
             if self.proc.poll() is not None:
                 break
             if line:
-                # line = "".join(chr(x) for x in line)
                 line = line.decode(locale.getpreferredencoding())
                 asyncio.run_coroutine_threadsafe(self.on_out(line), self.loop)
         if self.on_close is not None:
