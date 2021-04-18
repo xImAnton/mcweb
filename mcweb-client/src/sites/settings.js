@@ -55,9 +55,12 @@ function SettingsView({currentServer, javaVersions, maxRam, alert}) {
     function deleteServer() {
         setConfirmServerDeletion(false);
         delServer(currentServer.id).then(() => {
-            alert.success("Deleted " + currentServer.name);
+            alert.success("Deleted " + currentServer.displayName);
+        }).catch(() => {
+            alert.error("Couldn't delete the Server");
         })
     }
+
 
     return  <Site name="Settings">
                 { confirmServerDeletion && <CustomPopup headline="Confirm Server Deletion">

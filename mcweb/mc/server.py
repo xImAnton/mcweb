@@ -117,11 +117,7 @@ class MinecraftServer:
         """
         if self.status == 0 or self.status == 3:
             return
-        if not force:
-            await self.send_command("stop")
-        else:
-            await self.set_online_status(3)
-            self.communication.process.kill()
+        await self.send_command("stop")
         self.stop_event = Event()
         return self.stop_event
 

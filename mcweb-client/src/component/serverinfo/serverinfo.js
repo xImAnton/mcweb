@@ -1,6 +1,5 @@
 import Select from "../ui/select/select";
 import { startServer, stopServer, restartServer } from "../../services";
-import history from "../../history";
 import { FormTable, FormLine, DistributedFormLine } from "../ui/form/form";
 import styles from "./serverinfo.module.css";
 import Button from "../ui/button/button";

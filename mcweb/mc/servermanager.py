@@ -72,16 +72,29 @@ class ServerManager:
         self.servers = o
 
     async def delete_server(self, server):
+        """
+        Closes and deletes a server.
+        Removes server files and database references
+        Broadcasts deletion to clients and unloads the server from server manager
+        :param server:
+        :return:
+        """
         if server not in self.servers:
             raise ValueError("invalid server")
+        # stop server when it is online
         if 0 < server.status < 3:
-            await server.stop(force=True)
+            stop_event = await server.stop(force=True)
+            await stop_event.wait()
+        # remove server files
         shutil.rmtree(server.run_dir, ignore_errors=False)
+        # Remove server document
         await self.mc.mongo["server"].delete_one({"_id": server.id})
 
-        # send packet before unregistering, otherwise we couldn't broadcast to the clients of the server
+        # send packet before unregistering, otherwise we couldn't broadcast to the ws clients of the server console
         await ServerDeletionPacket(server.id).send(self)
         self.servers.remove(server)
+
+        # Remove all lastServer references
         await self.mc.mongo["user"].update_many({"lastServer": server.id}, {"$set": {"lastServer": None}})
 
     async def create_server(self, name, version_provider, major_version, minor_version, ram, port, java_version):

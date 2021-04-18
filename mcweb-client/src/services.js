@@ -49,8 +49,7 @@ function catchApiErrors(promise) {
 
 function catchTimeoutError(promise) {
     return promise.catch((e => {
-        console.error("Error while fetching url " + e.config.url);
-        console.error(e.response);
+        console.log(e.response);
         if (e.response) {
             if (e.response.status === 504) { // Gateway Timeout
                 if (!(history.location.pathname === "/apierror")) {

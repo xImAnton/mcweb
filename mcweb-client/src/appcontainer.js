@@ -52,8 +52,7 @@ export default function AppContainer({
 
     const alert = useAlert();
     const location = useLocation();
-    const fullPage = ["/createserver"].includes(location.pathname);
-    console.log(fullPage);
+    const fullPage = ["/createserver", "/apierror"].includes(location.pathname);
 
     const classes = [styles.gridcontainer];
     if (navbarOpened && responsive && !fullPage) {
@@ -79,7 +78,7 @@ export default function AppContainer({
                         <LoginView setSessionId={setSessionId} logout={logoutAndAlert} alert={alert} />
                     </Route>
                     <Route path="/">
-                        <Header responsive={responsive} toggleNavbar={toggleNavbar}/>
+                        <Header responsive={responsive} toggleNavbar={toggleNavbar} fullPage={fullPage} />
                         <Switch history={history} >
                             <Route path="/apierror">
                                 {/*display backend error*/}
