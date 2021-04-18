@@ -12,7 +12,7 @@ from ..mc.communication import ServerCommunication
 
 
 class MinecraftServer:
-    __slots__ = "mc", "connections", "id", "name", "display_name", "ram", "run_dir", "jar", "status", "software", "port", "addons", "java_version", "communication", "output", "files_to_remove", "stop_event"
+    __slots__ = "mc", "connections", "id", "name", "display_name", "ram", "run_dir", "jar", "status", "software", "port", "addons", "java_version", "communication", "output", "files_to_remove", "_stop_event"
 
     CHANGEABLE_FIELDS = {
         "displayName": lambda x: Regexes.SERVER_DISPLAY_NAME.match(x),
@@ -41,7 +41,7 @@ class MinecraftServer:
         self.communication = None
         self.output = []
         self.files_to_remove = []
-        self.stop_event = None
+        self._stop_event = None
 
     async def generate_command(self) -> str:
         return f"{Config.JAVA['installations'][self.java_version]['path'] + Config.JAVA['installations'][self.java_version]['additionalArguments']} -Xmx{self.ram}G -jar {self.jar} --port {self.port}"
@@ -118,21 +118,20 @@ class MinecraftServer:
         if self.status == 0 or self.status == 3:
             return
         await self.send_command("stop")
-        self.stop_event = Event()
-        return self.stop_event
+        self._stop_event = Event()
+        return self._stop_event
 
     async def on_stop(self) -> None:
         """
         called on server process end
         sets the server status to offline
         """
-        self.stop_event.set()
-        self.stop_event = None
-        self.communication.running = False
         await self.set_online_status(0)
         for f in self.files_to_remove:
             os.remove(f)
         self.files_to_remove = []
+        self._stop_event.set()
+        self._stop_event = None
 
     async def on_output(self, line) -> None:
         """

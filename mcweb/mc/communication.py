@@ -1,14 +1,15 @@
 import asyncio
 import subprocess
 import threading
+import locale
 
 
 class ServerCommunication:
-    __slots__ = "loop", "command", "cwd", "process", "on_output", "on_close", "running", "on_stderr", "shell"
-
     """
     A class for abstracting away sending commands to and receiving output from the server
     """
+    __slots__ = "loop", "command", "cwd", "process", "on_output", "on_close", "running", "on_stderr", "shell"
+
     def __init__(self, loop, command, on_output, on_stderr, on_close, cwd=".", shell=False):
         """
         :param command: the command to start the server with
@@ -36,7 +37,6 @@ class ServerCommunication:
         AsyncStreamWatcher(self.loop, self.process.stdout, self.process, self.on_stderr, None).start()
 
     async def process_end(self):
-        print("stopped")
         self.running = False
         await self.on_close()
 
@@ -47,7 +47,9 @@ class ServerCommunication:
         """
         if not self.running:
             return
-        self.process.stdin.write(str(cmd).encode("utf-8") + b'\n')
+
+        line = str(cmd).encode(locale.getpreferredencoding()) + b'\n'
+        self.process.stdin.write(line)
         self.process.stdin.flush()
 
 
@@ -67,6 +69,8 @@ class AsyncStreamWatcher(threading.Thread):
             if self.proc.poll() is not None:
                 break
             if line:
-                asyncio.run_coroutine_threadsafe(self.on_out(line.decode()), self.loop)
+                # line = "".join(chr(x) for x in line)
+                line = line.decode(locale.getpreferredencoding())
+                asyncio.run_coroutine_threadsafe(self.on_out(line), self.loop)
         if self.on_close is not None:
             asyncio.run_coroutine_threadsafe(self.on_close(), self.loop)

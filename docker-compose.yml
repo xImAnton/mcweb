@@ -12,6 +12,8 @@ services:
     secrets:
       - mongo_root_password
       - mongo_root_user
+    ports:
+      - "5002:27017"
   client-server:
     image: mcweb-client
     container_name: mcweb-client-server

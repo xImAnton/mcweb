@@ -18,5 +18,10 @@ COPY . .
 
 RUN pip3 install -r requirements.txt
 
+# set uncoding to utf-8
+ENV LC_ALL=en_US.utf8
+ENV export LANG="$LC_ALL"
+ENV PYTHONIOENCODING=utf8
+
 EXPOSE $BACKEND_PORT
 CMD ["python3", "./run.py"]
