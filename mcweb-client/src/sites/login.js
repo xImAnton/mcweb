@@ -3,15 +3,18 @@ import { login, getLogin, setTitle } from "../services";
 import LoadingAnimation from "../component/loading/loading";
 import { Redirect } from "react-router-dom";
 import styles from "./login.module.css";
+import { useAlert } from "react-alert";
 
 
-function LoginView({setSessionId, alert}) {
+function LoginView({setSessionId}) {
 
     const [currentUsername, setCurrentUsername] = useState(""); // current entered username
     const [currentPassword, setCurrentPassword] = useState(""); // current entered password
     const [loading, setLoading] = useState(true); // whether the app is trying to connect to backend, display loading animation
     const [loggingIn, setLoggingIn] = useState(false); // whether the app is currently trying to log in, displays logging in animation
     const [loggedIn, setLoggedIn] = useState(false);
+
+    const alert = useAlert();
 
     const ummounted = useRef(false);
 

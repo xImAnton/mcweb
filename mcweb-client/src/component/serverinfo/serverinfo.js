@@ -5,6 +5,7 @@ import styles from "./serverinfo.module.css";
 import Button from "../ui/button/button";
 import uistyles from "../ui/ui.module.css";
 import CopyField from "../ui/copy/copy";
+import { useAlert } from "react-alert";
 
 
 function ToggleServerButton({server, onClick}) {
@@ -60,7 +61,9 @@ function ServerStatus({status}) {
     return <div className={[uistyles.ui, styles.serverstatus, styles[serverStatus]].join(" ")}></div>;
 }
 
-function ServerInfo({changeServer, currentServer, setConsoleLines, alert, setCreationCancellable, servers, publicIP, closeNavbar, responsive}) {
+function ServerInfo({changeServer, currentServer, setConsoleLines, setCreationCancellable, servers, publicIP, closeNavbar, responsive}) {
+
+    const alert = useAlert();
 
     function toggleCurrentServer() {
         // start/ stop current server

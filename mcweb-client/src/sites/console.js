@@ -5,15 +5,18 @@ import Input from "../component/ui/input/text";
 import Button from "../component/ui/button/button";
 import styles from "./console.module.css";
 import uistyles from "../component/ui/ui.module.css";
+import { useAlert } from "react-alert";
+
 
 /**
  * Input field and button of console
  */
-function ConsoleInput({currentServer, alert, toggleAutoscroll, autoscroll}) {
+function ConsoleInput({currentServer, toggleAutoscroll, autoscroll}) {
 
     const [text, setText] = useState("");
     // keep ref to input to clear value on submit
     const inputRef = useRef(null);
+    const alert = useAlert();
 
     // called when send button clicked
     async function submitCommand() {
@@ -67,9 +70,11 @@ function ConsoleOutput({lines, autoscroll}) {
 /**
  * Console Page of Webinterface
  */
-function ConsoleView({lines, currentServer, getSessionId, alert}) {
+function ConsoleView({lines, currentServer, getSessionId}) {
 
     const [autoscroll, setAutoscroll] = useState(true);
+
+    const alert = useAlert();
 
     useEffect(() => {
         setTitle("Console");
@@ -78,7 +83,7 @@ function ConsoleView({lines, currentServer, getSessionId, alert}) {
     return  <Site name="Console">
                 <div className={styles.wrapper}>
                     <ConsoleOutput lines={lines} autoscroll={autoscroll} />
-                    <ConsoleInput currentServer={currentServer} getSessionId={getSessionId} alert={alert} toggleAutoscroll={() => setAutoscroll(!autoscroll)} autoscroll={autoscroll} />
+                    <ConsoleInput currentServer={currentServer} getSessionId={getSessionId} toggleAutoscroll={() => setAutoscroll(!autoscroll)} autoscroll={autoscroll} />
                 </div>
             </Site>
 }

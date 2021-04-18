@@ -75,7 +75,7 @@ export default function AppContainer({
                 <Switch history={history} >
                     <Route path="/login">
                         {/*Display LoginView when path is login*/}
-                        <LoginView setSessionId={setSessionId} logout={logoutAndAlert} alert={alert} />
+                        <LoginView setSessionId={setSessionId} logout={logoutAndAlert} />
                     </Route>
                     <Route path="/">
                         <Header responsive={responsive} toggleNavbar={toggleNavbar} fullPage={fullPage} />
@@ -94,7 +94,6 @@ export default function AppContainer({
                                         addFirstServer={addFirstServer}
                                         maxRam={config.maxRam}
                                         javaVersions={config.javaVersions}
-                                        alert={alert}
                                     />
                                 </div>
                             </Route>
@@ -108,7 +107,6 @@ export default function AppContainer({
                                     sessionId={() => sid}
                                     setConsoleLines={setConsoleLines}
                                     setCreationCancellable={setServerCreationCancellable}
-                                    alert={alert}
                                     publicIP={config.publicIP}
                                     closeNavbar={() => openNavbar(false)}
                                     responsive={responsive}
@@ -124,13 +122,13 @@ export default function AppContainer({
                                                 <PlayerView currentServer={currentServer} />
                                             </Route>
                                             <Route path="/console">
-                                                <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} alert={alert} />
+                                                <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} />
                                             </Route>
                                             <Route path="/backups">
                                                 <BackupsView currentServer={currentServer} />
                                             </Route>
                                             <Route path="/settings">
-                                                <SettingsView currentServer={currentServer} javaVersions={config.javaVersions} maxRam={config.maxRam} alert={alert} />
+                                                <SettingsView currentServer={currentServer} javaVersions={config.javaVersions} maxRam={config.maxRam} />
                                             </Route>
                                             { currentServer.supports.mods &&
                                                 <Route path="/mods">

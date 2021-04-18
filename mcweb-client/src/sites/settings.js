@@ -7,9 +7,10 @@ import Site from "./site";
 import Input from "../component/ui/input/text";
 import Button from "../component/ui/button/button";
 import { CustomPopup } from "../component/ui/infobox/infobox";
+import { useAlert } from "react-alert";
 
 
-function SettingsView({currentServer, javaVersions, maxRam, alert}) {
+function SettingsView({currentServer, javaVersions, maxRam}) {
 
     const [currentName, setName] = useState("");
     const [currentPort, setPort] = useState(25565);
@@ -17,6 +18,8 @@ function SettingsView({currentServer, javaVersions, maxRam, alert}) {
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
     const [loadingText, setLoadingText] = useState("");
     const [confirmServerDeletion, setConfirmServerDeletion] = useState(false);
+
+    const alert = useAlert();
 
     useEffect(() => {
         setTitle("Settings");
