@@ -6,11 +6,16 @@ import Button from "../button/button";
 function ExpandableFormLine({children, name}) {
     const [expanded, setExpanded] = useState(false);
 
+    const expandButtonLine = (<MergedFormLine>
+                                  <Button onClick={() => setExpanded(!expanded)}>{(expanded ? "Hide " : "Show ") + name}</Button>
+                              </MergedFormLine>)
+
     return  <>
-                <MergedFormLine>
-                    <Button onClick={() => setExpanded(!expanded)}>{(expanded ? "Hide " : "Show ") + name}</Button>
-                </MergedFormLine>
-                { expanded && <>{children}</>}
+                { !expanded && expandButtonLine }
+                { expanded && <>
+                    {children}
+                    {expandButtonLine}
+                </>}
             </>
 }
 
