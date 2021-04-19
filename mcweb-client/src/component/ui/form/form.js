@@ -11,11 +11,8 @@ function ExpandableFormLine({children, name}) {
                               </MergedFormLine>)
 
     return  <>
-                { !expanded && expandButtonLine }
-                { expanded && <>
-                    {children}
-                    {expandButtonLine}
-                </>}
+                { expanded && children }
+                { expandButtonLine }
             </>
 }
 
