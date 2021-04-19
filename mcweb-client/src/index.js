@@ -6,6 +6,7 @@ import history from "./history";
 import AppContainer from "./appcontainer";
 import { transitions, positions, Provider as AlertProvider } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
+import { DesignProvider } from "./ctx/design";
 
 import "./variables.css";
 
@@ -23,10 +24,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        let darkmode = (localStorage.getItem("MCWeb_Darkmode") === "true"); // set darkmode to setting, when defined in localStorage
-
         this.state = {
-            darkmode: darkmode, // whether the app is display in darkmode
             user: null,
             servers: [],
             consoleLines: [],
@@ -274,8 +272,6 @@ class App extends React.Component {
                         setConsoleLines={(a) => this.setState({consoleLines: a})}
                         setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
                         consoleLines={this.state.consoleLines}
-                        darkmode={this.state.darkmode}
-                        setDarkMode={(v) => this.setState({darkmode: v})}
                         setServerCreationCancellable={(v) => this.setState({serverCreationCancellable: v})}
                         />
                 </div>
@@ -285,7 +281,9 @@ class App extends React.Component {
 ReactDOM.render(
     <Router history={history}>
         <AlertProvider template={AlertTemplate} {...alertOptions}>
-            <App />
+            <DesignProvider>
+                <App />
+            </DesignProvider>
         </AlertProvider>
     </Router>,
 document.getElementById("root"));
