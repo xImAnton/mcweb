@@ -1,4 +1,3 @@
-import asyncio
 from time import strftime
 
 from sanic.blueprints import Blueprint
@@ -94,11 +93,15 @@ async def stop_server(req, i):
     """
     endpoint for stopping the specified server
     """
-    force = False
-    if "force" in req.args.keys():
-        force = bool(req.args["force"])
-    await req.ctx.server.stop(force)
-    return json_res({"success": "server stopped", "update": {"server": {"online_status": 3}}})
+    block = False
+    if "blockuntilstopped" in req.args.keys():
+        block = bool(req.args["blockuntilstopped"])
+    stop_event = await req.ctx.server.stop()
+    if stop_event is None:
+        return json_res({"error": "Error stopping server", "description": "", "status": 500}, status=500)
+    if block:
+        await stop_event.wait()
+    return json_res({"success": "server stopped", "update": {"server": {"online_status": 0 if block else 3}}})
 
 
 @server_blueprint.get("/<i:string>/restart")

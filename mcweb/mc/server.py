@@ -108,15 +108,14 @@ class MinecraftServer:
             await ConsoleMessagePacket("FileNotFoundError: " + str(e)).send(self.connections)
             await self.set_online_status(0)
 
-    async def stop(self, force=False) -> Optional[Event]:
+    async def stop(self) -> Optional[Event]:
         """
         stops the server
         check if server is running before calling
-        :param force: whether the process should be killed or the stop command should be executed
         :return:
         """
         if self.status == 0 or self.status == 3:
-            return
+            return None
         await self.send_command("stop")
         self._stop_event = Event()
         return self._stop_event
