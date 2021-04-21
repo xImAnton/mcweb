@@ -7,6 +7,8 @@ import Select from "../component/ui/select/select";
 import Button from "../component/ui/button/button";
 import Input from "../component/ui/input/text";
 import Site from "./site";
+import { useAlert } from "react-alert";
+
 
 
 /**
@@ -33,7 +35,7 @@ function CreateServerButton(props) {
 /**
  * Component for creating new servers
  */
-function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, javaVersions, alert}) {
+function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, javaVersions}) {
     const [versions, setVersions] = useState({}); // all possible versions for current server
     const [currentSoftware, setCurrentSoftware] = useState(""); // current software name
     const [currentMinor, setCurrentMinor] = useState(""); // current minor software version
@@ -44,6 +46,8 @@ function CreateServerView({addFirstServer, cancellable, changeServer, maxRam, ja
     const [versionsLoaded, setVersionsLoaded] = useState(false); // whether the versions are fetched and ready to display, displays "Loading Versions" when false
     const [currentPort, setCurrentPort] = useRestrictedState(25565, (p) => p <= 30000 && p >= 25000, () => {}); // current entered ram
     const [currentJavaVersion, setCurrentJavaVersion] = useState("");
+
+    const alert = useAlert();
 
     useEffect(() => {
         if (javaVersions) {

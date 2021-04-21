@@ -4,8 +4,9 @@ import { Router } from "react-router-dom";
 import { fetchAllServers, fetchServer, fetchUser, getConsoleTicket, logoutUser, fetchConfig } from "./services";
 import history from "./history";
 import AppContainer from "./appcontainer";
-import { transitions, positions, Provider as AlertProvider, useAlert } from 'react-alert';
+import { transitions, positions, Provider as AlertProvider } from 'react-alert';
 import AlertTemplate from 'react-alert-template-basic';
+import { DesignProvider } from "./ctx/design";
 
 import "./variables.css";
 
@@ -23,10 +24,7 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        let darkmode = (localStorage.getItem("MCWeb_Darkmode") === "true"); // set darkmode to setting, when defined in localStorage
-
         this.state = {
-            darkmode: darkmode, // whether the app is display in darkmode
             user: null,
             servers: [],
             consoleLines: [],
@@ -257,35 +255,35 @@ class App extends React.Component {
 
     render() {
         const sid = this.getSessionId();
-        return  <AlertProvider template={AlertTemplate} {...alertOptions}>
-                    <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
-                        <AppContainer
-                            sid={sid} 
-                            setSessionId={(i) => this.setSessionId(i)}
-                            logout={() => this.logout()}
-                            refetch={() => this.refetch()}
-                            config={this.state.config}
-                            serverCreationCancellable={this.state.serverCreationCancellable}
-                            changeServer={(i) => this.changeServer(i)}
-                            addFirstServer={(s) => this.addFirstServer(s)}
-                            missingFetches={this.state.missingFetches}
-                            user={this.state.user}
-                            currentServer={this.state.currentServer}
-                            servers={this.state.servers}
-                            setConsoleLines={(a) => this.setState({consoleLines: a})}
-                            setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
-                            consoleLines={this.state.consoleLines}
-                            darkmode={this.state.darkmode}
-                            setDarkMode={(v) => this.setState({darkmode: v})}
-                            setServerCreationCancellable={(v) => this.setState({serverCreationCancellable: v})}
-                            />
-                    </div>
-                </AlertProvider>
+        return  <div id="app" className={this.state.darkmode ? "darkmode" : "brightmode"}>
+                    <AppContainer
+                        sid={sid} 
+                        setSessionId={(i) => this.setSessionId(i)}
+                        logout={() => this.logout()}
+                        refetch={() => this.refetch()}
+                        config={this.state.config}
+                        serverCreationCancellable={this.state.serverCreationCancellable}
+                        changeServer={(i) => this.changeServer(i)}
+                        addFirstServer={(s) => this.addFirstServer(s)}
+                        missingFetches={this.state.missingFetches}
+                        user={this.state.user}
+                        currentServer={this.state.currentServer}
+                        servers={this.state.servers}
+                        setConsoleLines={(a) => this.setState({consoleLines: a})}
+                        setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
+                        consoleLines={this.state.consoleLines}
+                        setServerCreationCancellable={(v) => this.setState({serverCreationCancellable: v})}
+                        />
+                </div>
     }
 }
 
 ReactDOM.render(
     <Router history={history}>
-        <App />
+        <AlertProvider template={AlertTemplate} {...alertOptions}>
+            <DesignProvider>
+                <App />
+            </DesignProvider>
+        </AlertProvider>
     </Router>,
 document.getElementById("root"));

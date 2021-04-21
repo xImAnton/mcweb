@@ -18,10 +18,8 @@ import Footer from "./component/footer/footer";
 import LoginView from "./sites/login";
 import history from "./history";
 import styles from "./index.module.css";
-import { useMediaQuery } from "react-responsive";
-import { useState } from "react";
 import { useAlert } from 'react-alert';
-import { useLocation } from "react-router-dom"
+import { useDesign } from "./ctx/design";
 
 
 export default function AppContainer({
@@ -39,23 +37,14 @@ export default function AppContainer({
     servers,
     setConsoleLines,
     consoleLines,
-    setDarkMode,
-    darkmode,
     setServerCreationCancellable}) {
-    
-    const responsive = useMediaQuery({query: "(max-width: 700px)"});
 
-    const [navbarOpened, openNavbar] = useState(false);
-
-    const renderContent = !(responsive && navbarOpened);
-    const renderSidebar = !(responsive && !navbarOpened);
+    const design = useDesign();
 
     const alert = useAlert();
-    const location = useLocation();
-    const fullPage = ["/createserver", "/apierror"].includes(location.pathname);
 
     const classes = [styles.gridcontainer];
-    if (navbarOpened && responsive && !fullPage) {
+    if (design.navbarShown && design.isResponsive && !design.isFullPage) {
         classes.push(styles.navopen);
     }
 
@@ -65,102 +54,89 @@ export default function AppContainer({
         );
     }
 
-    function toggleNavbar() {
-        if (!fullPage) {
-            openNavbar(!navbarOpened);
-        }
-    }
-
-    return  <div className={classes.join(" ")}>
-                <Switch history={history} >
-                    <Route path="/login">
-                        {/*Display LoginView when path is login*/}
-                        <LoginView setSessionId={setSessionId} logout={logoutAndAlert} alert={alert} />
-                    </Route>
-                    <Route path="/">
-                        <Header responsive={responsive} toggleNavbar={toggleNavbar} fullPage={fullPage} />
-                        <Switch history={history} >
-                            <Route path="/apierror">
-                                {/*display backend error*/}
-                                <NoBackend refetch={refetch} />
-                            </Route>
-                            {/*redirect to login when no session id present, down here bc apierror has higher priority*/}
-                            {!sid && <Redirect to="/login" />}
-                            <Route path="/createserver">
-                                <div className={[styles.contentwrapper, styles.full].join(" ")}>
-                                    <CreateServerView 
-                                        cancellable={serverCreationCancellable}
+    return  <div id="app" className={design.isDarkmode ? "darkmode" : "brightmode"}>
+                <div className={classes.join(" ")}>
+                    <Switch history={history} >
+                        <Route path="/login">
+                            {/*Display LoginView when path is login*/}
+                            <LoginView setSessionId={setSessionId} logout={logoutAndAlert} />
+                        </Route>
+                        <Route path="/">
+                            <Header />
+                            <Switch history={history} >
+                                <Route path="/apierror">
+                                    {/*display backend error*/}
+                                    <NoBackend refetch={refetch} />
+                                </Route>
+                                {/*redirect to login when no session id present, down here bc apierror has higher priority*/}
+                                {!sid && <Redirect to="/login" />}
+                                <Route path="/createserver">
+                                    <div className={[styles.contentwrapper, styles.full].join(" ")}>
+                                        <CreateServerView 
+                                            cancellable={serverCreationCancellable}
+                                            changeServer={changeServer}
+                                            addFirstServer={addFirstServer}
+                                            maxRam={config.maxRam}
+                                            javaVersions={config.javaVersions}
+                                        />
+                                    </div>
+                                </Route>
+                                <Route path="/">
+                                    {/*display app when no fetches are missing*/}
+                                    <>{ missingFetches <= 0 && user ? (<>
+                                    { design.renderSidebar && <ServerInfo
+                                        servers={servers}
+                                        currentServer={currentServer}
                                         changeServer={changeServer}
-                                        addFirstServer={addFirstServer}
-                                        maxRam={config.maxRam}
-                                        javaVersions={config.javaVersions}
-                                        alert={alert}
-                                    />
-                                </div>
-                            </Route>
-                            <Route path="/">
-                                {/*display app when no fetches are missing*/}
-                                <>{ missingFetches <= 0 && user ? (<>
-                                { renderSidebar && <ServerInfo
-                                    servers={servers}
-                                    currentServer={currentServer}
-                                    changeServer={changeServer}
-                                    sessionId={() => sid}
-                                    setConsoleLines={setConsoleLines}
-                                    setCreationCancellable={setServerCreationCancellable}
-                                    alert={alert}
-                                    publicIP={config.publicIP}
-                                    closeNavbar={() => openNavbar(false)}
-                                    responsive={responsive}
-                                />}
-                                { renderSidebar && <NavBar logout={logoutAndAlert} username={user.username} currentServer={currentServer} responsive={responsive} closeNavbar={() => openNavbar(false)} setCreationCancellable={setServerCreationCancellable} /> }
-                                { renderContent && <div className={styles.contentwrapper}>
-                                    {currentServer && 
-                                        <Switch history={history} >
-                                            <Route path="/general">
-                                                <GeneralView currentServer={currentServer} />
-                                            </Route>
-                                            <Route path="/player">
-                                                <PlayerView currentServer={currentServer} />
-                                            </Route>
-                                            <Route path="/console">
-                                                <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} alert={alert} />
-                                            </Route>
-                                            <Route path="/backups">
-                                                <BackupsView currentServer={currentServer} />
-                                            </Route>
-                                            <Route path="/settings">
-                                                <SettingsView currentServer={currentServer} javaVersions={config.javaVersions} maxRam={config.maxRam} alert={alert} />
-                                            </Route>
-                                            { currentServer.supports.mods &&
-                                                <Route path="/mods">
-                                                    <ModView currentServer={currentServer} />
+                                        sessionId={() => sid}
+                                        setConsoleLines={setConsoleLines}
+                                        publicIP={config.publicIP}
+                                    />}
+                                    { design.renderSidebar && <NavBar logout={logoutAndAlert} username={user.username} currentServer={currentServer} setCreationCancellable={setServerCreationCancellable} /> }
+                                    { design.renderContent && <div className={styles.contentwrapper}>
+                                        {currentServer && 
+                                            <Switch history={history} >
+                                                <Route path="/general">
+                                                    <GeneralView currentServer={currentServer} />
                                                 </Route>
-                                            }
-                                            <Route path="/worlds">
-                                                <WorldsView currentServer={currentServer} />
-                                            </Route>
-                                            <Route path="/dsm">
-                                                <DSMView currentServer={currentServer} />
-                                            </Route>
-                                            <Route path="/user">
-                                                <UserView currentServer={currentServer} />
-                                            </Route>
-                                            <Route path="/">
-                                                <Redirect to="/general" />
-                                            </Route>
-                                        </Switch>
-                                    }
-                                {/*display LoadingAnimation when fetches are missing*/}
-                                </div>}</>) : (<LoadingAnimation loadingText="Loading Server Information" />)}</>
-                            </Route>
-                        </Switch>
-                        <Footer toggleDarkMode={() => {
-                            let dm = !darkmode;
-                            setDarkMode(dm);
-                            localStorage.setItem("MCWeb_Darkmode", dm);
-                        }} darkmode={darkmode} />
-                    </Route>
-                </Switch>
+                                                <Route path="/player">
+                                                    <PlayerView currentServer={currentServer} />
+                                                </Route>
+                                                <Route path="/console">
+                                                    <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} />
+                                                </Route>
+                                                <Route path="/backups">
+                                                    <BackupsView currentServer={currentServer} />
+                                                </Route>
+                                                <Route path="/settings">
+                                                    <SettingsView currentServer={currentServer} javaVersions={config.javaVersions} maxRam={config.maxRam} />
+                                                </Route>
+                                                { currentServer.supports.mods &&
+                                                    <Route path="/mods">
+                                                        <ModView currentServer={currentServer} />
+                                                    </Route>
+                                                }
+                                                <Route path="/worlds">
+                                                    <WorldsView currentServer={currentServer} />
+                                                </Route>
+                                                <Route path="/dsm">
+                                                    <DSMView currentServer={currentServer} />
+                                                </Route>
+                                                <Route path="/user">
+                                                    <UserView currentServer={currentServer} />
+                                                </Route>
+                                                <Route path="/">
+                                                    <Redirect to="/general" />
+                                                </Route>
+                                            </Switch>
+                                        }
+                                    {/*display LoadingAnimation when fetches are missing*/}
+                                    </div>}</>) : (<LoadingAnimation loadingText="Loading Server Information" />)}</>
+                                </Route>
+                            </Switch>
+                            <Footer />
+                        </Route>
+                    </Switch>
+                </div>
             </div>
 }

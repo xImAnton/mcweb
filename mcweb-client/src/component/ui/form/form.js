@@ -7,20 +7,20 @@ function ExpandableFormLine({children, name}) {
     const [expanded, setExpanded] = useState(false);
 
     return  <>
+                { expanded && children }
                 <MergedFormLine>
                     <Button onClick={() => setExpanded(!expanded)}>{(expanded ? "Hide " : "Show ") + name}</Button>
                 </MergedFormLine>
-                { expanded && <>{children}</>}
             </>
 }
 
 
 function MergedFormLine({children}) {
-    return <tr>
-        <td colSpan={2} className={[styles.value, styles.lastline].join(" ")}>
-            {children}
-        </td>
-    </tr>
+    return  <tr>
+                <td colSpan={2} className={[styles.value, styles.lastline].join(" ")}>
+                    {children}
+                </td>
+            </tr>
 }
 
 
