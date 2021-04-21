@@ -7,7 +7,7 @@ from asyncio import Event
 from ..io.config import Config
 from ..io.regexes import Regexes
 from ..io.wsmanager import WebsocketConnectionManager
-from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket, BulkConsoleMessagePacket
+from ..io.wspackets import StateChangePacket, ConsoleMessagePacket, AddonUpdatePacket
 from ..mc.communication import ServerCommunication
 
 
@@ -99,13 +99,13 @@ class MinecraftServer:
         self.communication = ServerCommunication(self.mc.loop, await self.generate_command(), self.on_output, self.on_output, self.on_stop, cwd=self.run_dir, shell=Config.get_docker_secret("mongo_user") is not None)
         self.output = []
         # Clear console on all clients
-        await BulkConsoleMessagePacket([], True).send(self.connections)
+        await StateChangePacket(consoleOut=[]).send(self.connections)
         await self.set_online_status(1)
         try:
             await self.communication.begin()
-        except FileNotFoundError as e:
+        except Exception as e:
             print("Couldn't find Start Command")
-            await ConsoleMessagePacket("FileNotFoundError: " + str(e)).send(self.connections)
+            await ConsoleMessagePacket("Error: " + str(e)).send(self.connections)
             await self.set_online_status(0)
 
     async def stop(self) -> Optional[Event]:
@@ -174,7 +174,8 @@ class MinecraftServer:
             "supports": Config.VERSIONS[self.software["server"]]["supports"],
             "addons": self.addons,
             "javaVersion": self.java_version,
-            "full": True
+            "consoleOut": self.output,
+            "full": True,
         }
 
     async def get_version_provider(self):

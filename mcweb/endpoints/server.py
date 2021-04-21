@@ -6,7 +6,7 @@ from websockets.exceptions import ConnectionClosed
 
 from mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, \
     console_ws, catch_keyerrors
-from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket, BulkConsoleMessagePacket
+from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket
 from ..mc.server import MinecraftServer
 from ..util import TempDir
 
@@ -61,7 +61,6 @@ async def console_websocket(req, ws, i):
         return
     await req.ctx.server.connections.connected(ws, req.ctx.ticket, req.ctx.user)
     await ConsoleConnectedPacket().send(ws)
-    await BulkConsoleMessagePacket(req.ctx.server.output).send(ws)
     try:
         while True:
             await ws.recv()
@@ -93,9 +92,7 @@ async def stop_server(req, i):
     """
     endpoint for stopping the specified server
     """
-    block = False
-    if "blockuntilstopped" in req.args.keys():
-        block = bool(req.args["blockuntilstopped"])
+    block = req.args.get("blockuntilstopped")
     stop_event = await req.ctx.server.stop()
     if stop_event is None:
         return json_res({"error": "Error stopping server", "description": "", "status": 500}, status=500)

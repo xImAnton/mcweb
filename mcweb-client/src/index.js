@@ -27,7 +27,6 @@ class App extends React.Component {
         this.state = {
             user: null,
             servers: [],
-            consoleLines: [],
             currentServer: null,
             serverCreationCancellable: true,
             missingFetches: 0, // how many fetches are missing, when greater 0, displays loading animation
@@ -45,6 +44,12 @@ class App extends React.Component {
 
     getSessionId() {
         return sessionStorage.getItem("MCWeb_Session");
+    }
+
+    setConsoleMessages(a) {
+        const srv = Object.assign({}, this.state.currentServer);
+        srv.consoleOut = a;
+        this.setState({currentServer: srv});
     }
 
     /**
@@ -66,19 +71,9 @@ class App extends React.Component {
         } else
         if (data.packetType === "ConsoleMessagePacket") {
             // add message to console
-            const consoleMessages = this.state.consoleLines.slice();
-            consoleMessages.push(data.data.message);
-            this.setState({consoleLines: consoleMessages});
-        } else
-        if (data.packetType === "BulkConsoleMessagePacket") {
-            // add several messages to console
-            if (data.data.reset) {
-                this.setState({consoleLines: data.data.lines});
-            } else {
-                let consoleMessages = this.state.consoleLines.slice();
-                consoleMessages = consoleMessages.concat(data.data.lines);
-                this.setState({consoleLines: consoleMessages});
-            }
+            let nm = this.state.currentServer.consoleOut.slice();
+            nm.push(data.data.message);
+            this.setConsoleMessages(nm);
         } else
         if (data.packetType === "ServerCreationPacket") {
             this.addNewServer(data.data.server);
@@ -137,7 +132,7 @@ class App extends React.Component {
             this.serverSocket.close();
         }
         // clear console lines --> new server
-        this.setState({consoleLines: []});
+        this.setConsoleMessages([]);
         // open ws
         this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + serverId + "/console?ticket=" + ticket);
         // set handler
@@ -269,9 +264,8 @@ class App extends React.Component {
                         user={this.state.user}
                         currentServer={this.state.currentServer}
                         servers={this.state.servers}
-                        setConsoleLines={(a) => this.setState({consoleLines: a})}
+                        setConsoleLines={(a) => this.setConsoleMessages(a)}
                         setCreationCancellable={(b) => this.setState({serverCreationCancellable: b})}
-                        consoleLines={this.state.consoleLines}
                         setServerCreationCancellable={(v) => this.setState({serverCreationCancellable: v})}
                         />
                 </div>

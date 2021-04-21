@@ -36,7 +36,6 @@ export default function AppContainer({
     currentServer,
     servers,
     setConsoleLines,
-    consoleLines,
     setServerCreationCancellable}) {
 
     const design = useDesign();
@@ -103,7 +102,7 @@ export default function AppContainer({
                                                     <PlayerView currentServer={currentServer} />
                                                 </Route>
                                                 <Route path="/console">
-                                                    <ConsoleView lines={consoleLines} currentServer={currentServer} getSessionId={() => sid} />
+                                                    <ConsoleView currentServer={currentServer} getSessionId={() => sid} />
                                                 </Route>
                                                 <Route path="/backups">
                                                     <BackupsView currentServer={currentServer} />

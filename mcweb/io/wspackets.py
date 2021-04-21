@@ -65,17 +65,6 @@ class AddonUpdatePacket(ServerWebSocketPacket):
         self.json["data"] = addon_data
 
 
-class BulkConsoleMessagePacket(ServerWebSocketPacket):
-    PACKET_TYPE = "BulkConsoleMessagePacket"
-
-    def __init__(self, msgs, reset=True):
-        super(BulkConsoleMessagePacket, self).__init__()
-        self.json["data"] = {
-            "lines": msgs,
-            "reset": reset
-        }
-
-
 class PermissionErrorPacket(ServerWebSocketPacket):
     PACKET_TYPE = "PermissionErrorPacket"
 

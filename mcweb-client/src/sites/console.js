@@ -62,7 +62,7 @@ function ConsoleOutput({lines, autoscroll}) {
     useEffect(() => {
         updateScroll();
     }, [lines, autoscroll]);
-
+    console.log(lines);
     return <textarea className={[uistyles.ui, styles.out].join(" ")} readOnly value={lines.length === 0 ? "Start your Server to see its Output" : lines.map((l) => l.trim()).join("\n")} ref={textRef} />
 
 }
@@ -70,7 +70,7 @@ function ConsoleOutput({lines, autoscroll}) {
 /**
  * Console Page of Webinterface
  */
-function ConsoleView({lines, currentServer, getSessionId}) {
+function ConsoleView({currentServer, getSessionId}) {
 
     const [autoscroll, setAutoscroll] = useState(true);
 
@@ -82,7 +82,7 @@ function ConsoleView({lines, currentServer, getSessionId}) {
 
     return  <Site name="Console">
                 <div className={styles.wrapper}>
-                    <ConsoleOutput lines={lines} autoscroll={autoscroll} />
+                    <ConsoleOutput lines={currentServer.consoleOut} autoscroll={autoscroll} />
                     <ConsoleInput currentServer={currentServer} getSessionId={getSessionId} toggleAutoscroll={() => setAutoscroll(!autoscroll)} autoscroll={autoscroll} />
                 </div>
             </Site>

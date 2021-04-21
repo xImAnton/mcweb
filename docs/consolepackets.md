@@ -80,20 +80,6 @@ sent when an addon gets added or removed to this server
 }
 ```
 
-## BulkConsoleMessagePacket
-
-Sent on WS Connect and has all previous console lines as payload
-
-```json
-{
-    "packetType": "BulkConsoleMessagePacket",
-    "data": {
-        "lines": ["lines", "to", "show"],
-        "reset": true
-    }
-}
-```
-
 ## PermissionErrorPacket
 
 Sent when something is requested via websocket and the user is not permitted to do that.  
