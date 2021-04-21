@@ -47,9 +47,12 @@ class App extends React.Component {
     }
 
     setConsoleMessages(a) {
-        const srv = Object.assign({}, this.state.currentServer);
-        srv.consoleOut = a;
-        this.setState({currentServer: srv});
+        this.setState({servers: this.state.servers.slice().map(x => {
+            if (x.id === this.state.currentServer.id) {
+                this.setState({currentServer: Object.assign(x, {consoleOut: a})});
+            }
+            return x;
+        })});
     }
 
     /**
@@ -63,7 +66,6 @@ class App extends React.Component {
             // update state of current server
             this.setState({servers: this.state.servers.slice().map(x => {
                 if (x.id === this.state.currentServer.id) {
-                    Object.assign(x, data.update.server);
                     this.setState({currentServer: Object.assign(x, data.update.server)});
                 }
                 return x;
@@ -131,8 +133,6 @@ class App extends React.Component {
         if (this.serverSocket) {
             this.serverSocket.close();
         }
-        // clear console lines --> new server
-        this.setConsoleMessages([]);
         // open ws
         this.serverSocket = new WebSocket("ws://" + window.location.host + "/api/server/" + serverId + "/console?ticket=" + ticket);
         // set handler

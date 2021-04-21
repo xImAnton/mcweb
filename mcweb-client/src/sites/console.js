@@ -62,7 +62,6 @@ function ConsoleOutput({lines, autoscroll}) {
     useEffect(() => {
         updateScroll();
     }, [lines, autoscroll]);
-    console.log(lines);
     return <textarea className={[uistyles.ui, styles.out].join(" ")} readOnly value={lines.length === 0 ? "Start your Server to see its Output" : lines.map((l) => l.trim()).join("\n")} ref={textRef} />
 
 }
