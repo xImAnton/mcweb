@@ -51,7 +51,7 @@ MCWEB_PW_HASH=$($PYTHON_CMD -c "from argon2 import PasswordHasher; print(Passwor
 > mongodb/seed.js
 # write root user to seed.js
 echo "Writing Database Initialisation Script"
-echo -e "db.user.insertOne({\nname: '$MCWEB_ROOT_UN',\nemail: 'test@example.com',\npassword: '$MCWEB_PW_HASH',\npermissions: [],\nsalt: '$MCWEB_ROOT_SALT'});" >> ./mcweb-mongo/seed.js
+echo -e "db.user.insertOne({\nname: '$MCWEB_ROOT_UN',\nemail: 'test@example.com',\npassword: '$MCWEB_PW_HASH',\npermissions: [],\nsalt: '$MCWEB_ROOT_SALT'});" >> mongodb/seed.js
 
 # generate random password for mongodb
 echo "Generating MongoDB root password"
