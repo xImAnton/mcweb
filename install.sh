@@ -48,7 +48,7 @@ echo "Hashing Password using Argon2"
 MCWEB_PW_HASH=$($PYTHON_CMD -c "from argon2 import PasswordHasher; print(PasswordHasher().hash(b'$MCWEB_ROOT_SALT' + '$MCWEB_ROOT_PW_FIRST'.encode() + b'$MCWEB_PEPPER'))")
 
 # Clear seed.js
-> mcweb-mongo/seed.js
+> mongodb/seed.js
 # write root user to seed.js
 echo "Writing Database Initialisation Script"
 echo -e "db.user.insertOne({\nname: '$MCWEB_ROOT_UN',\nemail: 'test@example.com',\npassword: '$MCWEB_PW_HASH',\npermissions: [],\nsalt: '$MCWEB_ROOT_SALT'});" >> ./mcweb-mongo/seed.js
