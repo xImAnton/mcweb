@@ -13,6 +13,7 @@ services:
       - mongo_root_user
     ports:
       - "5002:27017"
+    hostname: mongo.mcweb
   client:
     image: mcweb/client
     environment:

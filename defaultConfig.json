@@ -44,7 +44,7 @@
   "pepper": "20 rndm pepper bytes",
   "maxRam": 6,
   "mongoDB": {
-    "host": "mcweb-mongodb",
+    "host": "mongo.mcweb",
     "port": 27017,
     "username": "admin",
     "password": "",
