@@ -20,7 +20,7 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - mcweb-backend
+      - server
   server:
     image: mcweb/server
     environment:
@@ -29,7 +29,7 @@ services:
     volumes:
       - mcweb-servers:/servers
     depends_on:
-      - mcweb-mongodb
+      - mongo
     secrets:
       - mongo_password
       - mongo_user
