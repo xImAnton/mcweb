@@ -1,3 +1,7 @@
+#!/bin/bash
+
+sudo -v
+
 if [ -z ${PYTHON_CMD+x}]
 then
   PYTHON_CMD=python3
@@ -74,7 +78,7 @@ echo -e -n "$MCWEB_MONGO_PW" >> secrets/mongo_root_password.txt
 echo -e -n "$MCWEB_PEPPER" >> secrets/pepper.txt
 
 # change access to secrets so that the container can access it without any permissions
-sudo chmod -R 777 ./secrets
+chmod -R 777 ./secrets
 
 echo "Do you want to remove previous MCWeb Data? [y/n]"
 read -r CLEAR_VOLUMES
@@ -83,8 +87,8 @@ if [ "$CLEAR_VOLUMES" == "y" ]
 then
   # clear previous mcweb data
   echo "Removing old Docker Volumes"
-  sudo docker volume rm mcweb-data
-  sudo docker volume rm mcweb-servers
+  docker volume rm mcweb-data
+  docker volume rm mcweb-servers
 fi
 
 # build containers
@@ -97,7 +101,7 @@ make client
 echo "Building Database"
 make mongo
 
-echo -e "Everything is set up! Run \"sudo docker-compose up -d\" to start MCWeb."
+echo -e "Everything is set up! Run \"docker-compose up -d\" to start MCWeb."
 
 MCWEB_ROOT_PW_FIRST=""
 MCWEB_ROOT_PW_SEC=""
