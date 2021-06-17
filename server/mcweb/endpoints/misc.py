@@ -1,6 +1,6 @@
 from sanic.blueprints import Blueprint
 
-from server.mcweb.util import requires_login, json_res
+from ..util import requires_login, json_res
 from ..io.config import Config
 
 misc_blueprint = Blueprint("misc")

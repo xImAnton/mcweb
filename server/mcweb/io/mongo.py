@@ -2,7 +2,7 @@ import urllib.parse
 
 import motor.motor_asyncio
 
-from server.mcweb.io.config import Config
+from ..io.config import Config
 
 
 class MongoClient(motor.motor_asyncio.AsyncIOMotorClient):

@@ -4,7 +4,7 @@ from sanic.blueprints import Blueprint
 from sanic.response import file
 from websockets.exceptions import ConnectionClosed
 
-from server.mcweb.util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, \
+from ..util import server_endpoint, requires_server_online, json_res, requires_post_params, requires_login, \
     console_ws, catch_keyerrors
 from ..io.wspackets import ConsoleInfoPacket, ConsoleConnectedPacket
 from ..mc.server import MinecraftServer
