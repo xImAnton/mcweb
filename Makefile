@@ -1,4 +1,4 @@
-.PHONY: server, client, docker
+.PHONY: server client docker
 
 server:
 	sudo docker build --tag mcweb/server ./server
