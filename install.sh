@@ -87,13 +87,15 @@ then
   sudo docker volume rm mcweb-servers
 fi
 
-# build container
+# build containers
 echo "Building Backend"
-sudo docker build --tag mcweb-backend .
+make server
+
 echo "Building Frontend"
-sudo docker build --tag mcweb-client mcweb-client
+make client
+
 echo "Building Database"
-sudo docker build --tag mcweb-mongo mcweb-mongo
+make mongo
 
 echo -e "Everything is set up! Run \"sudo docker-compose up -d\" to start MCWeb."
 

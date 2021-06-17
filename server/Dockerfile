@@ -14,13 +14,14 @@ RUN yum install python3 -y \
 && yum clean all \
 && rm -rf /var/cache/yum
 
+WORKDIR /app
 COPY . .
 
 RUN pip3 install -r requirements.txt
 
-# set uncoding to utf-8
+# set encoding to utf-8
 ENV LC_ALL=en_US.utf8
-ENV export LANG="$LC_ALL"
+ENV LANG="$LC_ALL"
 ENV PYTHONIOENCODING=utf8
 
 EXPOSE $BACKEND_PORT

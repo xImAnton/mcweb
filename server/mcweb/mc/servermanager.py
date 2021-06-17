@@ -5,7 +5,7 @@ import asyncio
 
 import aiofiles
 
-from mcweb.io.config import Config
+from server.mcweb.io.config import Config
 from .server import MinecraftServer
 from .versions.base import VersionProvider
 from .versions.manager import VersionManager

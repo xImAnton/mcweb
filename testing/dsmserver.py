@@ -1,4 +1,4 @@
-from mcweb.mc.dsm.dsm import DSMServer
+from server.mcweb.mc import DSMServer
 import asyncio
 
 

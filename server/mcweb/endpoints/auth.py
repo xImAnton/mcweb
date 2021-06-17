@@ -4,9 +4,9 @@ import time
 from bson.objectid import ObjectId
 from sanic.blueprints import Blueprint
 
-from mcweb.auth import User
-from mcweb.io.config import Config
-from mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
+from server.mcweb.auth import User
+from server.mcweb.io.config import Config
+from server.mcweb.util import json_res, requires_post_params, requires_login, catch_keyerrors
 
 account_blueprint = Blueprint("account", url_prefix="account")
 

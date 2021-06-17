@@ -1,8 +1,7 @@
 version: "3.9"
 services:
-  mcweb-mongodb:
-    image: mcweb-mongo
-    container_name: mcweb-mongodb
+  mongo:
+    image: mcweb/mongo
     environment:
       - MONGO_INITDB_ROOT_USERNAME_FILE=/run/secrets/mongo_root_user
       - MONGO_INITDB_ROOT_PASSWORD_FILE=/run/secrets/mongo_root_password
@@ -14,18 +13,16 @@ services:
       - mongo_root_user
     ports:
       - "5002:27017"
-  client-server:
-    image: mcweb-client
-    container_name: mcweb-client-server
+  client:
+    image: mcweb/client
     environment:
       - BACKEND_ADDRESS=mcweb-backend:5001
     ports:
       - "80:80"
     depends_on:
       - mcweb-backend
-  mcweb-backend:
-    image: mcweb-backend
-    container_name: mcweb-backend
+  server:
+    image: mcweb/server
     environment:
       - BACKEND_HOST=0.0.0.0
       - BACKEND_PORT=5001

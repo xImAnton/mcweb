@@ -1,4 +1,4 @@
-<img src="mcweb-client/public/logo_wide_bright.png" alt="Logo" style="zoom:10%;" />
+<img src="client/public/logo_wide_bright.png" alt="Logo" style="zoom:10%;" />
 
 ---
 # MCWeb - a Minecraft Server Web Interface

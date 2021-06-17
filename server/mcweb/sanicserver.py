@@ -7,8 +7,8 @@ from argon2 import PasswordHasher
 import pymongo.errors
 from sanic import Sanic
 
-from mcweb.auth import User, Session
-from mcweb.util import json_res
+from server.mcweb.auth import User, Session
+from server.mcweb.util import json_res
 from .endpoints.auth import account_blueprint
 from .endpoints.misc import misc_blueprint
 from .endpoints.server import server_blueprint

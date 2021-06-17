@@ -16,7 +16,7 @@ import aiohttp
 from bson.objectid import ObjectId
 from sanic.response import json, redirect
 
-from mcweb.auth import User
+from server.mcweb.auth import User
 
 
 def json_res(di, **kwargs):
