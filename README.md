@@ -1,3 +1,5 @@
+## Will be continued at [github.com/SemoxyMC](https://github.com/SemoxyMC)
+
 <img src="mcweb-client/public/logo_wide_bright.png" alt="Logo" style="zoom:10%;" />
 
 ---
