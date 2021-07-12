@@ -1,4 +1,4 @@
-## **Canceled here, continued as [Semoxy](https://github.com/SemoxyMC)**
+# **Canceled here, continued as [Semoxy](https://github.com/SemoxyMC)**
 
 <img src="mcweb-client/public/logo_wide_bright.png" alt="Logo" style="zoom:10%;" />
 
